@@ -1,0 +1,46 @@
+{
+  "name": "redux-api",
+  "version": "0.0.1",
+  "author": {
+    "name": "Efremov Alex",
+    "email": "lexich121@gmail.com",
+    "url": "https://github.com/lexich"
+  },
+  "main": "lib/index.js",
+  "description": "",
+  "repository": "http://github.com/lexich/redux-api",
+  "scripts": {
+    "test": "npm run eslint && npm run mocha",
+    "mocha": "npm run compile && npm run mocha-run",
+    "mocha-run": "istanbul test _mocha --report html -- test/*_spec.js --reporter spec",
+    "build": "npm run browser-dev && npm run browser-min && npm run compile",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "eslint": "node_modules/.bin/eslint src test",
+    "compile": "node_modules/.bin/babel src --out-dir lib",
+    "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
+    "browser-min": "NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
+    "precommit": "npm test && npm run compile",
+    "prepush": "npm test && npm run compile",
+    "postmerge": "npm install"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1"
+  },
+  "devDependencies": {
+    "babel": "^5.8.21",
+    "babel-eslint": "^3.0.1",
+    "babel-loader": "^5.3.2",
+    "chai": "^3.0.0",
+    "coveralls": "^2.11.2",
+    "eslint": "^0.24.1",
+    "eslint-config-airbnb": "0.0.6",
+    "husky": "^0.9.1",
+    "istanbul": "*",
+    "mocha": "^2.2.4",
+    "mocha-lcov-reporter": "0.0.2",
+    "webpack": "^1.11.0"
+  },
+  "engines": {
+    "node": ">=0.12.0"
+  }
+}
