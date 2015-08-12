@@ -17,7 +17,7 @@ with bower
 bower instal redux-api --save
 ```
 
-Redux-api recommend to use `fetch` API for rest requests backend.
+Redux-api recommends to use `fetch` API for rest requests backend.
 [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch) 
 
 For example used es7 javascript, [Redux@1.0.0-rc](https://github.com/gaearon/redux/tree/v1.0.0-rc), but it's pretty simple to migrate this code to [Redux@v0.12.0](https://github.com/gaearon/redux/tree/v0.12.0)
@@ -58,10 +58,11 @@ const reducer = combineReducers(rest.reducers);
 const store = createStoreWithMiddleware(reducer);
 
 @connect((state)=> ({ entry: state.entry, regions: state.regions }))
-class UserApp {
+class Application {
   static propTypes = {
     entry: PropTypes.object.isRequired,
-    regions: PropTypes.array.isRequired
+    regions: PropTypes.array.isRequired,
+    dispatch: PropTypes.func.isRequired
   }
   componentDidMount() {
     const {dispatch} = this.props;
@@ -86,7 +87,7 @@ class UserApp {
 
 React.render(
   <Provider store={store}>
-    { ()=> <UserApp /> }
+    { ()=> <Application /> }
   </Provider>,
   document.getElementById("content")
 );
