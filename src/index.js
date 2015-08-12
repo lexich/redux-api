@@ -29,6 +29,7 @@ const defaultEndpointConfig = {
 };
 
 let instanceCounter = 0;
+const PREFIX = "@@redux-api";
 /**
  * Entry api point
  * @param  {Object} Rest api configuration
@@ -44,8 +45,10 @@ let instanceCounter = 0;
  *          { title: "", message: "" } :
  *          { title: data.title, message: data.message },
  *       options: {
- *         "Accept": "application/json",
- *         "Content-Type": "application/json"
+ *         headers: {
+ *           "Accept": "application/json",
+ *           "Content-Type": "application/json"
+ *         }
  *       }
  *     }
  *   });
@@ -69,10 +72,10 @@ export default function reduxApi(config, fetch) {
     const {transformer, options} = opts;
     const initialState = { loading: false, data: transformer() };
     const ACTIONS = {
-      actionFetch: `$$_API_${counter}_${key}`,
-      actionSuccess: `$$_API_${counter}_${key}_success`,
-      actionFail: `$$_API_${counter}_${key}_fail`,
-      actionReset: `$$_API_${counter}_${key}_delete`
+      actionFetch: `${PREFIX}@${counter}@${key}`,
+      actionSuccess: `${PREFIX}@${counter}@${key}_success`,
+      actionFail: `${PREFIX}@${counter}@${key}_fail`,
+      actionReset: `${PREFIX}@${counter}@${key}_delete`
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, opts.fetch || fetch);

@@ -1,5 +1,5 @@
 "use strict";
-export default function reducerFn(initialState, actions, transformer=(d)=> d) {
+export default function reducerFn(initialState, actions={}, transformer=(d)=> d) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = actions;
   return (state=initialState, action)=> {
     switch (action.type) {

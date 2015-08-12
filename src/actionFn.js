@@ -1,6 +1,6 @@
 "use strict";
 import urlTransform from "./urlTransform";
-export function actionFn(url, name, options, ACTIONS, fetch) {
+export default function actionFn(url, name, options, ACTIONS={}, fetch) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = ACTIONS;
   const fn = (pathvars, params={})=> (dispatch, getState)=> {
     const state = getState();
