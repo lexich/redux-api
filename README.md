@@ -23,7 +23,7 @@ bower instal redux-api --save
 ```js
 import reduxApi, {transformers} from "redux-api";
 ```
-# reduxApi(options, fetch)
+#### reduxApi(options, fetch)
 - **options** - configuration rest-api endpoints
 > *type*: Object
 > *return*: {reducers, actions} - `reducers` have to as parameter to `createStore` (see example section). actions (see `actions` section)
@@ -57,7 +57,7 @@ import reduxApi, {transformers} from "redux-api";
   > *example*: It's a good idea to write custom transformer
     for example you have responce
     ```json
-    { "title": "Hello", message: "World" } 
+    { "title": "Hello", "message": "World" } 
     ```
     Custom transformer
     ```js
