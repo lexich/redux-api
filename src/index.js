@@ -35,7 +35,6 @@ export const transformers = {
  * @type {Object}
  */
 const defaultEndpointConfig = {
-  action: "get",
   transformer: transformers.object
 };
 
@@ -51,11 +50,12 @@ const PREFIX = "@@redux-api";
  *     testItem: "/plain/url/:id",
  *     testModify: {
  *       url: "/plain/url/:endpoint",
- *       action: "post",
+
  *       transformer: (data)=> !data ?
  *          { title: "", message: "" } :
  *          { title: data.title, message: data.message },
  *       options: {
+ *         method: "post"
  *         headers: {
  *           "Accept": "application/json",
  *           "Content-Type": "application/json"

@@ -17,8 +17,113 @@ with bower
 bower instal redux-api --save
 ```
 
-Redux-api recommends to use `fetch` API for rest requests backend.
-[whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch) 
+=======
+## Documentation
+
+```js
+import reduxApi, {transformers} from "redux-api";
+```
+# reduxApi(options, fetch)
+- **options** - configuration rest-api endpoints
+> *type*: Object
+> *return*: {reducers, actions} - `reducers` have to as parameter to `createStore` (see example section). actions (see `actions` section)
+> *default*: {}
+> *example*:
+  Simple endpoint definition `GET /api/v1/entry` where response is Object
+  ```js
+  {
+    entry: "/api/v1/entry",
+  }
+  // equivalent
+  {
+    entry: {
+      url: "/api/v1/entry"
+    }
+  }
+  // equivalent
+  {
+    entry: {      
+      url: "/api/v1/entry",
+      transformer: transformers.object, //it's default value      
+      options: {}                       //it's default value
+    }
+  }
+  ```
+  **url** - endpoint for rest api
+  > *type*: String 
+  **transformer** - response transformer
+  > *type*: Function
+  > *default*: transformers.object
+  > *example*: It's a good idea to write custom transformer
+    for example you have responce
+    ```json
+    { "title": "Hello", message: "World" } 
+    ```
+    Custom transformer
+    ```js
+    function customTransformer(data) {
+      if (!data) {
+        return {title: "", message: ""};
+      }
+      return { title: (data.title || ""), message: (data.message || "")};
+    }
+    ```
+    **options** - Options for rest-api backend. `function(url, options)`
+    > *type*: Object
+    > *default*: null
+    > *example*: if you use [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch) backend
+      ```
+      options: {
+        method: "post",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+      ```
+
+- **fetch** - rest backend. Redux-api recommends to use `fetch` API for rest [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch) 
+> *type*: Function
+> *default*: null
+
+```js 
+import reduxApi, {transformers} from "redux-api";
+const rest = reduxApi({
+  entries: "/api/v1/entry",
+  entry: {
+    url: "/api/v1/entry/:id",
+    options: {
+      method: "post"
+    }
+  }
+});
+const {actions} = rest;
+
+/*
+initialState for store
+store = {
+  entries: {
+    loading: false, // request finish flag
+    sync: false,    // data has loaded minimum once
+    data: {}        // data
+  },
+  entry: { loading: false, sync: false, data: {} },
+}
+*/
+
+// In component with redux support (see example section)
+const {dispatch} = this.props;
+dispatch(rest.actions.entries()); // GET "/api/v1/entry"
+dispatch(rest.actions.entry({id: 1}, {
+  body: JSON.stringify({ name: 'Hubot', login: 'hubot' 
+}}));  // POST "/api/v1/entry/1" with body
+
+//also available helper methods
+dispatch(rest.actions.entries.reset()) // set initialState to store
+dispatch(rest.actions.entries.sync()) // this mathod save you from twice requests
+                                    // flag `sync`. if `sync===true` requst 
+                                    // wouldnt execute
+```
 
 For example used es7 javascript, [Redux@1.0.0-rc](https://github.com/gaearon/redux/tree/v1.0.0-rc), but it's pretty simple to migrate this code to [Redux@v0.12.0](https://github.com/gaearon/redux/tree/v0.12.0)
 
@@ -67,7 +172,7 @@ class Application {
   componentDidMount() {
     const {dispatch} = this.props;
     // fetch `/api/v1/regions
-    dispatch(rest.actions.regions());
+    dispatch(rest.actions.regions.sync());
     //specify id for GET: /api/v1/entry/1
     dispatch(rest.actions.entry({id: 1})); 
   }
