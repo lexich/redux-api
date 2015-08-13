@@ -69,13 +69,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _lodashLangIsArray = __webpack_require__(/*! lodash/lang/isArray */ 2);
+	var _lodashLangIsArray = __webpack_require__(/*! lodash/lang/isArray */ 3);
 	
 	var _lodashLangIsArray2 = _interopRequireDefault(_lodashLangIsArray);
 	
-	var _lodashLangIsObject = __webpack_require__(/*! lodash/lang/isObject */ 3);
+	var _lodashLangIsObject = __webpack_require__(/*! lodash/lang/isObject */ 4);
 	
 	var _lodashLangIsObject2 = _interopRequireDefault(_lodashLangIsObject);
+	
+	var _lodashLangIsString = __webpack_require__(/*! lodash/lang/isString */ 51);
+	
+	var _lodashLangIsString2 = _interopRequireDefault(_lodashLangIsString);
+	
+	var _lodashLangIsNumber = __webpack_require__(/*! lodash/lang/isNumber */ 50);
+	
+	var _lodashLangIsNumber2 = _interopRequireDefault(_lodashLangIsNumber);
+	
+	var _lodashLangIsBoolean = __webpack_require__(/*! lodash/lang/isBoolean */ 47);
+	
+	var _lodashLangIsBoolean2 = _interopRequireDefault(_lodashLangIsBoolean);
 	
 	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 7);
 	
@@ -97,7 +109,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return !data ? [] : (0, _lodashLangIsArray2["default"])(data) ? data : [data];
 	  },
 	  object: function object(data) {
-	    return !data ? {} : (0, _lodashLangIsObject2["default"])(data) ? data : { data: data };
+	    if (!data) {
+	      return {};
+	    }
+	    if ((0, _lodashLangIsArray2["default"])(data) || (0, _lodashLangIsString2["default"])(data) || (0, _lodashLangIsNumber2["default"])(data) || (0, _lodashLangIsBoolean2["default"])(data) || !(0, _lodashLangIsObject2["default"])(data)) {
+	      return { data: data };
+	    } else {
+	      return data;
+	    }
 	  }
 	};
 	
@@ -170,12 +189,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
+/*!*******************************************!*\
+  !*** ./~/lodash/internal/isObjectLike.js ***!
+  \*******************************************/
+/***/ function(module, exports) {
+
+	/**
+	 * Checks if `value` is object-like.
+	 *
+	 * @private
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+	
+	module.exports = isObjectLike;
+
+
+/***/ },
+/* 2 */
 /*!***************************************!*\
   !*** ./~/lodash/internal/toObject.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(/*! ../lang/isObject */ 3);
+	var isObject = __webpack_require__(/*! ../lang/isObject */ 4);
 	
 	/**
 	 * Converts `value` to an object if it's not one.
@@ -192,15 +232,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 2 */
+/* 3 */
 /*!**********************************!*\
   !*** ./~/lodash/lang/isArray.js ***!
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(/*! ../internal/getNative */ 12),
-	    isLength = __webpack_require__(/*! ../internal/isLength */ 4),
-	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 5);
+	    isLength = __webpack_require__(/*! ../internal/isLength */ 5),
+	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
 	
 	/** `Object#toString` result references. */
 	var arrayTag = '[object Array]';
@@ -241,7 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /*!***********************************!*\
   !*** ./~/lodash/lang/isObject.js ***!
   \***********************************/
@@ -278,7 +318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /*!***************************************!*\
   !*** ./~/lodash/internal/isLength.js ***!
   \***************************************/
@@ -307,27 +347,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
-/*!*******************************************!*\
-  !*** ./~/lodash/internal/isObjectLike.js ***!
-  \*******************************************/
-/***/ function(module, exports) {
-
-	/**
-	 * Checks if `value` is object-like.
-	 *
-	 * @private
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-	
-	module.exports = isObjectLike;
-
-
-/***/ },
 /* 6 */
 /*!*********************************!*\
   !*** ./~/lodash/object/keys.js ***!
@@ -336,7 +355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var getNative = __webpack_require__(/*! ../internal/getNative */ 12),
 	    isArrayLike = __webpack_require__(/*! ../internal/isArrayLike */ 13),
-	    isObject = __webpack_require__(/*! ../lang/isObject */ 3),
+	    isObject = __webpack_require__(/*! ../lang/isObject */ 4),
 	    shimKeys = __webpack_require__(/*! ../internal/shimKeys */ 46);
 	
 	/* Native method references for those with the same name as other `lodash` methods. */
@@ -441,7 +460,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var toObject = __webpack_require__(/*! ./toObject */ 1);
+	var toObject = __webpack_require__(/*! ./toObject */ 2);
 	
 	/**
 	 * The base implementation of `get` without support for string paths
@@ -480,8 +499,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIsEqualDeep = __webpack_require__(/*! ./baseIsEqualDeep */ 30),
-	    isObject = __webpack_require__(/*! ../lang/isObject */ 3),
-	    isObjectLike = __webpack_require__(/*! ./isObjectLike */ 5);
+	    isObject = __webpack_require__(/*! ../lang/isObject */ 4),
+	    isObjectLike = __webpack_require__(/*! ./isObjectLike */ 1);
 	
 	/**
 	 * The base implementation of `_.isEqual` without support for `this` binding
@@ -563,7 +582,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isNative = __webpack_require__(/*! ../lang/isNative */ 48);
+	var isNative = __webpack_require__(/*! ../lang/isNative */ 49);
 	
 	/**
 	 * Gets the native function at `key` of `object`.
@@ -589,7 +608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getLength = __webpack_require__(/*! ./getLength */ 11),
-	    isLength = __webpack_require__(/*! ./isLength */ 4);
+	    isLength = __webpack_require__(/*! ./isLength */ 5);
 	
 	/**
 	 * Checks if `value` is array-like.
@@ -645,8 +664,8 @@ return /******/ (function(modules) { // webpackBootstrap
   \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(/*! ../lang/isArray */ 2),
-	    toObject = __webpack_require__(/*! ./toObject */ 1);
+	var isArray = __webpack_require__(/*! ../lang/isArray */ 3),
+	    toObject = __webpack_require__(/*! ./toObject */ 2);
 	
 	/** Used to match property names within property paths. */
 	var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\n\\]|\\.)*?\1)\]/,
@@ -682,7 +701,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \*************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(/*! ../lang/isObject */ 3);
+	var isObject = __webpack_require__(/*! ../lang/isObject */ 4);
 	
 	/**
 	 * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -707,7 +726,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseToString = __webpack_require__(/*! ./baseToString */ 37),
-	    isArray = __webpack_require__(/*! ../lang/isArray */ 2);
+	    isArray = __webpack_require__(/*! ../lang/isArray */ 3);
 	
 	/** Used to match property names within property paths. */
 	var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\n\\]|\\.)*?)\2)\]/g;
@@ -744,7 +763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArrayLike = __webpack_require__(/*! ../internal/isArrayLike */ 13),
-	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 5);
+	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
 	
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -1046,7 +1065,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    baseMatchesProperty = __webpack_require__(/*! ./baseMatchesProperty */ 33),
 	    bindCallback = __webpack_require__(/*! ./bindCallback */ 38),
 	    identity = __webpack_require__(/*! ../utility/identity */ 19),
-	    property = __webpack_require__(/*! ../utility/property */ 52);
+	    property = __webpack_require__(/*! ../utility/property */ 55);
 	
 	/**
 	 * The base implementation of `_.callback` which supports specifying the
@@ -1165,8 +1184,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var equalArrays = __webpack_require__(/*! ./equalArrays */ 42),
 	    equalByTag = __webpack_require__(/*! ./equalByTag */ 43),
 	    equalObjects = __webpack_require__(/*! ./equalObjects */ 44),
-	    isArray = __webpack_require__(/*! ../lang/isArray */ 2),
-	    isTypedArray = __webpack_require__(/*! ../lang/isTypedArray */ 49);
+	    isArray = __webpack_require__(/*! ../lang/isArray */ 3),
+	    isTypedArray = __webpack_require__(/*! ../lang/isTypedArray */ 52);
 	
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -1274,7 +1293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIsEqual = __webpack_require__(/*! ./baseIsEqual */ 9),
-	    toObject = __webpack_require__(/*! ./toObject */ 1);
+	    toObject = __webpack_require__(/*! ./toObject */ 2);
 	
 	/**
 	 * The base implementation of `_.isMatch` without support for callback
@@ -1336,7 +1355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseIsMatch = __webpack_require__(/*! ./baseIsMatch */ 31),
 	    getMatchData = __webpack_require__(/*! ./getMatchData */ 45),
-	    toObject = __webpack_require__(/*! ./toObject */ 1);
+	    toObject = __webpack_require__(/*! ./toObject */ 2);
 	
 	/**
 	 * The base implementation of `_.matches` which does not clone `source`.
@@ -1376,11 +1395,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var baseGet = __webpack_require__(/*! ./baseGet */ 8),
 	    baseIsEqual = __webpack_require__(/*! ./baseIsEqual */ 9),
 	    baseSlice = __webpack_require__(/*! ./baseSlice */ 36),
-	    isArray = __webpack_require__(/*! ../lang/isArray */ 2),
+	    isArray = __webpack_require__(/*! ../lang/isArray */ 3),
 	    isKey = __webpack_require__(/*! ./isKey */ 15),
 	    isStrictComparable = __webpack_require__(/*! ./isStrictComparable */ 16),
 	    last = __webpack_require__(/*! ../array/last */ 23),
-	    toObject = __webpack_require__(/*! ./toObject */ 1),
+	    toObject = __webpack_require__(/*! ./toObject */ 2),
 	    toPath = __webpack_require__(/*! ./toPath */ 17);
 	
 	/**
@@ -1600,8 +1619,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var getLength = __webpack_require__(/*! ./getLength */ 11),
-	    isLength = __webpack_require__(/*! ./isLength */ 4),
-	    toObject = __webpack_require__(/*! ./toObject */ 1);
+	    isLength = __webpack_require__(/*! ./isLength */ 5),
+	    toObject = __webpack_require__(/*! ./toObject */ 2);
 	
 	/**
 	 * Creates a `baseEach` or `baseEachRight` function.
@@ -1639,7 +1658,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var toObject = __webpack_require__(/*! ./toObject */ 1);
+	var toObject = __webpack_require__(/*! ./toObject */ 2);
 	
 	/**
 	 * Creates a base function for `_.forIn` or `_.forInRight`.
@@ -1677,7 +1696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var baseCallback = __webpack_require__(/*! ./baseCallback */ 26),
 	    baseReduce = __webpack_require__(/*! ./baseReduce */ 35),
-	    isArray = __webpack_require__(/*! ../lang/isArray */ 2);
+	    isArray = __webpack_require__(/*! ../lang/isArray */ 3);
 	
 	/**
 	 * Creates a function for `_.reduce` or `_.reduceRight`.
@@ -1900,7 +1919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isStrictComparable = __webpack_require__(/*! ./isStrictComparable */ 16),
-	    pairs = __webpack_require__(/*! ../object/pairs */ 51);
+	    pairs = __webpack_require__(/*! ../object/pairs */ 54);
 	
 	/**
 	 * Gets the propery names, values, and compare flags of `object`.
@@ -1930,10 +1949,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArguments = __webpack_require__(/*! ../lang/isArguments */ 18),
-	    isArray = __webpack_require__(/*! ../lang/isArray */ 2),
+	    isArray = __webpack_require__(/*! ../lang/isArray */ 3),
 	    isIndex = __webpack_require__(/*! ./isIndex */ 14),
-	    isLength = __webpack_require__(/*! ./isLength */ 4),
-	    keysIn = __webpack_require__(/*! ../object/keysIn */ 50);
+	    isLength = __webpack_require__(/*! ./isLength */ 5),
+	    keysIn = __webpack_require__(/*! ../object/keysIn */ 53);
 	
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -1974,12 +1993,56 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 47 */
+/*!************************************!*\
+  !*** ./~/lodash/lang/isBoolean.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
+	
+	/** `Object#toString` result references. */
+	var boolTag = '[object Boolean]';
+	
+	/** Used for native method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objToString = objectProto.toString;
+	
+	/**
+	 * Checks if `value` is classified as a boolean primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isBoolean(false);
+	 * // => true
+	 *
+	 * _.isBoolean(null);
+	 * // => false
+	 */
+	function isBoolean(value) {
+	  return value === true || value === false || (isObjectLike(value) && objToString.call(value) == boolTag);
+	}
+	
+	module.exports = isBoolean;
+
+
+/***/ },
+/* 48 */
 /*!*************************************!*\
   !*** ./~/lodash/lang/isFunction.js ***!
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(/*! ./isObject */ 3);
+	var isObject = __webpack_require__(/*! ./isObject */ 4);
 	
 	/** `Object#toString` result references. */
 	var funcTag = '[object Function]';
@@ -2020,14 +2083,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 48 */
+/* 49 */
 /*!***********************************!*\
   !*** ./~/lodash/lang/isNative.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isFunction = __webpack_require__(/*! ./isFunction */ 47),
-	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 5);
+	var isFunction = __webpack_require__(/*! ./isFunction */ 48),
+	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
 	
 	/** Used to detect host constructors (Safari > 5). */
 	var reIsHostCtor = /^\[object .+?Constructor\]$/;
@@ -2077,14 +2140,108 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 50 */
+/*!***********************************!*\
+  !*** ./~/lodash/lang/isNumber.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
+	
+	/** `Object#toString` result references. */
+	var numberTag = '[object Number]';
+	
+	/** Used for native method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objToString = objectProto.toString;
+	
+	/**
+	 * Checks if `value` is classified as a `Number` primitive or object.
+	 *
+	 * **Note:** To exclude `Infinity`, `-Infinity`, and `NaN`, which are classified
+	 * as numbers, use the `_.isFinite` method.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isNumber(8.4);
+	 * // => true
+	 *
+	 * _.isNumber(NaN);
+	 * // => true
+	 *
+	 * _.isNumber('8.4');
+	 * // => false
+	 */
+	function isNumber(value) {
+	  return typeof value == 'number' || (isObjectLike(value) && objToString.call(value) == numberTag);
+	}
+	
+	module.exports = isNumber;
+
+
+/***/ },
+/* 51 */
+/*!***********************************!*\
+  !*** ./~/lodash/lang/isString.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
+	
+	/** `Object#toString` result references. */
+	var stringTag = '[object String]';
+	
+	/** Used for native method references. */
+	var objectProto = Object.prototype;
+	
+	/**
+	 * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objToString = objectProto.toString;
+	
+	/**
+	 * Checks if `value` is classified as a `String` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+	 * @example
+	 *
+	 * _.isString('abc');
+	 * // => true
+	 *
+	 * _.isString(1);
+	 * // => false
+	 */
+	function isString(value) {
+	  return typeof value == 'string' || (isObjectLike(value) && objToString.call(value) == stringTag);
+	}
+	
+	module.exports = isString;
+
+
+/***/ },
+/* 52 */
 /*!***************************************!*\
   !*** ./~/lodash/lang/isTypedArray.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isLength = __webpack_require__(/*! ../internal/isLength */ 4),
-	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 5);
+	var isLength = __webpack_require__(/*! ../internal/isLength */ 5),
+	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 1);
 	
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -2160,17 +2317,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 53 */
 /*!***********************************!*\
   !*** ./~/lodash/object/keysIn.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var isArguments = __webpack_require__(/*! ../lang/isArguments */ 18),
-	    isArray = __webpack_require__(/*! ../lang/isArray */ 2),
+	    isArray = __webpack_require__(/*! ../lang/isArray */ 3),
 	    isIndex = __webpack_require__(/*! ../internal/isIndex */ 14),
-	    isLength = __webpack_require__(/*! ../internal/isLength */ 4),
-	    isObject = __webpack_require__(/*! ../lang/isObject */ 3);
+	    isLength = __webpack_require__(/*! ../internal/isLength */ 5),
+	    isObject = __webpack_require__(/*! ../lang/isObject */ 4);
 	
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2233,14 +2390,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 54 */
 /*!**********************************!*\
   !*** ./~/lodash/object/pairs.js ***!
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var keys = __webpack_require__(/*! ./keys */ 6),
-	    toObject = __webpack_require__(/*! ../internal/toObject */ 1);
+	    toObject = __webpack_require__(/*! ../internal/toObject */ 2);
 	
 	/**
 	 * Creates a two dimensional array of the key-value pairs for `object`,
@@ -2275,7 +2432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 55 */
 /*!**************************************!*\
   !*** ./~/lodash/utility/property.js ***!
   \**************************************/
