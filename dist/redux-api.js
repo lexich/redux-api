@@ -879,6 +879,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  fn.reset = function () {
 	    return { type: actionReset };
 	  };
+	  fn.sync = function () {
+	    return function (dispatch, getState) {
+	      var state = getState();
+	      var store = state[name];
+	      if (store.sync) return;
+	      return fn(dispatch, getState);
+	    };
+	  };
 	  return fn;
 	}
 	
@@ -917,7 +925,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case actionFetch:
 	        return _extends({}, state, { loading: true, error: null });
 	      case actionSuccess:
-	        return _extends({}, state, { loading: false, error: null, data: transformer(action.data) });
+	        return _extends({}, state, { loading: false, sync: true, error: null, data: transformer(action.data) });
 	      case actionFail:
 	        return _extends({}, state, { loading: false, error: action.error });
 	      case actionReset:
