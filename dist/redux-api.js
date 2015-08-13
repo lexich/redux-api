@@ -126,7 +126,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @type {Object}
 	 */
 	var defaultEndpointConfig = {
-	  action: "get",
 	  transformer: transformers.object
 	};
 	
@@ -142,11 +141,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     testItem: "/plain/url/:id",
 	 *     testModify: {
 	 *       url: "/plain/url/:endpoint",
-	 *       action: "post",
+	
 	 *       transformer: (data)=> !data ?
 	 *          { title: "", message: "" } :
 	 *          { title: data.title, message: data.message },
 	 *       options: {
+	 *         method: "post"
 	 *         headers: {
 	 *           "Accept": "application/json",
 	 *           "Content-Type": "application/json"
