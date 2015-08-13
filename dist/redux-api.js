@@ -879,12 +879,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  fn.reset = function () {
 	    return { type: actionReset };
 	  };
-	  fn.sync = function () {
+	  fn.sync = function (pathvars, params) {
 	    return function (dispatch, getState) {
 	      var state = getState();
 	      var store = state[name];
 	      if (store.sync) return;
-	      return fn(dispatch, getState);
+	      return fn(pathvars, params)(dispatch, getState);
 	    };
 	  };
 	  return fn;
