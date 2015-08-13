@@ -2,7 +2,8 @@
 /*global describe, it*/
 
 var expect = require("chai").expect;
-var reduxApi = require("../lib/index.js").default;
+var reduxApi = require("../src/index.js").default;
+var transformers = require("../src/index.js").transformers;
 var isFunction = require("lodash/lang/isFunction");
 var size = require("lodash/collection/size");
 
@@ -11,6 +12,18 @@ function getState() {
 }
 
 describe("index", function() {
+  it("check transformers", function() {
+    expect(transformers.array()).to.eql([]);
+    expect(transformers.array({id: 1})).to.eql([{id: 1}]);
+    expect(transformers.array([1])).to.eql([1]);
+
+    expect(transformers.object()).to.eql({});
+    expect(transformers.object({id: 1})).to.eql({id: 1});
+    expect(transformers.object([1])).to.eql({data: [1]});
+    expect(transformers.object("test")).to.eql({data: "test"});
+    expect(transformers.object(1)).to.eql({data: 1});
+    expect(transformers.object(true)).to.eql({data: true});
+  });
   it("check null params", function() {
     expect(isFunction(reduxApi)).to.be.true;
     expect(reduxApi()).to.eql({

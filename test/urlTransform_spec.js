@@ -2,7 +2,7 @@
 /*global describe, it*/
 
 var expect = require("chai").expect;
-var urlTransform = require("../lib/urlTransform");
+var urlTransform = require("../src/urlTransform");
 
 describe("urlTransform", function() {
   it("check null params", function() {

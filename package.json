@@ -11,16 +11,15 @@
   "repository": "http://github.com/lexich/redux-api",
   "scripts": {
     "test": "npm run eslint && npm run mocha",
-    "mocha": "npm run compile && npm run mocha-run",
-    "mocha-run": "istanbul test _mocha --report html -- test/*_spec.js --reporter spec",
+    "mocha": "istanbul test _mocha --report html -- --require babel/register test/*_spec.js --reporter spec",
     "build": "npm run browser-dev && npm run browser-min && npm run compile",
-    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly --report html -- -R test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "eslint": "node_modules/.bin/eslint src test",
     "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
     "browser-min": "NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
-    "precommit": "npm test && npm run compile",
-    "prepush": "npm test && npm run compile",
+    "precommit": "npm test && npm run build",
+    "prepush": "npm test && npm run build",
     "postmerge": "npm install"
   },
   "dependencies": {

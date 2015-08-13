@@ -2,7 +2,7 @@
 /*global describe, it*/
 
 var expect = require("chai").expect;
-var reducerFn = require("../lib/reducerFn");
+var reducerFn = require("../src/reducerFn");
 var isFunction = require("lodash/lang/isFunction");
 
 describe("reducerFn", function() {
@@ -40,5 +40,8 @@ describe("reducerFn", function() {
     var res4 = fn(initialState, {type: actions.actionReset});
     expect(res4).to.eql(initialState);
     expect(res4 !== initialState).to.be.true;
+
+    var res5 = fn(undefined, {type: "fake"});
+    expect(res5 === initialState).to.be.true;
   });
 });

@@ -2,7 +2,7 @@
 /*global describe, it*/
 
 var expect = require("chai").expect;
-var actionFn = require("../lib/actionFn");
+var actionFn = require("../src/actionFn");
 var isFunction = require("lodash/lang/isFunction");
 
 function fetchSuccess() {
@@ -25,27 +25,29 @@ function fetchFail() {
   });
 }
 
+var ACTIONS = {
+  actionFetch: "actionFetch",
+  actionSuccess: "actionSuccess",
+  actionFail: "actionFail",
+  actionReset: "actionReset"
+};
+
 describe("actionFn", function() {
   it("check null params", function() {
     var api = actionFn();
     expect(isFunction(api)).to.be.true;
   });
   it("check normal usage", function(done) {
-    var api = actionFn("/test", "test", null, {
-      actionFetch: "actionFetch",
-      actionSuccess: "actionSuccess",
-      actionFail: "actionFail",
-      actionReset: "actionReset"
-    }, fetchSuccess);
-    expect(api.reset()).to.eql({type: "actionReset"});
+    var api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
+    expect(api.reset()).to.eql({type: ACTIONS.actionReset });
     var action = api();
     expect(isFunction(action)).to.be.true;
 
     var expectedEvent = [
       {
-        type: "actionFetch"
+        type: ACTIONS.actionFetch
       }, {
-        type: "actionSuccess",
+        type: ACTIONS.actionSuccess,
         data: {msg: "hello"}
       }
     ];
@@ -59,18 +61,13 @@ describe("actionFn", function() {
     action(dispatch, getState);
   });
   it("check fail fetch", function(done) {
-    var api = actionFn("/test", "test", null, {
-      actionFetch: "actionFetch",
-      actionSuccess: "actionSuccess",
-      actionFail: "actionFail",
-      actionReset: "actionReset"
-    }, fetchFail);
+    var api = actionFn("/test", "test", null, ACTIONS, fetchFail);
 
     var expectedEvent = [
       {
-        type: "actionFetch"
+        type: ACTIONS.actionFetch
       }, {
-        type: "actionFail",
+        type: ACTIONS.actionFail,
         error: "Error"
       }
     ];
@@ -81,5 +78,14 @@ describe("actionFn", function() {
       !expectedEvent.length && done();
     }
     api()(dispatch, getState);
+  });
+  it("check double request", function() {
+    var api = actionFn("/test/:id", "test", null, ACTIONS, fetchSuccess);
+    function dispatch(msg) {
+      expect(msg, "dispatch mustn't call").to.be.false;
+    }
+    api({id: 1})(dispatch, function() {
+      return {test: {loading: true, data: {}}};
+    });
   });
 });
