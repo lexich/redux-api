@@ -15,5 +15,11 @@ export default function actionFn(url, name, options, ACTIONS={}, fetch) {
       .catch((error)=> dispatch({ type: actionFail, error }));
   };
   fn.reset = ()=> ({type: actionReset});
+  fn.sync = ()=> (dispatch, getState)=> {
+    const state = getState();
+    const store =state[name];
+    if (store.sync) return;
+    return fn(dispatch, getState);
+  };
   return fn;
 }

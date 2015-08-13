@@ -6,7 +6,7 @@ export default function reducerFn(initialState, actions={}, transformer=(d)=> d)
     case actionFetch:
       return {...state, loading: true, error: null};
     case actionSuccess:
-      return {...state, loading: false, error: null, data: transformer(action.data)};
+      return {...state, loading: false, sync: true, error: null, data: transformer(action.data)};
     case actionFail:
       return {...state, loading: false, error: action.error};
     case actionReset:

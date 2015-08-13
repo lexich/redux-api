@@ -29,7 +29,7 @@ describe("reducerFn", function() {
 
     var res2 = fn(initialState, {type: actions.actionSuccess, data: true});
     expect(res2).to.eql({
-      loading: false, error: null, data: true
+      loading: false, error: null, data: true, sync: true
     });
 
     var res3 = fn(initialState, {type: actions.actionFail, error: "Error"});

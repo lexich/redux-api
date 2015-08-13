@@ -30,7 +30,7 @@ describe("index", function() {
       actions: {}, reducers: {}
     });
   });
-  it("check string url", function(done) {
+  it("check string url", function() {
     function fetchSuccess(url, data) {
       expect(url).to.eql("/plain/url");
       expect(data).to.eql({});
@@ -62,11 +62,10 @@ describe("index", function() {
       expect(expectedEvent).to.have.length.above(0);
       var exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
-      !expectedEvent.length && done();
     }
     action(dispatch, getState);
   });
-  it("check object url", function(done) {
+  it("check object url", function() {
     function fetchSuccess(url, options) {
       expect(url).to.eql("/plain/url/1");
       expect(options).to.eql({
@@ -107,7 +106,6 @@ describe("index", function() {
       expect(expectedEvent).to.have.length.above(0);
       var exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
-      !expectedEvent.length && done();
     }
     action(dispatch, getState);
   });

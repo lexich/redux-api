@@ -16,7 +16,7 @@ function fetchSuccess() {
 }
 
 function getState() {
-  return {test: {loading: false, data: {}}};
+  return {test: {loading: false, sync: true, data: {}}};
 }
 
 function fetchFail() {
@@ -37,7 +37,25 @@ describe("actionFn", function() {
     var api = actionFn();
     expect(isFunction(api)).to.be.true;
   });
-  it("check normal usage", function(done) {
+  it("check sync method", function() {
+    var api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
+    var expectedEvent = [
+      {
+        type: ACTIONS.actionFetch
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {msg: "hello"}
+      }
+    ];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      var exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    api.sync()(dispatch, getState);
+    api.sync()(dispatch, getState);
+  });
+  it("check normal usage", function() {
     var api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
     expect(api.reset()).to.eql({type: ACTIONS.actionReset });
     var action = api();
@@ -55,12 +73,10 @@ describe("actionFn", function() {
       expect(expectedEvent).to.have.length.above(0);
       var exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
-      !expectedEvent.length && done();
     }
-
     action(dispatch, getState);
   });
-  it("check fail fetch", function(done) {
+  it("check fail fetch", function() {
     var api = actionFn("/test", "test", null, ACTIONS, fetchFail);
 
     var expectedEvent = [
@@ -75,7 +91,6 @@ describe("actionFn", function() {
       expect(expectedEvent).to.have.length.above(0);
       var exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
-      !expectedEvent.length && done();
     }
     api()(dispatch, getState);
   });
