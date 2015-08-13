@@ -1,20 +1,19 @@
+### Redux-api
 
 [![Build Status](https://travis-ci.org/lexich/redux-api.svg)](https://travis-ci.org/lexich/redux-api)
 [![NPM version](https://badge.fury.io/js/redux-api.svg)](http://badge.fury.io/js/redux-api)
 [![Coverage Status](https://coveralls.io/repos/lexich/redux-api/badge.png?branch=master)](https://coveralls.io/r/lexich/redux-api?branch=master)
-
-### Redux-api
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is recommended to work with [Redux](https://github.com/gaearon/redux).
 
 ## Install
 with npm
 ```sh
-npm instal redux-api --save
+npm install redux-api --save
 ```
 with bower
 ```sh
-bower instal redux-api --save
+bower install redux-api --save
 ```
 
 =======
@@ -86,6 +85,7 @@ import reduxApi, {transformers} from "redux-api";
 > *type*: Function
 > *default*: null
 
+#### actions
 ```js 
 import reduxApi, {transformers} from "redux-api";
 const rest = reduxApi({
