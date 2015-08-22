@@ -23,7 +23,8 @@
     "postmerge": "npm install"
   },
   "dependencies": {
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "qs": "^4.0.0"
   },
   "devDependencies": {
     "babel": "^5.8.21",
