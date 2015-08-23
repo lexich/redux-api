@@ -8,7 +8,8 @@ export default function actionFn(url, name, options, ACTIONS={}, fetch) {
     if (store.loading) { return; }
     dispatch({ type: actionFetch });
     const _url = urlTransform(url, pathvars);
-    const opts = { ...options, ...params };
+    const pre = options && options.pre ? options.pre : function(r) { return r; };
+    const opts = pre({ ...options, ...params });
     fetch(_url, opts)
       .then((resp)=> resp.json())
       .then((data)=> dispatch({ type: actionSuccess, data }))
