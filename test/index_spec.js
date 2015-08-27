@@ -109,4 +109,21 @@ describe("index", function() {
     }
     action(dispatch, getState);
   });
+  it("use provided reducerName when avaliable", function() {
+    var res = reduxApi({
+      test: {
+        reducerName: "foo",
+        url: "/plain/url/:id",
+        options: {
+          headers: {
+            "Accept": "application/json"
+          }
+        }
+      }
+  }, function fetchSuccess() {});
+
+    expect(res.actions.test).to.exist;
+    expect(res.reducers.test).to.not.exist;
+    expect(res.reducers.foo).to.exist;
+  });
 });

@@ -90,7 +90,9 @@ export default function reduxApi(config, fetch) {
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, opts.fetch || fetch);
-    memo.reducers[key] = reducerFn( initialState, ACTIONS, transformer );
+    if (!memo.reducers[value.reducerName]) {
+      memo.reducers[value.reducerName || key] = reducerFn( initialState, ACTIONS, transformer );
+    }
     return memo;
   }, {actions: {}, reducers: {}});
 }
