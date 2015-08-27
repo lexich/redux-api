@@ -182,7 +182,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    memo.actions[key] = (0, _actionFn2["default"])(url, key, options, ACTIONS, opts.fetch || fetch);
-	    memo.reducers[key] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer);
+	    if (!memo.reducers[value.reducerName]) {
+	      memo.reducers[value.reducerName || key] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer);
+	    }
 	    return memo;
 	  }, { actions: {}, reducers: {} });
 	}
