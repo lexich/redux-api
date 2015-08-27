@@ -5,10 +5,16 @@ var expect = require("chai").expect;
 var actionFn = require("../src/actionFn");
 var isFunction = require("lodash/lang/isFunction");
 
-function fetchSuccess() {
+function fetchSuccess(url, opts) {
   return new Promise(function(resolve) {
     resolve({
       json: function() {
+        if (opts && opts.body) {
+          return {body: opts.body};
+        }
+        if (opts && opts.header) {
+          return {header: opts.header};
+        }
         return {msg: "hello"};
       }
     });
@@ -67,6 +73,102 @@ describe("actionFn", function() {
       }, {
         type: ACTIONS.actionSuccess,
         data: {msg: "hello"}
+      }
+    ];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      var exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    action(dispatch, getState);
+  });
+  it("check body as string usage", function() {
+    var api = actionFn("/test", "test", {
+        body: "foo=bar"
+    }, ACTIONS, fetchSuccess);
+    expect(api.reset()).to.eql({type: ACTIONS.actionReset });
+    var action = api();
+    expect(isFunction(action)).to.be.true;
+
+    var expectedEvent = [
+      {
+        type: ACTIONS.actionFetch
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {body: "foo=bar"}
+      }
+    ];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      var exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    action(dispatch, getState);
+  });
+  it("check body as method usage", function() {
+    var api = actionFn("/test", "test", {
+        body: function() {
+          return "foo=bar";
+        }
+    }, ACTIONS, fetchSuccess);
+    expect(api.reset()).to.eql({type: ACTIONS.actionReset });
+    var action = api();
+    expect(isFunction(action)).to.be.true;
+
+    var expectedEvent = [
+      {
+        type: ACTIONS.actionFetch
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {body: "foo=bar"}
+      }
+    ];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      var exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    action(dispatch, getState);
+  });
+  it("check header as string usage", function() {
+    var api = actionFn("/test", "test", {
+        header: "foo=bar"
+    }, ACTIONS, fetchSuccess);
+    expect(api.reset()).to.eql({type: ACTIONS.actionReset });
+    var action = api();
+    expect(isFunction(action)).to.be.true;
+
+    var expectedEvent = [
+      {
+        type: ACTIONS.actionFetch
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {header: "foo=bar"}
+      }
+    ];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      var exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    action(dispatch, getState);
+  });
+  it("check header as method usage", function() {
+    var api = actionFn("/test", "test", {
+        header: function() {
+          return "foo=bar";
+        }
+    }, ACTIONS, fetchSuccess);
+    expect(api.reset()).to.eql({type: ACTIONS.actionReset });
+    var action = api();
+    expect(isFunction(action)).to.be.true;
+
+    var expectedEvent = [
+      {
+        type: ACTIONS.actionFetch
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {header: "foo=bar"}
       }
     ];
     function dispatch(msg) {
