@@ -76,6 +76,7 @@ const PREFIX = "@@redux-api";
 export default function reduxApi(config, fetch) {
   const counter = instanceCounter++;
   return reduce(config, (memo, value, key)=> {
+    const keyName = value.reducerName || key;
     const url = typeof value === "object" ? value.url : value;
     const opts = typeof value === "object" ?
       { ...defaultEndpointConfig, ...value } :
@@ -83,14 +84,16 @@ export default function reduxApi(config, fetch) {
     const {transformer, options} = opts;
     const initialState = { loading: false, data: transformer() };
     const ACTIONS = {
-      actionFetch: `${PREFIX}@${counter}@${key}`,
-      actionSuccess: `${PREFIX}@${counter}@${key}_success`,
-      actionFail: `${PREFIX}@${counter}@${key}_fail`,
-      actionReset: `${PREFIX}@${counter}@${key}_delete`
+      actionFetch: `${PREFIX}@${counter}@${keyName}`,
+      actionSuccess: `${PREFIX}@${counter}@${keyName}_success`,
+      actionFail: `${PREFIX}@${counter}@${keyName}_fail`,
+      actionReset: `${PREFIX}@${counter}@${keyName}_delete`
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, opts.fetch || fetch);
-    memo.reducers[key] = reducerFn( initialState, ACTIONS, transformer );
+    if (!memo.reducers[keyName]) {
+      memo.reducers[keyName] = reducerFn( initialState, ACTIONS, transformer );
+    }
     return memo;
   }, {actions: {}, reducers: {}});
 }
