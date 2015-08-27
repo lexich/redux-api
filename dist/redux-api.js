@@ -168,6 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function reduxApi(config, fetch) {
 	  var counter = instanceCounter++;
 	  return (0, _lodashCollectionReduce2["default"])(config, function (memo, value, key) {
+	    var keyName = value.reducerName || key;
 	    var url = typeof value === "object" ? value.url : value;
 	    var opts = typeof value === "object" ? _extends({}, defaultEndpointConfig, value) : _extends({}, defaultEndpointConfig);
 	    var transformer = opts.transformer;
@@ -175,15 +176,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var initialState = { loading: false, data: transformer() };
 	    var ACTIONS = {
-	      actionFetch: PREFIX + "@" + counter + "@" + key,
-	      actionSuccess: PREFIX + "@" + counter + "@" + key + "_success",
-	      actionFail: PREFIX + "@" + counter + "@" + key + "_fail",
-	      actionReset: PREFIX + "@" + counter + "@" + key + "_delete"
+	      actionFetch: PREFIX + "@" + counter + "@" + keyName,
+	      actionSuccess: PREFIX + "@" + counter + "@" + keyName + "_success",
+	      actionFail: PREFIX + "@" + counter + "@" + keyName + "_fail",
+	      actionReset: PREFIX + "@" + counter + "@" + keyName + "_delete"
 	    };
 	
 	    memo.actions[key] = (0, _actionFn2["default"])(url, key, options, ACTIONS, opts.fetch || fetch);
-	    if (!memo.reducers[value.reducerName]) {
-	      memo.reducers[value.reducerName || key] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer);
+	    if (!memo.reducers[keyName]) {
+	      memo.reducers[keyName] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer);
 	    }
 	    return memo;
 	  }, { actions: {}, reducers: {} });
