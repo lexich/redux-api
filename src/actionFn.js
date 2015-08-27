@@ -1,5 +1,7 @@
 "use strict";
 import urlTransform from "./urlTransform";
+import isFunction from "lodash/lang/isFunction";
+
 export default function actionFn(url, name, options, ACTIONS={}, fetch) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = ACTIONS;
   const fn = (pathvars, params={})=> (dispatch, getState)=> {
@@ -9,6 +11,12 @@ export default function actionFn(url, name, options, ACTIONS={}, fetch) {
     dispatch({ type: actionFetch });
     const _url = urlTransform(url, pathvars);
     const opts = { ...options, ...params };
+    if (opts.header) {
+      opts.header = isFunction(opts.header) ? opts.header() : opts.header;
+    }
+    if (opts.body) {
+      opts.body = isFunction(opts.body) ? opts.body() : opts.body;
+    }
     fetch(_url, opts)
       .then((resp)=> resp.json())
       .then((data)=> dispatch({ type: actionSuccess, data }))
