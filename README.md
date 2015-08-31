@@ -6,6 +6,8 @@
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is recommended to work with [Redux](https://github.com/gaearon/redux).
 
+
+
 ## Install
 with npm
 ```sh
@@ -75,8 +77,8 @@ import reduxApi, {transformers} from "redux-api";
       options: {
         method: "post",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          "Accept": "application/json",
+          "Content-Type": "application/json"
         }
       }
       ```
@@ -115,7 +117,7 @@ store = {
 const {dispatch} = this.props;
 dispatch(rest.actions.entries()); // GET "/api/v1/entry"
 dispatch(rest.actions.entry({id: 1}, {
-  body: JSON.stringify({ name: 'Hubot', login: 'hubot'
+  body: JSON.stringify({ name: "Hubot", login: "hubot"
 }}));  // POST "/api/v1/entry/1" with body
 
 //also available helper methods
@@ -132,12 +134,12 @@ Sometimes though, you might want named actions that go back to the same reducer.
 import reduxApi, {transformers} from "redux-api";
 const rest = reduxApi({
   getUser: {
-    reducerName: 'user'
+    reducerName: "user"
     url: "/user/1", // return a user object
   }
   updateUser: {
-    reducerName: 'user'
-    url: "/user/1",
+    reducerName: "user"
+    url: "/user/1/update",
     options: {
       method: "post"
     }
@@ -149,7 +151,7 @@ const {actions} = rest;
 const {dispatch} = this.props;
 dispatch(rest.actions.getUser()); // GET "/api/v1/entry"
 dispatch(rest.actions.updateUser({}, {
-  body: JSON.stringify({ name: 'Hubot', login: 'hubot'})
+  body: JSON.stringify({ name: "Hubot", login: "hubot"})
 }));  // POST "/api/v1/entry/1" with body
 
 ```
@@ -227,3 +229,5 @@ React.render(
   document.getElementById("content")
 );
 ```
+
+### [Releases Changelog](https://github.com/lexich/redux-api/releases)
