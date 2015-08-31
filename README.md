@@ -230,4 +230,20 @@ React.render(
 );
 ```
 
+### Url schema
+/api/v1/user/:id
+```js
+rest.actions.user({id: 1}) // /api/v1/user/1
+```
+
+/api/v1/user/(:id)
+```js
+rest.actions.user({id: 1}) // /api/v1/user/1
+```
+
+/api/v1/user/(:id)
+```js
+rest.actions.user({id: 1, test: 2}) // /api/v1/user/1?test=2
+```
+
 ### [Releases Changelog](https://github.com/lexich/redux-api/releases)
