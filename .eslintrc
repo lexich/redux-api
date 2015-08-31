@@ -5,11 +5,6 @@
     "browser": true,
     "node": true
   },
-  "globals": {
-    "Em": true,
-    "DS": true,
-    "Modernizr": true
-  },
   "ecmaFeatures": {
     "arrowFunctions": true,
     "blockBindings": true,
@@ -29,7 +24,6 @@
     "jsx": false
   },
   "rules": {
-    "no-var": 0,
     "no-multi-spaces": 0,
     "space-infix-ops": 0,
     "quotes": [
