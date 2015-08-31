@@ -1068,10 +1068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      dispatch({ type: actionFetch });
 	      var _url = (0, _urlTransform2["default"])(url, pathvars);
-	      var pre = options && options.pre ? options.pre : function (r) {
-	        return r;
-	      };
-	      var opts = pre(_extends({}, options, params));
+	      var opts = _extends({}, options, params);
 	      fetch(_url, opts).then(function (resp) {
 	        return resp.json();
 	      }).then(function (data) {
