@@ -1,26 +1,28 @@
 "use strict";
 import reduce from "lodash/collection/reduce";
+import omit from "lodash/object/omit";
+import keys from "lodash/object/keys";
 import qs from "qs";
 
-export default function urlTransform(url, params={}) {
-  var urlWithParams = reduce(params,
-    (url, value, key) => {
-      url = url.replace(new RegExp(`\\(:${key}\\)`, "g"), function() {
-        delete params[key];
-        return value;
-      });
-      url = url.replace(new RegExp(`:${key}`, "g"), function() {
-        delete params[key];
-        return value;
-      });
-      return url;
-    }, url);
-  if (!urlWithParams) return urlWithParams;
-  var cleanURL = urlWithParams.replace(new RegExp(`\\(:(.*?)\\)`, "g"), "");
+const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 
-  var finalURL = cleanURL;
-  if (Object.keys(params).length > 0) {
-    finalURL = `${cleanURL}?${qs.stringify(params)}`;
+export default function urlTransform(url, params={}) {
+  if (!url) { return ""; }
+  const usedKeys = {};
+  const urlWithParams = reduce(params,
+    (url, value, key)=> url.replace(
+      new RegExp(`(\\(:${key}\\)|:${key})`, "g"),
+        ()=> (usedKeys[key] = value)), url);
+  if (!urlWithParams) { return urlWithParams; }
+  const cleanURL = urlWithParams.replace(rxClean, "");
+  const usedKeysArray = keys(usedKeys);
+  if (usedKeysArray.length !== keys(params).length) {
+    const urlObject = cleanURL.split("?");
+    const mergeParams = {
+      ...(urlObject[1] && qs.parse(urlObject[1])),
+      ...omit(params, usedKeysArray)
+    };
+    return `${urlObject[0]}?${qs.stringify(mergeParams)}`;
   }
-  return finalURL;
+  return cleanURL;
 }
