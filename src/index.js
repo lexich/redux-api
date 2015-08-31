@@ -92,7 +92,7 @@ export default function reduxApi(config, fetch) {
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, opts.fetch || fetch);
     if (!memo.reducers[keyName]) {
-      memo.reducers[keyName] = reducerFn( initialState, ACTIONS, transformer );
+      memo.reducers[keyName] = reducerFn(initialState, ACTIONS, transformer);
     }
     return memo;
   }, {actions: {}, reducers: {}});
