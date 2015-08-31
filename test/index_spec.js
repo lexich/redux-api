@@ -1,11 +1,11 @@
 "use strict";
-/*global describe, it*/
+/* global describe, it */
 
-var expect = require("chai").expect;
-var reduxApi = require("../src/index.js").default;
-var transformers = require("../src/index.js").transformers;
-var isFunction = require("lodash/lang/isFunction");
-var size = require("lodash/collection/size");
+const expect = require("chai").expect;
+const reduxApi = require("../src/index.js").default;
+const transformers = require("../src/index.js").transformers;
+const isFunction = require("lodash/lang/isFunction");
+const size = require("lodash/collection/size");
 
 function getState() {
   return {test: {loading: false, data: {}}};
@@ -42,15 +42,15 @@ describe("index", function() {
         });
       });
     }
-    var res = reduxApi({
+    const res = reduxApi({
       test: "/plain/url"
     }, fetchSuccess);
     expect(size(res.actions)).to.eql(1);
     expect(size(res.reducers)).to.eql(1);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
-    var action = res.actions.test();
-    var expectedEvent = [
+    const action = res.actions.test();
+    const expectedEvent = [
       {
         type: "@@redux-api@1@test"
       }, {
@@ -60,7 +60,7 @@ describe("index", function() {
     ];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
-      var exp = expectedEvent.shift();
+      const exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
     }
     action(dispatch, getState);
@@ -81,7 +81,7 @@ describe("index", function() {
         });
       });
     }
-    var res = reduxApi({
+    const res = reduxApi({
       test: {
         url: "/plain/url/:id",
         options: {
@@ -93,8 +93,8 @@ describe("index", function() {
     }, fetchSuccess);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
-    var action = res.actions.test({id: 1});
-    var expectedEvent = [
+    const action = res.actions.test({id: 1});
+    const expectedEvent = [
       {
         type: "@@redux-api@2@test"
       }, {
@@ -104,9 +104,25 @@ describe("index", function() {
     ];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
-      var exp = expectedEvent.shift();
+      const exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
     }
     action(dispatch, getState);
+  });
+  it("use provided reducerName when avaliable", function() {
+    const res = reduxApi({
+      test: {
+        reducerName: "foo",
+        url: "/plain/url/:id",
+        options: {
+          headers: {
+            "Accept": "application/json"
+          }
+        }
+      }
+    }, function fetchSuccess() {});
+    expect(res.actions.test).to.exist;
+    expect(res.reducers.test).to.not.exist;
+    expect(res.reducers.foo).to.exist;
   });
 });

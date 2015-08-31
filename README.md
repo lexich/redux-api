@@ -6,6 +6,8 @@
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is recommended to work with [Redux](https://github.com/gaearon/redux).
 
+
+
 ## Install
 with npm
 ```sh
@@ -41,22 +43,22 @@ import reduxApi, {transformers} from "redux-api";
   }
   // equivalent
   {
-    entry: {      
+    entry: {
       url: "/api/v1/entry",
-      transformer: transformers.object, //it's default value      
+      transformer: transformers.object, //it's default value
       options: {}                       //it's default value
     }
   }
   ```
   **url** - endpoint for rest api
-  > *type*: String 
+  > *type*: String
   **transformer** - response transformer
   > *type*: Function
   > *default*: transformers.object
   > *example*: It's a good idea to write custom transformer
     for example you have responce
     ```json
-    { "title": "Hello", "message": "World" } 
+    { "title": "Hello", "message": "World" }
     ```
     Custom transformer
     ```js
@@ -75,18 +77,18 @@ import reduxApi, {transformers} from "redux-api";
       options: {
         method: "post",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          "Accept": "application/json",
+          "Content-Type": "application/json"
         }
       }
       ```
 
-- **fetch** - rest backend. Redux-api recommends to use `fetch` API for rest [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch) 
+- **fetch** - rest backend. Redux-api recommends to use `fetch` API for rest [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch)
 > *type*: Function
 > *default*: null
 
 #### actions
-```js 
+```js
 import reduxApi, {transformers} from "redux-api";
 const rest = reduxApi({
   entries: "/api/v1/entry",
@@ -115,15 +117,45 @@ store = {
 const {dispatch} = this.props;
 dispatch(rest.actions.entries()); // GET "/api/v1/entry"
 dispatch(rest.actions.entry({id: 1}, {
-  body: JSON.stringify({ name: 'Hubot', login: 'hubot' 
+  body: JSON.stringify({ name: "Hubot", login: "hubot"
 }}));  // POST "/api/v1/entry/1" with body
 
 //also available helper methods
 dispatch(rest.actions.entries.reset()) // set initialState to store
 dispatch(rest.actions.entries.sync()) // this mathod save you from twice requests
-                                    // flag `sync`. if `sync===true` requst 
+                                    // flag `sync`. if `sync===true` requst
                                     // wouldnt execute
 ```
+
+#### reducerName
+
+Sometimes though, you might want named actions that go back to the same reducer. For example:
+```js
+import reduxApi, {transformers} from "redux-api";
+const rest = reduxApi({
+  getUser: {
+    reducerName: "user"
+    url: "/user/1", // return a user object
+  }
+  updateUser: {
+    reducerName: "user"
+    url: "/user/1/update",
+    options: {
+      method: "post"
+    }
+  }
+});
+const {actions} = rest;
+
+// In component with redux support (see example section)
+const {dispatch} = this.props;
+dispatch(rest.actions.getUser()); // GET "/api/v1/entry"
+dispatch(rest.actions.updateUser({}, {
+  body: JSON.stringify({ name: "Hubot", login: "hubot"})
+}));  // POST "/api/v1/entry/1" with body
+
+```
+In the above example, both getUser, and updateUser update the same user reducer as they share the same reducerName
 
 For example used es7 javascript, [Redux@1.0.0-rc](https://github.com/gaearon/redux/tree/v1.0.0-rc), but it's pretty simple to migrate this code to [Redux@v0.12.0](https://github.com/gaearon/redux/tree/v0.12.0)
 
@@ -174,11 +206,11 @@ class Application {
     // fetch `/api/v1/regions
     dispatch(rest.actions.regions.sync());
     //specify id for GET: /api/v1/entry/1
-    dispatch(rest.actions.entry({id: 1})); 
+    dispatch(rest.actions.entry({id: 1}));
   }
   render() {
     const {entry, regions} = this.props;
-    const Regions = regions.data.map((item)=> <p>{ item.name }</p>)    
+    const Regions = regions.data.map((item)=> <p>{ item.name }</p>)
     return (
       <div>
         Loading regions: { regions.loading }
@@ -197,3 +229,5 @@ React.render(
   document.getElementById("content")
 );
 ```
+
+### [Releases Changelog](https://github.com/lexich/redux-api/releases)
