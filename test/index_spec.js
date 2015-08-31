@@ -1,5 +1,5 @@
 "use strict";
-/*global describe, it*/
+/* global describe, it */
 
 var expect = require("chai").expect;
 var reduxApi = require("../src/index.js").default;
@@ -120,8 +120,7 @@ describe("index", function() {
           }
         }
       }
-  }, function fetchSuccess() {});
-
+    }, function fetchSuccess() {});
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
     expect(res.reducers.foo).to.exist;

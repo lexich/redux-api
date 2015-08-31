@@ -2,7 +2,7 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(factory);
+		define([], factory);
 	else if(typeof exports === 'object')
 		exports["redux-api"] = factory();
 	else
@@ -2746,7 +2746,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    parameterLimit: 1000,
 	    strictNullHandling: false,
 	    plainObjects: false,
-	    allowPrototypes: false
+	    allowPrototypes: false,
+	    allowDots: false
 	};
 	
 	
@@ -2891,7 +2892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    options.depth = typeof options.depth === 'number' ? options.depth : internals.depth;
 	    options.arrayLimit = typeof options.arrayLimit === 'number' ? options.arrayLimit : internals.arrayLimit;
 	    options.parseArrays = options.parseArrays !== false;
-	    options.allowDots = options.allowDots !== false;
+	    options.allowDots = typeof options.allowDots === 'boolean' ? options.allowDots : internals.allowDots;
 	    options.plainObjects = typeof options.plainObjects === 'boolean' ? options.plainObjects : internals.plainObjects;
 	    options.allowPrototypes = typeof options.allowPrototypes === 'boolean' ? options.allowPrototypes : internals.allowPrototypes;
 	    options.parameterLimit = typeof options.parameterLimit === 'number' ? options.parameterLimit : internals.parameterLimit;

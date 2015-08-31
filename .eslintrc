@@ -49,6 +49,7 @@
     "no-param-reassign": 0,
     "no-extend-native": 0,
     "no-empty": 0,
-    "guard-for-in": 0
+    "guard-for-in": 0,
+    "comma-dangle": 0
   }
 }

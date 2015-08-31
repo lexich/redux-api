@@ -1,5 +1,5 @@
 "use strict";
-/*global describe, it*/
+/* global describe, it */
 
 var expect = require("chai").expect;
 var urlTransform = require("../src/urlTransform");
