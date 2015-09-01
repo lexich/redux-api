@@ -63,10 +63,12 @@ describe("actionFn", function() {
 
     const expectedEvent = [
       {
-        type: ACTIONS.actionFetch
+        type: ACTIONS.actionFetch,
+        syncing: false
       }, {
         type: ACTIONS.actionSuccess,
-        data: {msg: "hello"}
+        data: {msg: "hello"},
+        syncing: false
       }
     ];
     function dispatch(msg) {
@@ -81,10 +83,12 @@ describe("actionFn", function() {
 
     const expectedEvent = [
       {
-        type: ACTIONS.actionFetch
+        type: ACTIONS.actionFetch,
+        syncing: false
       }, {
         type: ACTIONS.actionFail,
-        error: "Error"
+        error: "Error",
+        syncing: false
       }
     ];
     function dispatch(msg) {
