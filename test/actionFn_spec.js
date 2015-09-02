@@ -16,7 +16,7 @@ function fetchSuccess() {
 }
 
 function getState() {
-  return {test: {loading: false, sync: true, data: {}}};
+  return {test: {loading: false, syncing: false, sync: false, data: {}}};
 }
 
 function fetchFail() {
@@ -38,23 +38,32 @@ describe("actionFn", function() {
     expect(isFunction(api)).to.be.true;
   });
   it("check sync method", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
-    const expectedEvent = [
-      {
-        type: ACTIONS.actionFetch
-      }, {
-        type: ACTIONS.actionSuccess,
-        data: {msg: "hello"}
-      }
-    ];
-    function dispatch(msg) {
+    const initialState = getState();
+    initialState.test.sync = true;
+    let executeCounter = 0;
+    const api = actionFn("/test", "test", null, ACTIONS, ()=> {
+      executeCounter++;
+      return fetchSuccess();
+    });
+    api.sync()(function() {}, ()=> initialState);
+    expect(executeCounter).to.be.eql(0);
+
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: true
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: {msg: "hello"},
+      syncing: false
+    }];
+    api.sync()((msg)=> {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
-    }
-    api.sync()(dispatch, getState);
-    api.sync()(dispatch, getState);
+    }, getState);
+    expect(executeCounter).to.be.eql(1);
   });
+
   it("check normal usage", function() {
     const api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
     expect(api.reset()).to.eql({type: ACTIONS.actionReset });
