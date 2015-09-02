@@ -230,6 +230,26 @@ React.render(
 );
 ```
 
+### Store state schema
+```js
+const rest = reduxApi({
+  user: "/user/1"
+});
+```
+
+```js
+// initialState
+{
+  user: {
+    sync: false,    // State was update once
+    syncing: false, // State syncing is in progress
+    loading: false, // State updating is in progress
+    error: null,    // responce error
+    data: []        // responce data
+  }
+}
+```
+
 ### Url schema
 /api/v1/user/:id
 ```js
