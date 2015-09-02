@@ -174,7 +174,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var transformer = opts.transformer;
 	    var options = opts.options;
 	
-	    var initialState = { loading: false, data: transformer() };
+	    var initialState = {
+	      sync: false,
+	      syncing: false,
+	      loading: false,
+	      data: transformer()
+	    };
 	    var ACTIONS = {
 	      actionFetch: PREFIX + "@" + counter + "@" + keyName,
 	      actionSuccess: PREFIX + "@" + counter + "@" + keyName + "_success",
@@ -1207,21 +1212,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var fn = function fn(pathvars) {
 	    var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	    var info = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 	    return function (dispatch, getState) {
 	      var state = getState();
 	      var store = state[name];
 	      if (store.loading) {
 	        return;
 	      }
-	      dispatch({ type: actionFetch });
+	      dispatch({ type: actionFetch, syncing: !!info.syncing });
 	      var _url = (0, _urlTransform2["default"])(url, pathvars);
 	      var opts = _extends({}, options, params);
 	      fetch(_url, opts).then(function (resp) {
 	        return resp.json();
 	      }).then(function (data) {
-	        return dispatch({ type: actionSuccess, data: data });
+	        return dispatch({
+	          type: actionSuccess,
+	          syncing: false,
+	          data: data
+	        });
 	      })["catch"](function (error) {
-	        return dispatch({ type: actionFail, error: error });
+	        return dispatch({
+	          type: actionFail,
+	          syncing: false,
+	          error: error
+	        });
 	      });
 	    };
 	  };
@@ -1233,7 +1247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var state = getState();
 	      var store = state[name];
 	      if (store.sync) return;
-	      return fn(pathvars, params)(dispatch, getState);
+	      return fn(pathvars, params, { syncing: true })(dispatch, getState);
 	    };
 	  };
 	  return fn;
@@ -1272,11 +1286,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    switch (action.type) {
 	      case actionFetch:
-	        return _extends({}, state, { loading: true, error: null });
+	        return _extends({}, state, {
+	          loading: true,
+	          error: null,
+	          syncing: !!action.syncing
+	        });
 	      case actionSuccess:
-	        return _extends({}, state, { loading: false, sync: true, error: null, data: transformer(action.data) });
+	        return _extends({}, state, {
+	          loading: false,
+	          sync: true,
+	          syncing: false,
+	          error: null,
+	          data: transformer(action.data)
+	        });
 	      case actionFail:
-	        return _extends({}, state, { loading: false, error: action.error });
+	        return _extends({}, state, {
+	          loading: false,
+	          error: action.error,
+	          syncing: false
+	        });
 	      case actionReset:
 	        return _extends({}, initialState);
 	      default:

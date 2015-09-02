@@ -82,7 +82,12 @@ export default function reduxApi(config, fetch) {
       { ...defaultEndpointConfig, ...value } :
       { ...defaultEndpointConfig };
     const {transformer, options} = opts;
-    const initialState = { loading: false, data: transformer() };
+    const initialState = {
+      sync: false,
+      syncing: false,
+      loading: false,
+      data: transformer()
+    };
     const ACTIONS = {
       actionFetch: `${PREFIX}@${counter}@${keyName}`,
       actionSuccess: `${PREFIX}@${counter}@${keyName}_success`,

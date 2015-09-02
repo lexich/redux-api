@@ -52,10 +52,12 @@ describe("index", function() {
     const action = res.actions.test();
     const expectedEvent = [
       {
-        type: "@@redux-api@1@test"
+        type: "@@redux-api@1@test",
+        syncing: false
       }, {
         type: "@@redux-api@1@test_success",
-        data: {msg: "hello"}
+        data: {msg: "hello"},
+        syncing: false
       }
     ];
     function dispatch(msg) {
@@ -96,10 +98,12 @@ describe("index", function() {
     const action = res.actions.test({id: 1});
     const expectedEvent = [
       {
-        type: "@@redux-api@2@test"
+        type: "@@redux-api@2@test",
+        syncing: false
       }, {
         type: "@@redux-api@2@test_success",
-        data: {msg: "hello"}
+        data: {msg: "hello"},
+        syncing: false
       }
     ];
     function dispatch(msg) {
