@@ -24,7 +24,7 @@ bower install redux-api --save
 ```js
 import reduxApi, {transformers} from "redux-api";
 ```
-#### reduxApi(options, fetch)
+#### reduxApi(options, fetchAdapter)
 - **options** - configuration rest-api endpoints
 > *type*: Object
 > *return*: {reducers, actions} - `reducers` have to as parameter to `createStore` (see example section). actions (see `actions` section)
@@ -83,9 +83,14 @@ import reduxApi, {transformers} from "redux-api";
       }
       ```
 
-- **fetch** - rest backend. Redux-api recommends to use `fetch` API for rest [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch)
+- **adaptersFetch** - adapter for rest backend using `fetch` API for rest [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch)
 > *type*: Function
 > *default*: null
+> *example*: 
+```js
+// available adapters
+import adapterFetch from "redux-api/adapters/fetch";
+```
 
 #### actions
 ```js
