@@ -1203,7 +1203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _urlTransform2 = _interopRequireDefault(_urlTransform);
 	
-	function actionFn(url, name, options, ACTIONS, fetch) {
+	function actionFn(url, name, options, ACTIONS, fetchAdapter) {
 	  if (ACTIONS === undefined) ACTIONS = {};
 	  var actionFetch = ACTIONS.actionFetch;
 	  var actionSuccess = ACTIONS.actionSuccess;
@@ -1222,9 +1222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      dispatch({ type: actionFetch, syncing: !!info.syncing });
 	      var _url = (0, _urlTransform2["default"])(url, pathvars);
 	      var opts = _extends({}, options, params);
-	      fetch(_url, opts).then(function (resp) {
-	        return resp.json();
-	      }).then(function (data) {
+	      fetchAdapter(_url, opts).then(function (data) {
 	        return dispatch({
 	          type: actionSuccess,
 	          syncing: false,
