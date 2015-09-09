@@ -37,6 +37,7 @@ describe("actionFn", function() {
     const api = actionFn();
     expect(isFunction(api)).to.be.true;
   });
+
   it("check sync method", function() {
     const initialState = getState();
     initialState.test.sync = true;
@@ -87,6 +88,7 @@ describe("actionFn", function() {
     }
     action(dispatch, getState);
   });
+
   it("check fail fetch", function() {
     const api = actionFn("/test", "test", null, ACTIONS, fetchFail);
 
@@ -107,6 +109,7 @@ describe("actionFn", function() {
     }
     api()(dispatch, getState);
   });
+
   it("check double request", function() {
     const api = actionFn("/test/:id", "test", null, ACTIONS, fetchSuccess);
     function dispatch(msg) {
@@ -115,5 +118,21 @@ describe("actionFn", function() {
     api({id: 1})(dispatch, function() {
       return {test: {loading: true, data: {}}};
     });
+  });
+
+  it("check options param", function() {
+    let callOptions = 0;
+    let checkOptions = null;
+    const api = actionFn("/test/:id", "test", function(url, params) {
+      callOptions++;
+      return { ...params,  test: 1 };
+    }, ACTIONS, function(url, opts) {
+      checkOptions = opts;
+      return fetchSuccess();
+    });
+    function dispatch() {}
+    api("", {params: 1})(dispatch, getState);
+    expect(callOptions).to.eql(1);
+    expect(checkOptions).to.eql({params: 1, test: 1});
   });
 });

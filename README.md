@@ -49,6 +49,16 @@ import reduxApi, {transformers} from "redux-api";
       options: {}                       //it's default value
     }
   }
+  // equivalent
+  {
+    entry: {
+      url: "/api/v1/entry",
+      transformer: transformers.object, //it's default value
+      options: function(url, params) {  //it's default value
+        return {};
+      }                       
+    }
+  }
   ```
   **url** - endpoint for rest api
   > *type*: String
