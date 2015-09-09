@@ -178,7 +178,8 @@ For example used es7 javascript, [Redux@1.0.0-rc](https://github.com/gaearon/red
 rest.js
 ```js
 import "whatwg-fetch";
-import reduxApi, {transformers} from "./utils/Api";
+import reduxApi, {transformers} from "redux-api";
+import adapterFetch from "redux-api/adapters/fetch";
 export default reduxApi({
   // simple edpoint description
   entry: `/api/v1/entry/:id`,
@@ -194,7 +195,7 @@ export default reduxApi({
       }
     }
   }
-}, fetch); // it's nessasary to point using rest backend
+}, adapterFetch(fetch)); // it's nessasary to point using rest backend
 ```
 
 index.jsx
