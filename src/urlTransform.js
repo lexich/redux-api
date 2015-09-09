@@ -3,6 +3,7 @@ import reduce from "lodash/collection/reduce";
 import omit from "lodash/object/omit";
 import keys from "lodash/object/keys";
 import qs from "qs";
+import { parse } from "url";
 
 const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 
@@ -14,7 +15,8 @@ export default function urlTransform(url, params={}) {
       new RegExp(`(\\(:${key}\\)|:${key})`, "g"),
         ()=> (usedKeys[key] = value)), url);
   if (!urlWithParams) { return urlWithParams; }
-  const cleanURL = urlWithParams.replace(rxClean, "");
+  const { protocol, host, path } = parse(urlWithParams);
+  const cleanURL = (host) ? `${protocol}//${host}${path.replace(rxClean, "")}` : path.replace(rxClean, "");
   const usedKeysArray = keys(usedKeys);
   if (usedKeysArray.length !== keys(params).length) {
     const urlObject = cleanURL.split("?");

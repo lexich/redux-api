@@ -17,6 +17,11 @@ describe("urlTransform", function() {
     expect(urlTransform("/test/:id/hey/:id", {id: 1})).to.eql("/test/1/hey/1");
   });
 
+  it("check replace path with hostname", function() {
+    expect(urlTransform("http://localhost:1234/test/:id", {id: 1})).to.eql("http://localhost:1234/test/1");
+    expect(urlTransform("http://localhost:1234/test/:id/hey/:id", {id: 1})).to.eql("http://localhost:1234/test/1/hey/1");
+  });
+
   it("check optional params path", function() {
     expect(urlTransform("/test/:id", {id: 1})).to.eql("/test/1");
     expect(urlTransform("/test/(:id)", {id: 1})).to.eql("/test/1");
