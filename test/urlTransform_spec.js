@@ -20,6 +20,8 @@ describe("urlTransform", function() {
   it("check replace path with hostname", function() {
     expect(urlTransform("http://localhost:1234/test/:id", {id: 1})).to.eql("http://localhost:1234/test/1");
     expect(urlTransform("http://localhost:1234/test/:id/hey/:id", {id: 1})).to.eql("http://localhost:1234/test/1/hey/1");
+    expect(urlTransform("http://localhost:1234/test/:id/hey/:id?hello=1", {id: 1})).to.eql("http://localhost:1234/test/1/hey/1?hello=1");
+    expect(urlTransform("http://localhost:1234/test/:id/hey/:id?hello=1&world=2", {id: 1})).to.eql("http://localhost:1234/test/1/hey/1?hello=1&world=2");
   });
 
   it("check optional params path", function() {
