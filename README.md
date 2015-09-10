@@ -203,7 +203,7 @@ index.jsx
 import React, {PropTypes} from "react";
 import { createStore, applyMiddleware, combineReducers } from "redux";
 import thunk from "redux-thunk";
-import { Provider } from "react-redux";
+import { Provider, connect } from "react-redux";
 import rest from "./rest"; //our redux-rest object
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
