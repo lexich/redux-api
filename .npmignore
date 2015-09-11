@@ -1,2 +1,6 @@
-src
-dist
+/src
+/dist
+/examples
+/coverage
+/node_modules
+/webpack.config.js
