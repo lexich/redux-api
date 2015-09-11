@@ -42,7 +42,9 @@ let instanceCounter = 0;
 const PREFIX = "@@redux-api";
 /**
  * Entry api point
- * @param  {Object} Rest api configuration
+ * @param {Object} config Rest api configuration
+ * @param {Function} fetch Adapter for rest requests
+ * @param {Boolean} isServer false by default (fif you want to use it for isomorphic apps)
  * @return {actions, reducers}        { actions, reducers}
  * @example ```js
  *   const api = reduxApi({
@@ -73,9 +75,9 @@ const PREFIX = "@@redux-api";
  *   }));
  * ```
  */
-export default function reduxApi(config, fetch) {
+export default function reduxApi(config) {
   const counter = instanceCounter++;
-  return reduce(config, (memo, value, key)=> {
+  const initApi = (cfg, fetch, isServer=false)=> reduce(config, (memo, value, key)=> {
     const keyName = value.reducerName || key;
     const url = typeof value === "object" ? value.url : value;
     const opts = typeof value === "object" ?
@@ -97,8 +99,18 @@ export default function reduxApi(config, fetch) {
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, opts.fetch || fetch);
     if (!memo.reducers[keyName]) {
-      memo.reducers[keyName] = reducerFn(initialState, ACTIONS, transformer);
+      memo.reducers[keyName] = reducerFn(initialState, ACTIONS, transformer, isServer);
     }
     return memo;
-  }, {actions: {}, reducers: {}});
+  }, cfg);
+
+  const reduxApiObject = {
+    actions: {},
+    reducers: {}
+  };
+  reduxApiObject.init = function(fetch, isServer=false) {
+    reduxApiObject.reducers["@redux-api"] = ()=> ({ server: isServer });
+    return initApi(reduxApiObject, fetch, isServer);
+  };
+  return reduxApiObject;
 }

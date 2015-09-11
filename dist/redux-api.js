@@ -133,7 +133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var PREFIX = "@@redux-api";
 	/**
 	 * Entry api point
-	 * @param  {Object} Rest api configuration
+	 * @param {Object} config Rest api configuration
+	 * @param {Function} fetch Adapter for rest requests
+	 * @param {Boolean} isServer false by default (fif you want to use it for isomorphic apps)
 	 * @return {actions, reducers}        { actions, reducers}
 	 * @example ```js
 	 *   const api = reduxApi({
@@ -165,34 +167,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * ```
 	 */
 	
-	function reduxApi(config, fetch) {
+	function reduxApi(config) {
 	  var counter = instanceCounter++;
-	  return (0, _lodashCollectionReduce2["default"])(config, function (memo, value, key) {
-	    var keyName = value.reducerName || key;
-	    var url = typeof value === "object" ? value.url : value;
-	    var opts = typeof value === "object" ? _extends({}, defaultEndpointConfig, value) : _extends({}, defaultEndpointConfig);
-	    var transformer = opts.transformer;
-	    var options = opts.options;
+	  var initApi = function initApi(cfg, fetch) {
+	    var isServer = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+	    return (0, _lodashCollectionReduce2["default"])(config, function (memo, value, key) {
+	      var keyName = value.reducerName || key;
+	      var url = typeof value === "object" ? value.url : value;
+	      var opts = typeof value === "object" ? _extends({}, defaultEndpointConfig, value) : _extends({}, defaultEndpointConfig);
+	      var transformer = opts.transformer;
+	      var options = opts.options;
 	
-	    var initialState = {
-	      sync: false,
-	      syncing: false,
-	      loading: false,
-	      data: transformer()
-	    };
-	    var ACTIONS = {
-	      actionFetch: PREFIX + "@" + counter + "@" + keyName,
-	      actionSuccess: PREFIX + "@" + counter + "@" + keyName + "_success",
-	      actionFail: PREFIX + "@" + counter + "@" + keyName + "_fail",
-	      actionReset: PREFIX + "@" + counter + "@" + keyName + "_delete"
-	    };
+	      var initialState = {
+	        sync: false,
+	        syncing: false,
+	        loading: false,
+	        data: transformer()
+	      };
+	      var ACTIONS = {
+	        actionFetch: PREFIX + "@" + counter + "@" + keyName,
+	        actionSuccess: PREFIX + "@" + counter + "@" + keyName + "_success",
+	        actionFail: PREFIX + "@" + counter + "@" + keyName + "_fail",
+	        actionReset: PREFIX + "@" + counter + "@" + keyName + "_delete"
+	      };
 	
-	    memo.actions[key] = (0, _actionFn2["default"])(url, key, options, ACTIONS, opts.fetch || fetch);
-	    if (!memo.reducers[keyName]) {
-	      memo.reducers[keyName] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer);
-	    }
-	    return memo;
-	  }, { actions: {}, reducers: {} });
+	      memo.actions[key] = (0, _actionFn2["default"])(url, key, options, ACTIONS, opts.fetch || fetch);
+	      if (!memo.reducers[keyName]) {
+	        memo.reducers[keyName] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer, isServer);
+	      }
+	      return memo;
+	    }, cfg);
+	  };
+	
+	  var reduxApiObject = {
+	    actions: {},
+	    reducers: {}
+	  };
+	  reduxApiObject.init = function (fetch) {
+	    var isServer = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	
+	    reduxApiObject.reducers["@redux-api"] = function () {
+	      return { server: isServer };
+	    };
+	    return initApi(reduxApiObject, fetch, isServer);
+	  };
+	  return reduxApiObject;
 	}
 
 /***/ },
@@ -1262,13 +1281,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var actionFail = ACTIONS.actionFail;
 	  var actionReset = ACTIONS.actionReset;
 	
-	  var fn = function fn(pathvars) {
-	    var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	    var info = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	  var fn = function fn(pathvars, params, callback) {
+	    if (params === undefined) params = {};
+	    var info = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 	    return function (dispatch, getState) {
 	      var state = getState();
 	      var store = state[name];
 	      if (store.loading) {
+	        callback && callback("request still loading");
 	        return;
 	      }
 	      dispatch({ type: actionFetch, syncing: !!info.syncing });
@@ -1276,29 +1296,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var baseOptions = (0, _lodashLangIsFunction2["default"])(options) ? options(_url, params) : options;
 	      var opts = _extends({}, baseOptions, params);
 	      fetchAdapter(_url, opts).then(function (data) {
-	        return dispatch({
-	          type: actionSuccess,
-	          syncing: false,
-	          data: data
-	        });
+	        dispatch({ type: actionSuccess, syncing: false, data: data });
+	        callback && callback(null, data);
 	      })["catch"](function (error) {
-	        return dispatch({
-	          type: actionFail,
-	          syncing: false,
-	          error: error
-	        });
+	        dispatch({ type: actionFail, syncing: false, error: error });
+	        callback && callback(error);
 	      });
 	    };
 	  };
 	  fn.reset = function () {
 	    return { type: actionReset };
 	  };
-	  fn.sync = function (pathvars, params) {
+	  fn.sync = function (pathvars, params, callback) {
 	    return function (dispatch, getState) {
 	      var state = getState();
 	      var store = state[name];
-	      if (store.sync) return;
-	      return fn(pathvars, params, { syncing: true })(dispatch, getState);
+	      if (!state["@redux-api"].server && store.sync) {
+	        callback && callback();
+	        return;
+	      }
+	      return fn(pathvars, params, callback, { syncing: true })(dispatch, getState);
 	    };
 	  };
 	  return fn;

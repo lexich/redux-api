@@ -1,12 +1,11 @@
 ### Redux-api
+Flux REST API for redux infrastructure
 
 [![Build Status](https://travis-ci.org/lexich/redux-api.svg)](https://travis-ci.org/lexich/redux-api)
 [![NPM version](https://badge.fury.io/js/redux-api.svg)](http://badge.fury.io/js/redux-api)
 [![Coverage Status](https://coveralls.io/repos/lexich/redux-api/badge.png?branch=master)](https://coveralls.io/r/lexich/redux-api?branch=master)
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is recommended to work with [Redux](https://github.com/gaearon/redux).
-
-
 
 ## Install
 with npm
@@ -19,50 +18,52 @@ bower install redux-api --save
 ```
 
 =======
-## Documentation
+## Examples
+[examples/isomorphic](https://github.com/lexich/redux-api/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github api
 
+## Documentation
 ```js
 import reduxApi, {transformers} from "redux-api";
 ```
-#### reduxApi(options, fetchAdapter)
-- **options** - configuration rest-api endpoints
-> *type*: Object
-> *return*: {reducers, actions} - `reducers` have to as parameter to `createStore` (see example section). actions (see `actions` section)
-> *default*: {}
-> *example*:
+#### reduxApi(options)
+- @description create endpoint
+- @param **options** - configuration rest-api endpoints
+  > *type*: Object
+  > *default*: {}
+  > *example*:
   Simple endpoint definition `GET /api/v1/entry` where response is Object
-  ```js
-  {
-    entry: "/api/v1/entry",
-  }
-  // equivalent
-  {
-    entry: {
-      url: "/api/v1/entry"
+    ```js
+    {
+      entry: "/api/v1/entry",
     }
-  }
-  // equivalent
-  {
-    entry: {
-      url: "/api/v1/entry",
-      transformer: transformers.object, //it's default value
-      options: {}                       //it's default value
+    // equivalent
+    {
+      entry: {
+        url: "/api/v1/entry"
+      }
     }
-  }
-  // equivalent
-  {
-    entry: {
-      url: "/api/v1/entry",
-      transformer: transformers.object, //it's default value
-      options: function(url, params) {  //it's default value
-        return {};
-      }                       
+    // equivalent
+    {
+      entry: {
+        url: "/api/v1/entry",
+        transformer: transformers.object, //it's default value
+        options: {}                       //it's default value
+      }
     }
-  }
-  ```
-  **url** - endpoint for rest api
+    // equivalent
+    {
+      entry: {
+        url: "/api/v1/entry",
+        transformer: transformers.object, //it's default value
+        options: function(url, params) {  //it's default value
+          return {};
+        }                       
+      }
+    }
+    ```
+- @param **options.{endpoint}.url** - endpoint for rest api
   > *type*: String
-  **transformer** - response transformer
+- @param  **options.{endpoint}.transformer** - response transformer
   > *type*: Function
   > *default*: transformers.object
   > *example*: It's a good idea to write custom transformer
@@ -73,17 +74,15 @@ import reduxApi, {transformers} from "redux-api";
     Custom transformer
     ```js
     function customTransformer(data) {
-      if (!data) {
-        return {title: "", message: ""};
-      }
+      data || (data = {});
       return { title: (data.title || ""), message: (data.message || "")};
     }
     ```
-    **options** - Options for rest-api backend. `function(url, options)`
-    > *type*: Object
+- @param **options.{endpoint}.options** - Options for rest-api backend. `function(url, options)`
+    > *type*: Object | Funtions
     > *default*: null
-    > *example*: if you use [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch) backend
-      ```
+    > *example*: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend
+      ```js
       options: {
         method: "post",
         headers: {
@@ -91,20 +90,37 @@ import reduxApi, {transformers} from "redux-api";
           "Content-Type": "application/json"
         }
       }
+      // equivalent
+      options: function() {
+        return {
+          method: "post",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          }
+        };
+      }
+      
       ```
 
-- **adaptersFetch** - adapter for rest backend using `fetch` API for rest [whatwg-fetch](https://www.npmjs.com/package/whatwg-fetch)
-> *type*: Function
-> *default*: null
-> *example*: 
+#### reduxApi object
+`reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
 ```js
-// available adapters
+import "isomorphic-fetch";
+import reduxApi from "redux-api";
 import adapterFetch from "redux-api/adapters/fetch";
+const rest = reduxApi({
+  ... //config
+});
+rest.init(adapterFetch(fetch), false);
 ```
+- **reduxApi().init(adapter, isServer)**
+> *type*: Function - initialize reduxApi object
+> @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
+> @param **isServer** - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.
 
 #### actions
 ```js
-import reduxApi, {transformers} from "redux-api";
 const rest = reduxApi({
   entries: "/api/v1/entry",
   entry: {
@@ -114,6 +130,7 @@ const rest = reduxApi({
     }
   }
 });
+....
 const {actions} = rest;
 
 /*
@@ -139,7 +156,8 @@ dispatch(rest.actions.entry({id: 1}, {
 dispatch(rest.actions.entries.reset()) // set initialState to store
 dispatch(rest.actions.entries.sync()) // this mathod save you from twice requests
                                     // flag `sync`. if `sync===true` requst
-                                    // wouldnt execute
+                                    // wouldnt execute.
+                                    // In server-side mode calls twice
 ```
 
 #### reducerName
@@ -177,7 +195,7 @@ For example used es7 javascript, [Redux@1.0.0-rc](https://github.com/gaearon/red
 ###Example
 rest.js
 ```js
-import "whatwg-fetch";
+import "isomorphic-fetch";
 import reduxApi, {transformers} from "redux-api";
 import adapterFetch from "redux-api/adapters/fetch";
 export default reduxApi({
@@ -195,7 +213,7 @@ export default reduxApi({
       }
     }
   }
-}, adapterFetch(fetch)); // it's nessasary to point using rest backend
+}).init(adapterFetch(fetch)); // it's nessasary to point using rest backend
 ```
 
 index.jsx
