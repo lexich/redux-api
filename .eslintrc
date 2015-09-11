@@ -21,7 +21,7 @@
     "spread": true,
     "superInFunctions": true,
     "templateStrings": true,
-    "jsx": false
+    "jsx": true
   },
   "rules": {
     "no-multi-spaces": 0,

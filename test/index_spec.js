@@ -26,9 +26,9 @@ describe("index", function() {
   });
   it("check null params", function() {
     expect(isFunction(reduxApi)).to.be.true;
-    expect(reduxApi()).to.eql({
-      actions: {}, reducers: {}
-    });
+    const api = reduxApi();
+    expect(api.actions).to.eql({});
+    expect(api.reducers).to.eql({});
   });
   it("check string url", function() {
     function fetchSuccess(url, data) {
@@ -44,9 +44,9 @@ describe("index", function() {
     }
     const res = reduxApi({
       test: "/plain/url"
-    }, fetchSuccess);
+    }).init(fetchSuccess);
     expect(size(res.actions)).to.eql(1);
-    expect(size(res.reducers)).to.eql(1);
+    expect(size(res.reducers)).to.eql(2);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
     const action = res.actions.test();
@@ -92,7 +92,7 @@ describe("index", function() {
           }
         }
       }
-    }, fetchSuccess);
+    }).init(fetchSuccess);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
     const action = res.actions.test({id: 1});
@@ -124,7 +124,7 @@ describe("index", function() {
           }
         }
       }
-    }, function fetchSuccess() {});
+    }).init(function fetchSuccess() {});
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
     expect(res.reducers.foo).to.exist;

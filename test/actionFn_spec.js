@@ -16,7 +16,10 @@ function fetchSuccess() {
 }
 
 function getState() {
-  return {test: {loading: false, syncing: false, sync: false, data: {}}};
+  return {
+    "@redux-api": { server: false },
+    test: {loading: false, syncing: false, sync: false, data: {}}
+  };
 }
 
 function fetchFail() {
