@@ -19,7 +19,7 @@ bower install redux-api --save
 
 =======
 ## Examples
-[examples/isomorphic](https://github.com/lexich/redux-api/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github api
+[examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github api
 
 ## Documentation
 ```js
@@ -117,7 +117,7 @@ rest.init(adapterFetch(fetch), false);
 - **reduxApi().init(adapter, isServer)**
 > *type*: Function - initialize reduxApi object
 > @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
-> @param **isServer** - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.
+> @param **isServer** - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.
 
 #### actions
 ```js
