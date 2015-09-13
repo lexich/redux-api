@@ -26,12 +26,12 @@ bower install redux-api --save
 import reduxApi, {transformers} from "redux-api";
 ```
 #### reduxApi(options)
-- @description create endpoint
-- @param **options** - configuration rest-api endpoints
+- @description create endpoint  
+- @param **options** - configuration rest-api endpoints  
   > *type*: Object
   > *default*: {}
   > *example*:
-  Simple endpoint definition `GET /api/v1/entry` where response is Object
+  Simple endpoint definition `GET /api/v1/entry` where response is Object  
     ```js
     {
       entry: "/api/v1/entry",
@@ -61,13 +61,13 @@ import reduxApi, {transformers} from "redux-api";
       }
     }
     ```
-- @param **options.{endpoint}.url** - endpoint for rest api
-  > *type*: String
-- @param  **options.{endpoint}.transformer** - response transformer
-  > *type*: Function
-  > *default*: transformers.object
-  > *example*: It's a good idea to write custom transformer
-    for example you have responce
+- @param **options.{endpoint}.url** - endpoint for rest api 
+  > *type*: String  
+- @param  **options.{endpoint}.transformer** - response transformer  
+  > *type*: Function  
+  > *default*: transformers.object  
+  > *example*: It's a good idea to write custom transformer  
+    for example you have responce  
     ```json
     { "title": "Hello", "message": "World" }
     ```
@@ -79,9 +79,9 @@ import reduxApi, {transformers} from "redux-api";
     }
     ```
 - @param **options.{endpoint}.options** - Options for rest-api backend. `function(url, options)`
-    > *type*: Object | Funtions
-    > *default*: null
-    > *example*: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend
+    > *type*: Object | Funtions  
+    > *default*: null  
+    > *example*: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend  
       ```js
       options: {
         method: "post",
@@ -114,10 +114,10 @@ const rest = reduxApi({
 });
 rest.init(adapterFetch(fetch), false);
 ```
-- **reduxApi().init(adapter, isServer)**
-> *type*: Function - initialize reduxApi object
-> @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
-> @param **isServer** - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.
+- **reduxApi().init(adapter, isServer)**  
+> *type*: Function - initialize reduxApi object  
+> @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
+> @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.  
 
 #### actions
 ```js
