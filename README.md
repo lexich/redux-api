@@ -68,16 +68,16 @@ import reduxApi, {transformers} from "redux-api";
   > *default*: transformers.object  
   > *example*: It's a good idea to write custom transformer  
     for example you have responce  
-    ```json
-    { "title": "Hello", "message": "World" }
-    ```
+```json
+  { "title": "Hello", "message": "World" }
+```
     Custom transformer
-    ```js
-    function customTransformer(data) {
-      data || (data = {});
-      return { title: (data.title || ""), message: (data.message || "")};
-    }
-    ```
+```js
+  function customTransformer(data) {
+    data || (data = {});
+    return { title: (data.title || ""), message: (data.message || "")};
+  }
+```
 - @param **options.{endpoint}.options** - Options for rest-api backend. `function(url, options)`
     > *type*: Object | Funtions  
     > *default*: null  
