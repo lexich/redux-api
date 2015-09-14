@@ -32,10 +32,6 @@ app.set("views", path.join(__dirname, "..", "views"));
 // set up ejs for templating. You can use whatever
 app.set("view engine", path.join(__dirname, "..", "ejs"));
 
-app.get("/", function(req, res) {
-  res.redirect("/lexich");
-});
-
 app.use(function(req, res, next) {
   const location = createLocation(req.url);
   const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
@@ -48,7 +44,7 @@ app.use(function(req, res, next) {
     } else if (error) {
       res.status(500).send(error.message);
     } else if (renderProps === null) {
-      res.status(404).send("Not found");
+      res.status(404).render("404.ejs");
     } else {
       const html = React.renderToString(
         <Provider store={store}>
