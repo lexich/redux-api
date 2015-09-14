@@ -1,6 +1,5 @@
 "use strict";
 import React from "react";
-
 import express from "express";
 import path from "path";
 
@@ -10,8 +9,8 @@ import { Provider } from "react-redux";
 import thunk from "redux-thunk";
 
 // React-router
-import Router from "react-router";
-import Location from "react-router/lib/Location";
+import {RoutingContext, match} from "react-router";
+import createLocation from "history/lib/createLocation";
 import routes from "./routes/routes";
 
 // Redux-api
@@ -38,18 +37,26 @@ app.get("/", function(req, res) {
 });
 
 app.use(function(req, res, next) {
-  const location = new Location(req.path, req.query);
+  const location = createLocation(req.url);
   const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
   const reducer = combineReducers(reducers);
   const store = createStoreWithMiddleware(reducer);
   const childRoutes = routes(store);
-  Router.run(childRoutes, location, (error, initialState, transition)=> {
-    const html = React.renderToString(
-      <Provider store={store}>
-        {() => <Router {...initialState}/>}
-      </Provider>
-    );
-    res.render("index.ejs", { html, json: JSON.stringify(store.getState()) });
+  match({ routes: childRoutes, location }, (error, redirectLocation, renderProps)=> {
+    if (redirectLocation) {
+      res.status(301).redirect(redirectLocation.pathname + redirectLocation.search);
+    } else if (error) {
+      res.status(500).send(error.message);
+    } else if (renderProps === null) {
+      res.status(404).send("Not found");
+    } else {
+      const html = React.renderToString(
+        <Provider store={store}>
+          {() => <RoutingContext {...renderProps} />}
+        </Provider>
+      );
+      res.render("index.ejs", { html, json: JSON.stringify(store.getState()) });
+    }
   });
 });
 

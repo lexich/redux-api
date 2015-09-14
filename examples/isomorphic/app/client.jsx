@@ -3,7 +3,7 @@ import React from "react";
 
 // React-Router
 import Router from "react-router";
-import History from "react-router/lib/BrowserHistory";
+import createHistory from 'history/lib/createBrowserHistory'
 import routes from "./routes/routes";
 
 // Redux
@@ -27,14 +27,12 @@ const store = initialState ? finalCreateStore(reducer, initialState) : finalCrea
 delete window.$REDUX_STATE;
 
 const childRoutes = routes(store);
-const history = new History;
+const history = createHistory();
 const el = document.getElementById("react-main-mount");
 
-Router.run(childRoutes, history, ()=> {
-  React.render(
-    <Provider store={store}>
-      {()=> <Router key="ta-app" history={history} children={childRoutes}/>}
-    </Provider>,
-    document.getElementById("react-main-mount")
-  );
-});
+React.render(
+  <Provider store={store}>
+    {()=> <Router key="ta-app" history={history} children={childRoutes}/>}
+  </Provider>,
+  document.getElementById("react-main-mount")
+);
