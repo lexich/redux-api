@@ -42,8 +42,16 @@ describe("index", function() {
       test: "/plain/url"
     }).init(fetchSuccess);
     expect(size(res.actions)).to.eql(1);
+    expect(size(res.events)).to.eql(1);
+
     expect(size(res.reducers)).to.eql(2);
     expect(res.actions.test).to.exist;
+    expect(res.events.test).to.have.keys(
+      "actionFetch",
+      "actionSuccess",
+      "actionFail",
+      "actionReset"
+    );
     expect(res.reducers.test).to.exist;
     const expectedEvent = [
       {

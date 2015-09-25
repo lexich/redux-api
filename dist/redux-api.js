@@ -206,12 +206,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          data: transformer()
 	        };
 	        memo.reducers[reducerName] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer, isServer);
+	        memo.events[reducerName] = ACTIONS;
 	      }
 	      return memo;
 	    }, cfg);
 	  };
 	
-	  var reduxApiObject = { actions: {}, reducers: {} };
+	  var reduxApiObject = { actions: {}, reducers: {}, events: {} };
 	  reduxApiObject.init = function (fetch) {
 	    var isServer = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 	

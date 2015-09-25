@@ -109,11 +109,12 @@ export default function reduxApi(config) {
         data: transformer()
       };
       memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, transformer, isServer);
+      memo.events[reducerName] = ACTIONS;
     }
     return memo;
   }, cfg);
 
-  const reduxApiObject = { actions: {}, reducers: {} };
+  const reduxApiObject = { actions: {}, reducers: {}, events: {} };
   reduxApiObject.init = function(fetch, isServer=false) {
     reduxApiObject.reducers["@redux-api"] = ()=> ({ server: isServer });
     return initApi(reduxApiObject, fetch, isServer);
