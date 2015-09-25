@@ -2,6 +2,7 @@
 
 import urlTransform from "./urlTransform";
 import isFunction from "lodash/lang/isFunction";
+import each from "lodash/collection/each";
 
 /**
  * Constructor for create action
@@ -32,9 +33,13 @@ export default function actionFn(url, name, options, ACTIONS={}, fetchAdapter) {
     const _url = urlTransform(url, pathvars);
     const baseOptions = isFunction(options) ? options(_url, params) : options;
     const opts = { ...baseOptions, ...params };
+    const broadcast = opts.broadcast;
+    delete opts.broadcast;
+
     fetchAdapter(_url, opts)
       .then((data)=> {
         dispatch({ type: actionSuccess, syncing: false, data });
+        each(broadcast, (btype)=> dispatch({type: btype, data}));
         callback && callback(null, data);
       })
       .catch((error)=> {

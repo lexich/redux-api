@@ -182,5 +182,34 @@ describe("actionFn", function() {
     });
   });
 
+  it("check broadcast option", function() {
+    const BROADCAST_ACTION = "BROADCAST_ACTION";
+    const options = {
+      broadcast: [BROADCAST_ACTION]
+    };
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {msg: "hello"},
+        syncing: false
+      }, {
+        type: BROADCAST_ACTION,
+        data: {msg: "hello"}
+      }
+    ];
+    const api = actionFn("/test/:id", "test", options, ACTIONS, fetchSuccess);
+
+    return new Promise((resolve)=> {
+      api(null, null, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
   });
 });
