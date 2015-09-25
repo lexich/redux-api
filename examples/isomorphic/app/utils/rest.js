@@ -1,5 +1,5 @@
 import reduxApi from "../../../../src/index"; // redux-api
-import _ from "lodash";
+import map from "lodash/collection/map";
 
 const headers = {
   "User-Agent": "redux-api1"
@@ -11,7 +11,7 @@ export default reduxApi({
     url: `${URL}/users/:user/repos`,
     options: { headers },
     transformer(data) {
-      return _.map(data, (item)=> {
+      return map(data, (item)=> {
         return {
           name: item.name,
           fullName: item.full_name,

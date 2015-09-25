@@ -11,7 +11,7 @@ export default function routes({dispatch}) {
     indexRoute: {
       path: "/",
       onEnter(state, replaceState) {
-        replaceState(nextState, "/lexich");
+        replaceState(state, "/lexich");
       }
     },
     childRoutes: [{
@@ -19,7 +19,7 @@ export default function routes({dispatch}) {
       component: User,
       onEnter(state, replaceState, callback) {
         const {user} = state.params;
-        dispatch(actions.userRepos.sync({ user }, null, callback));
+        dispatch(actions.userRepos({ user }, null, callback));
       }
     }, {
       path: "/:user/:repo",
