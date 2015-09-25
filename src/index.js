@@ -7,6 +7,7 @@ import isNumber from "lodash/lang/isNumber";
 import isBoolean from "lodash/lang/isBoolean";
 
 import reduce from "lodash/collection/reduce";
+import size from "lodash/collection/size";
 
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
@@ -38,7 +39,6 @@ const defaultEndpointConfig = {
   transformer: transformers.object
 };
 
-let instanceCounter = 0;
 const PREFIX = "@@redux-api";
 /**
  * Entry api point
@@ -76,38 +76,44 @@ const PREFIX = "@@redux-api";
  * ```
  */
 export default function reduxApi(config) {
-  const counter = instanceCounter++;
   const initApi = (cfg, fetch, isServer=false)=> reduce(config, (memo, value, key)=> {
-    const keyName = value.reducerName || key;
-    const url = typeof value === "object" ? value.url : value;
     const opts = typeof value === "object" ?
-      { ...defaultEndpointConfig, ...value } :
-      { ...defaultEndpointConfig };
-    const {transformer, options} = opts;
-    const initialState = {
-      sync: false,
-      syncing: false,
-      loading: false,
-      data: transformer()
-    };
+      { ...defaultEndpointConfig, reducerName: key, ...value } :
+      { ...defaultEndpointConfig, reducerName: key, url: value };
+
+    const {
+      url, options, transformer,
+      broadcast, virtual, reducerName
+    } = opts;
+
     const ACTIONS = {
-      actionFetch: `${PREFIX}@${counter}@${keyName}`,
-      actionSuccess: `${PREFIX}@${counter}@${keyName}_success`,
-      actionFail: `${PREFIX}@${counter}@${keyName}_fail`,
-      actionReset: `${PREFIX}@${counter}@${keyName}_delete`
+      actionFetch: `${PREFIX}@${reducerName}`,
+      actionSuccess: `${PREFIX}@${reducerName}_success`,
+      actionFail: `${PREFIX}@${reducerName}_fail`,
+      actionReset: `${PREFIX}@${reducerName}_delete`
     };
 
-    memo.actions[key] = actionFn(url, key, options, ACTIONS, opts.fetch || fetch);
-    if (!memo.reducers[keyName]) {
-      memo.reducers[keyName] = reducerFn(initialState, ACTIONS, transformer, isServer);
+    const meta = {
+      fetch: opts.fetch || fetch,
+      broadcast,
+      virtual: size(broadcast) > 0 ? !!virtual : false
+    };
+
+    memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
+
+    if (!meta.virtual && !memo.reducers[reducerName]) {
+      const initialState = {
+        sync: false,
+        syncing: false,
+        loading: false,
+        data: transformer()
+      };
+      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, transformer, isServer);
     }
     return memo;
   }, cfg);
 
-  const reduxApiObject = {
-    actions: {},
-    reducers: {}
-  };
+  const reduxApiObject = { actions: {}, reducers: {} };
   reduxApiObject.init = function(fetch, isServer=false) {
     reduxApiObject.reducers["@redux-api"] = ()=> ({ server: isServer });
     return initApi(reduxApiObject, fetch, isServer);
