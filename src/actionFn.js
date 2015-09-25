@@ -26,7 +26,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const fn = (pathvars, params={}, callback, info={})=> (dispatch, getState)=> {
     const state = getState();
     const store = state[name];
-    if (store.loading) {
+    if (store && store.loading) {
       callback && callback("request still loading");
       return;
     }
@@ -60,7 +60,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   fn.sync = (pathvars, params, callback)=> (dispatch, getState)=> {
     const state = getState();
     const store = state[name];
-    if (!state["@redux-api"].server && store.sync) {
+    if (!state["@redux-api"].server && store && store.sync) {
       callback && callback();
       return;
     }

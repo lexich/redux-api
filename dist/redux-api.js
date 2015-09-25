@@ -1342,7 +1342,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return function (dispatch, getState) {
 	      var state = getState();
 	      var store = state[name];
-	      if (store.loading) {
+	      if (store && store.loading) {
 	        callback && callback("request still loading");
 	        return;
 	      }
@@ -1380,7 +1380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return function (dispatch, getState) {
 	      var state = getState();
 	      var store = state[name];
-	      if (!state["@redux-api"].server && store.sync) {
+	      if (!state["@redux-api"].server && store && store.sync) {
 	        callback && callback();
 	        return;
 	      }
