@@ -2,7 +2,7 @@ import reduxApi from "../../../../src/index"; // redux-api
 import map from "lodash/collection/map";
 
 const headers = {
-  "User-Agent": "redux-api1"
+  "User-Agent": "redux-api"
 };
 const URL = "https://api.github.com";
 
