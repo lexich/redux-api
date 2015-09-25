@@ -32,7 +32,7 @@ import reduxApi, {transformers} from "redux-api";
   > *default*: {}
   > *example*:
   Simple endpoint definition `GET /api/v1/entry` where response is Object  
-    ```js
+```js
     {
       entry: "/api/v1/entry",
     }
@@ -60,7 +60,7 @@ import reduxApi, {transformers} from "redux-api";
         }                       
       }
     }
-    ```
+```
 - @param **options.{endpoint}.url** - endpoint for rest api 
   > *type*: String  
 - @param  **options.{endpoint}.transformer** - response transformer  
@@ -82,7 +82,7 @@ import reduxApi, {transformers} from "redux-api";
     > *type*: Object | Funtions  
     > *default*: null  
     > *example*: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend  
-      ```js
+```js
       options: {
         method: "post",
         headers: {
@@ -100,8 +100,33 @@ import reduxApi, {transformers} from "redux-api";
           }
         };
       }
-      
-      ```
+```
+
+- @param **options.{endpoint}.broadcast** - list of actions which would emit after data fetching.
+  > *type*: Array
+  > *default*: null
+  > *example*
+```js
+import {ACTION_ENTRY_UPDATE} from "./constants";
+....
+entry: {
+  url: "/api/v1/entry",
+  broadcast: [ ACTION_ENTRY_UPDATE ]
+}
+// in your redux reducer
+function (state, action) {
+  switch (action.type) {
+  case ACTION_ENTRY_UPDATE:
+    return {
+      ...state,
+      data: action.data // fetching data
+    };
+  default:
+    return state;
+  }
+}
+```
+
 
 #### reduxApi object
 `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.

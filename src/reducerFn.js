@@ -1,5 +1,12 @@
 "use strict";
-export default function reducerFn(initialState, actions={}, transformer=(d)=> d) {
+/**
+ * Reducer contructor
+ * @param  {Object}   initialState default initial state
+ * @param  {Object}   actions      actions map
+ * @param  {Function} transformer  transformer function
+ * @return {Function}              reducer function
+ */
+export default function reducerFn(initialState, actions={}, transformer=(val)=> val) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = actions;
   return (state=initialState, action)=> {
     switch (action.type) {

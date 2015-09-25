@@ -7,11 +7,7 @@ const isFunction = require("lodash/lang/isFunction");
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
-    resolve({
-      json: function() {
-        return {msg: "hello"};
-      }
-    });
+    resolve({ msg: "hello"});
   });
 }
 
@@ -42,15 +38,19 @@ describe("actionFn", function() {
   });
 
   it("check sync method", function() {
-    const initialState = getState();
-    initialState.test.sync = true;
     let executeCounter = 0;
     const api = actionFn("/test", "test", null, ACTIONS, ()=> {
       executeCounter++;
       return fetchSuccess();
     });
-    api.sync()(function() {}, ()=> initialState);
-    expect(executeCounter).to.be.eql(0);
+
+    const async1 = new Promise((resolve)=> {
+      const initialState = getState();
+      initialState.test.sync = true;
+
+      api.sync(null, null, resolve)(function() {}, ()=> initialState);
+      expect(executeCounter).to.be.eql(0);
+    });
 
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
@@ -60,20 +60,23 @@ describe("actionFn", function() {
       data: {msg: "hello"},
       syncing: false
     }];
-    api.sync()((msg)=> {
-      expect(expectedEvent).to.have.length.above(0);
-      const exp = expectedEvent.shift();
-      expect(msg).to.eql(exp);
-    }, getState);
-    expect(executeCounter).to.be.eql(1);
+    const async2 = new Promise((resolve)=> {
+      api.sync(null, null, resolve)((msg)=> {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> {
+      expect(executeCounter).to.be.eql(1);
+      expect(expectedEvent).to.have.length(0);
+    });
+
+    return Promise.all([async1, async2]);
   });
 
   it("check normal usage", function() {
     const api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
     expect(api.reset()).to.eql({type: ACTIONS.actionReset });
-    const action = api();
-    expect(isFunction(action)).to.be.true;
-
     const expectedEvent = [
       {
         type: ACTIONS.actionFetch,
@@ -84,12 +87,20 @@ describe("actionFn", function() {
         syncing: false
       }
     ];
-    function dispatch(msg) {
-      expect(expectedEvent).to.have.length.above(0);
-      const exp = expectedEvent.shift();
-      expect(msg).to.eql(exp);
-    }
-    action(dispatch, getState);
+    return new Promise((resolve)=> {
+      const action = api(null, null, resolve);
+      expect(isFunction(action)).to.be.true;
+
+
+      function dispatch(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }
+      action(dispatch, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
   });
 
   it("check fail fetch", function() {
@@ -110,7 +121,11 @@ describe("actionFn", function() {
       const exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
     }
-    api()(dispatch, getState);
+    return new Promise((resolve)=> {
+      api(null, null, resolve)(dispatch, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
   });
 
   it("check double request", function() {
@@ -118,8 +133,10 @@ describe("actionFn", function() {
     function dispatch(msg) {
       expect(msg, "dispatch mustn't call").to.be.false;
     }
-    api({id: 1})(dispatch, function() {
-      return {test: {loading: true, data: {}}};
+    return new Promise((resolve)=> {
+      api({id: 1}, null, resolve)(dispatch, function() {
+        return {test: {loading: true, data: {}}};
+      });
     });
   });
 
@@ -134,8 +151,65 @@ describe("actionFn", function() {
       return fetchSuccess();
     });
     function dispatch() {}
-    api("", {params: 1})(dispatch, getState);
-    expect(callOptions).to.eql(1);
-    expect(checkOptions).to.eql({params: 1, test: 1});
+    return new Promise((resolve)=> {
+      api("", {params: 1}, resolve)(dispatch, getState);
+      expect(callOptions).to.eql(1);
+      expect(checkOptions).to.eql({params: 1, test: 1});
+    });
+  });
+
+  it("check server mode", function() {
+    function getServerState() {
+      return {
+        "@redux-api": { server: true },
+        test: {loading: false, syncing: false, sync: true, data: {}}
+      };
+    }
+    const api = actionFn("/test/:id", "test", null, ACTIONS, fetchSuccess);
+
+    const expectedEvent = [
+      { type: "actionFetch", syncing: true },
+      { type: "actionSuccess", syncing: false, data: { msg: "hello" } }
+    ];
+    return new Promise((resolve)=> {
+      api.sync(null, null, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getServerState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
+  });
+
+  it("check broadcast option", function() {
+    const BROADCAST_ACTION = "BROADCAST_ACTION";
+    const options = {
+      broadcast: [BROADCAST_ACTION]
+    };
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {msg: "hello"},
+        syncing: false
+      }, {
+        type: BROADCAST_ACTION,
+        data: {msg: "hello"}
+      }
+    ];
+    const api = actionFn("/test/:id", "test", options, ACTIONS, fetchSuccess);
+
+    return new Promise((resolve)=> {
+      api(null, null, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
   });
 });
