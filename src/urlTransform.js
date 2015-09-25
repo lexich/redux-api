@@ -7,6 +7,12 @@ import { parse } from "url";
 
 const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 
+/**
+ * Url modification
+ * @param  {String} url    url template
+ * @param  {Object} params params for url template
+ * @return {String}        result url
+ */
 export default function urlTransform(url, params={}) {
   if (!url) { return ""; }
   const usedKeys = {};
