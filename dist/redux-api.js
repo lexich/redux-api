@@ -77,21 +77,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _lodashLangIsObject2 = _interopRequireDefault(_lodashLangIsObject);
 	
-	var _lodashLangIsString = __webpack_require__(/*! lodash/lang/isString */ 71);
+	var _lodashLangIsString = __webpack_require__(/*! lodash/lang/isString */ 72);
 	
 	var _lodashLangIsString2 = _interopRequireDefault(_lodashLangIsString);
 	
-	var _lodashLangIsNumber = __webpack_require__(/*! lodash/lang/isNumber */ 70);
+	var _lodashLangIsNumber = __webpack_require__(/*! lodash/lang/isNumber */ 71);
 	
 	var _lodashLangIsNumber2 = _interopRequireDefault(_lodashLangIsNumber);
 	
-	var _lodashLangIsBoolean = __webpack_require__(/*! lodash/lang/isBoolean */ 68);
+	var _lodashLangIsBoolean = __webpack_require__(/*! lodash/lang/isBoolean */ 69);
 	
 	var _lodashLangIsBoolean2 = _interopRequireDefault(_lodashLangIsBoolean);
 	
-	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 12);
+	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 13);
 	
 	var _lodashCollectionReduce2 = _interopRequireDefault(_lodashCollectionReduce);
+	
+	var _lodashCollectionSize = __webpack_require__(/*! lodash/collection/size */ 32);
+	
+	var _lodashCollectionSize2 = _interopRequireDefault(_lodashCollectionSize);
 	
 	var _reducerFn = __webpack_require__(/*! ./reducerFn */ 27);
 	
@@ -129,7 +133,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  transformer: transformers.object
 	};
 	
-	var instanceCounter = 0;
 	var PREFIX = "@@redux-api";
 	/**
 	 * Entry api point
@@ -168,41 +171,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	
 	function reduxApi(config) {
-	  var counter = instanceCounter++;
 	  var initApi = function initApi(cfg, fetch) {
 	    var isServer = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 	    return (0, _lodashCollectionReduce2["default"])(config, function (memo, value, key) {
-	      var keyName = value.reducerName || key;
-	      var url = typeof value === "object" ? value.url : value;
-	      var opts = typeof value === "object" ? _extends({}, defaultEndpointConfig, value) : _extends({}, defaultEndpointConfig);
-	      var transformer = opts.transformer;
+	      var opts = typeof value === "object" ? _extends({}, defaultEndpointConfig, { reducerName: key }, value) : _extends({}, defaultEndpointConfig, { reducerName: key, url: value });
+	
+	      var url = opts.url;
 	      var options = opts.options;
+	      var transformer = opts.transformer;
+	      var broadcast = opts.broadcast;
+	      var virtual = opts.virtual;
+	      var reducerName = opts.reducerName;
 	
-	      var initialState = {
-	        sync: false,
-	        syncing: false,
-	        loading: false,
-	        data: transformer()
-	      };
 	      var ACTIONS = {
-	        actionFetch: PREFIX + "@" + counter + "@" + keyName,
-	        actionSuccess: PREFIX + "@" + counter + "@" + keyName + "_success",
-	        actionFail: PREFIX + "@" + counter + "@" + keyName + "_fail",
-	        actionReset: PREFIX + "@" + counter + "@" + keyName + "_delete"
+	        actionFetch: PREFIX + "@" + reducerName,
+	        actionSuccess: PREFIX + "@" + reducerName + "_success",
+	        actionFail: PREFIX + "@" + reducerName + "_fail",
+	        actionReset: PREFIX + "@" + reducerName + "_delete"
 	      };
 	
-	      memo.actions[key] = (0, _actionFn2["default"])(url, key, options, ACTIONS, opts.fetch || fetch);
-	      if (!memo.reducers[keyName]) {
-	        memo.reducers[keyName] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer, isServer);
+	      var meta = {
+	        fetch: opts.fetch || fetch,
+	        broadcast: broadcast,
+	        virtual: (0, _lodashCollectionSize2["default"])(broadcast) > 0 ? !!virtual : false
+	      };
+	
+	      memo.actions[key] = (0, _actionFn2["default"])(url, key, options, ACTIONS, meta);
+	
+	      if (!meta.virtual && !memo.reducers[reducerName]) {
+	        var initialState = {
+	          sync: false,
+	          syncing: false,
+	          loading: false,
+	          data: transformer()
+	        };
+	        memo.reducers[reducerName] = (0, _reducerFn2["default"])(initialState, ACTIONS, transformer, isServer);
 	      }
 	      return memo;
 	    }, cfg);
 	  };
 	
-	  var reduxApiObject = {
-	    actions: {},
-	    reducers: {}
-	  };
+	  var reduxApiObject = { actions: {}, reducers: {} };
 	  reduxApiObject.init = function (fetch) {
 	    var isServer = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 	
@@ -221,7 +230,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var getNative = __webpack_require__(/*! ../internal/getNative */ 6),
+	var getNative = __webpack_require__(/*! ../internal/getNative */ 7),
 	    isLength = __webpack_require__(/*! ../internal/isLength */ 5),
 	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 2);
 	
@@ -375,40 +384,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/*!****************************************!*\
-  !*** ./~/lodash/internal/getNative.js ***!
-  \****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var isNative = __webpack_require__(/*! ../lang/isNative */ 69);
-	
-	/**
-	 * Gets the native function at `key` of `object`.
-	 *
-	 * @private
-	 * @param {Object} object The object to query.
-	 * @param {string} key The key of the method to get.
-	 * @returns {*} Returns the function if it's native, else `undefined`.
-	 */
-	function getNative(object, key) {
-	  var value = object == null ? undefined : object[key];
-	  return isNative(value) ? value : undefined;
-	}
-	
-	module.exports = getNative;
-
-
-/***/ },
-/* 7 */
 /*!*********************************!*\
   !*** ./~/lodash/object/keys.js ***!
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var getNative = __webpack_require__(/*! ../internal/getNative */ 6),
-	    isArrayLike = __webpack_require__(/*! ../internal/isArrayLike */ 9),
+	var getNative = __webpack_require__(/*! ../internal/getNative */ 7),
+	    isArrayLike = __webpack_require__(/*! ../internal/isArrayLike */ 10),
 	    isObject = __webpack_require__(/*! ../lang/isObject */ 4),
-	    shimKeys = __webpack_require__(/*! ../internal/shimKeys */ 67);
+	    shimKeys = __webpack_require__(/*! ../internal/shimKeys */ 68);
 	
 	/* Native method references for those with the same name as other `lodash` methods. */
 	var nativeKeys = getNative(Object, 'keys');
@@ -450,6 +434,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	module.exports = keys;
+
+
+/***/ },
+/* 7 */
+/*!****************************************!*\
+  !*** ./~/lodash/internal/getNative.js ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var isNative = __webpack_require__(/*! ../lang/isNative */ 70);
+	
+	/**
+	 * Gets the native function at `key` of `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @param {string} key The key of the method to get.
+	 * @returns {*} Returns the function if it's native, else `undefined`.
+	 */
+	function getNative(object, key) {
+	  var value = object == null ? undefined : object[key];
+	  return isNative(value) ? value : undefined;
+	}
+	
+	module.exports = getNative;
 
 
 /***/ },
@@ -502,12 +511,36 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
+/*!****************************************!*\
+  !*** ./~/lodash/internal/getLength.js ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseProperty = __webpack_require__(/*! ./baseProperty */ 18);
+	
+	/**
+	 * Gets the "length" property value of `object`.
+	 *
+	 * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
+	 * that affects Safari on at least iOS 8.1-8.3 ARM64.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {*} Returns the "length" value.
+	 */
+	var getLength = baseProperty('length');
+	
+	module.exports = getLength;
+
+
+/***/ },
+/* 10 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/isArrayLike.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var getLength = __webpack_require__(/*! ./getLength */ 18),
+	var getLength = __webpack_require__(/*! ./getLength */ 9),
 	    isLength = __webpack_require__(/*! ./isLength */ 5);
 	
 	/**
@@ -525,13 +558,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /*!**************************************!*\
   !*** ./~/lodash/lang/isArguments.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArrayLike = __webpack_require__(/*! ../internal/isArrayLike */ 9),
+	var isArrayLike = __webpack_require__(/*! ../internal/isArrayLike */ 10),
 	    isObjectLike = __webpack_require__(/*! ../internal/isObjectLike */ 2);
 	
 	/** Used for native method references. */
@@ -568,13 +601,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /*!***********************************!*\
   !*** ./~/lodash/object/keysIn.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArguments = __webpack_require__(/*! ../lang/isArguments */ 10),
+	var isArguments = __webpack_require__(/*! ../lang/isArguments */ 11),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1),
 	    isIndex = __webpack_require__(/*! ../internal/isIndex */ 19),
 	    isLength = __webpack_require__(/*! ../internal/isLength */ 5),
@@ -641,15 +674,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /*!***************************************!*\
   !*** ./~/lodash/collection/reduce.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayReduce = __webpack_require__(/*! ../internal/arrayReduce */ 37),
-	    baseEach = __webpack_require__(/*! ../internal/baseEach */ 13),
-	    createReduce = __webpack_require__(/*! ../internal/createReduce */ 59);
+	var arrayReduce = __webpack_require__(/*! ../internal/arrayReduce */ 38),
+	    baseEach = __webpack_require__(/*! ../internal/baseEach */ 14),
+	    createReduce = __webpack_require__(/*! ../internal/createReduce */ 60);
 	
 	/**
 	 * Reduces `collection` to a value which is the accumulated result of running
@@ -694,14 +727,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /*!***************************************!*\
   !*** ./~/lodash/internal/baseEach.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseForOwn = __webpack_require__(/*! ./baseForOwn */ 43),
-	    createBaseEach = __webpack_require__(/*! ./createBaseEach */ 55);
+	var baseForOwn = __webpack_require__(/*! ./baseForOwn */ 44),
+	    createBaseEach = __webpack_require__(/*! ./createBaseEach */ 56);
 	
 	/**
 	 * The base implementation of `_.forEach` without support for callback
@@ -718,13 +751,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /*!**************************************!*\
   !*** ./~/lodash/internal/baseFor.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var createBaseFor = __webpack_require__(/*! ./createBaseFor */ 56);
+	var createBaseFor = __webpack_require__(/*! ./createBaseFor */ 57);
 	
 	/**
 	 * The base implementation of `baseForIn` and `baseForOwn` which iterates
@@ -744,7 +777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /*!**************************************!*\
   !*** ./~/lodash/internal/baseGet.js ***!
   \**************************************/
@@ -782,13 +815,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/baseIsEqual.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIsEqualDeep = __webpack_require__(/*! ./baseIsEqualDeep */ 45),
+	var baseIsEqualDeep = __webpack_require__(/*! ./baseIsEqualDeep */ 46),
 	    isObject = __webpack_require__(/*! ../lang/isObject */ 4),
 	    isObjectLike = __webpack_require__(/*! ./isObjectLike */ 2);
 	
@@ -819,7 +852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/baseProperty.js ***!
   \*******************************************/
@@ -839,30 +872,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	module.exports = baseProperty;
-
-
-/***/ },
-/* 18 */
-/*!****************************************!*\
-  !*** ./~/lodash/internal/getLength.js ***!
-  \****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var baseProperty = __webpack_require__(/*! ./baseProperty */ 17);
-	
-	/**
-	 * Gets the "length" property value of `object`.
-	 *
-	 * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
-	 * that affects Safari on at least iOS 8.1-8.3 ARM64.
-	 *
-	 * @private
-	 * @param {Object} object The object to query.
-	 * @returns {*} Returns the "length" value.
-	 */
-	var getLength = baseProperty('length');
-	
-	module.exports = getLength;
 
 
 /***/ },
@@ -966,7 +975,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseToString = __webpack_require__(/*! ./baseToString */ 52),
+	var baseToString = __webpack_require__(/*! ./baseToString */ 53),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1);
 	
 	/** Used to match property names within property paths. */
@@ -1312,8 +1321,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Function+Object}     action function object
 	 */
 	
-	function actionFn(url, name, options, ACTIONS, fetchAdapter) {
-	  if (ACTIONS === undefined) ACTIONS = {};
+	function actionFn(url, name, options) {
+	  var ACTIONS = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+	  var meta = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
 	  var actionFetch = ACTIONS.actionFetch;
 	  var actionSuccess = ACTIONS.actionSuccess;
 	  var actionFail = ACTIONS.actionFail;
@@ -1336,21 +1346,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        callback && callback("request still loading");
 	        return;
 	      }
-	      dispatch({ type: actionFetch, syncing: !!info.syncing });
+	      !meta.virtual && dispatch({ type: actionFetch, syncing: !!info.syncing });
 	      var _url = (0, _urlTransform2["default"])(url, pathvars);
 	      var baseOptions = (0, _lodashLangIsFunction2["default"])(options) ? options(_url, params) : options;
 	      var opts = _extends({}, baseOptions, params);
-	      var broadcast = opts.broadcast;
-	      delete opts.broadcast;
 	
-	      fetchAdapter(_url, opts).then(function (data) {
-	        dispatch({ type: actionSuccess, syncing: false, data: data });
-	        (0, _lodashCollectionEach2["default"])(broadcast, function (btype) {
+	      meta.fetch(_url, opts).then(function (data) {
+	        !meta.virtual && dispatch({ type: actionSuccess, syncing: false, data: data });
+	        (0, _lodashCollectionEach2["default"])(meta.broadcast, function (btype) {
 	          return dispatch({ type: btype, data: data });
 	        });
 	        callback && callback(null, data);
 	      })["catch"](function (error) {
-	        dispatch({ type: actionFail, syncing: false, error: error });
+	        !meta.virtual && dispatch({ type: actionFail, syncing: false, error: error });
 	        callback && callback(error);
 	      });
 	    };
@@ -1469,23 +1477,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 12);
+	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 13);
 	
 	var _lodashCollectionReduce2 = _interopRequireDefault(_lodashCollectionReduce);
 	
-	var _lodashObjectOmit = __webpack_require__(/*! lodash/object/omit */ 73);
+	var _lodashObjectOmit = __webpack_require__(/*! lodash/object/omit */ 74);
 	
 	var _lodashObjectOmit2 = _interopRequireDefault(_lodashObjectOmit);
 	
-	var _lodashObjectKeys = __webpack_require__(/*! lodash/object/keys */ 7);
+	var _lodashObjectKeys = __webpack_require__(/*! lodash/object/keys */ 6);
 	
 	var _lodashObjectKeys2 = _interopRequireDefault(_lodashObjectKeys);
 	
-	var _qs = __webpack_require__(/*! qs */ 76);
+	var _qs = __webpack_require__(/*! qs */ 77);
 	
 	var _qs2 = _interopRequireDefault(_qs);
 	
-	var _url = __webpack_require__(/*! url */ 84);
+	var _url = __webpack_require__(/*! url */ 85);
 	
 	var rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 	
@@ -1575,9 +1583,9 @@ return /******/ (function(modules) { // webpackBootstrap
   \****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayEach = __webpack_require__(/*! ../internal/arrayEach */ 34),
-	    baseEach = __webpack_require__(/*! ../internal/baseEach */ 13),
-	    createForEach = __webpack_require__(/*! ../internal/createForEach */ 58);
+	var arrayEach = __webpack_require__(/*! ../internal/arrayEach */ 35),
+	    baseEach = __webpack_require__(/*! ../internal/baseEach */ 14),
+	    createForEach = __webpack_require__(/*! ../internal/createForEach */ 59);
 	
 	/**
 	 * Iterates over elements of `collection` invoking `iteratee` for each element.
@@ -1616,6 +1624,45 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 32 */
+/*!*************************************!*\
+  !*** ./~/lodash/collection/size.js ***!
+  \*************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var getLength = __webpack_require__(/*! ../internal/getLength */ 9),
+	    isLength = __webpack_require__(/*! ../internal/isLength */ 5),
+	    keys = __webpack_require__(/*! ../object/keys */ 6);
+	
+	/**
+	 * Gets the size of `collection` by returning its length for array-like
+	 * values or the number of own enumerable properties for objects.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @category Collection
+	 * @param {Array|Object|string} collection The collection to inspect.
+	 * @returns {number} Returns the size of `collection`.
+	 * @example
+	 *
+	 * _.size([1, 2, 3]);
+	 * // => 3
+	 *
+	 * _.size({ 'a': 1, 'b': 2 });
+	 * // => 2
+	 *
+	 * _.size('pebbles');
+	 * // => 7
+	 */
+	function size(collection) {
+	  var length = collection ? getLength(collection) : 0;
+	  return isLength(length) ? length : keys(collection).length;
+	}
+	
+	module.exports = size;
+
+
+/***/ },
+/* 33 */
 /*!****************************************!*\
   !*** ./~/lodash/function/restParam.js ***!
   \****************************************/
@@ -1682,14 +1729,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /*!***************************************!*\
   !*** ./~/lodash/internal/SetCache.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {var cachePush = __webpack_require__(/*! ./cachePush */ 54),
-	    getNative = __webpack_require__(/*! ./getNative */ 6);
+	/* WEBPACK VAR INJECTION */(function(global) {var cachePush = __webpack_require__(/*! ./cachePush */ 55),
+	    getNative = __webpack_require__(/*! ./getNative */ 7);
 	
 	/** Native method references. */
 	var Set = getNative(global, 'Set');
@@ -1721,7 +1768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 34 */
+/* 35 */
 /*!****************************************!*\
   !*** ./~/lodash/internal/arrayEach.js ***!
   \****************************************/
@@ -1752,7 +1799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /*!***************************************!*\
   !*** ./~/lodash/internal/arrayMap.js ***!
   \***************************************/
@@ -1782,7 +1829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /*!****************************************!*\
   !*** ./~/lodash/internal/arrayPush.js ***!
   \****************************************/
@@ -1811,7 +1858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/arrayReduce.js ***!
   \******************************************/
@@ -1846,7 +1893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /*!****************************************!*\
   !*** ./~/lodash/internal/arraySome.js ***!
   \****************************************/
@@ -1878,17 +1925,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/baseCallback.js ***!
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseMatches = __webpack_require__(/*! ./baseMatches */ 47),
-	    baseMatchesProperty = __webpack_require__(/*! ./baseMatchesProperty */ 48),
+	var baseMatches = __webpack_require__(/*! ./baseMatches */ 48),
+	    baseMatchesProperty = __webpack_require__(/*! ./baseMatchesProperty */ 49),
 	    bindCallback = __webpack_require__(/*! ./bindCallback */ 8),
 	    identity = __webpack_require__(/*! ../utility/identity */ 24),
-	    property = __webpack_require__(/*! ../utility/property */ 75);
+	    property = __webpack_require__(/*! ../utility/property */ 76);
 	
 	/**
 	 * The base implementation of `_.callback` which supports specifying the
@@ -1922,15 +1969,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /*!*********************************************!*\
   !*** ./~/lodash/internal/baseDifference.js ***!
   \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIndexOf = __webpack_require__(/*! ./baseIndexOf */ 44),
-	    cacheIndexOf = __webpack_require__(/*! ./cacheIndexOf */ 53),
-	    createCache = __webpack_require__(/*! ./createCache */ 57);
+	var baseIndexOf = __webpack_require__(/*! ./baseIndexOf */ 45),
+	    cacheIndexOf = __webpack_require__(/*! ./cacheIndexOf */ 54),
+	    createCache = __webpack_require__(/*! ./createCache */ 58);
 	
 	/** Used as the size to enable large array optimizations. */
 	var LARGE_ARRAY_SIZE = 200;
@@ -1986,16 +2033,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/baseFlatten.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayPush = __webpack_require__(/*! ./arrayPush */ 36),
-	    isArguments = __webpack_require__(/*! ../lang/isArguments */ 10),
+	var arrayPush = __webpack_require__(/*! ./arrayPush */ 37),
+	    isArguments = __webpack_require__(/*! ../lang/isArguments */ 11),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1),
-	    isArrayLike = __webpack_require__(/*! ./isArrayLike */ 9),
+	    isArrayLike = __webpack_require__(/*! ./isArrayLike */ 10),
 	    isObjectLike = __webpack_require__(/*! ./isObjectLike */ 2);
 	
 	/**
@@ -2036,14 +2083,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /*!****************************************!*\
   !*** ./~/lodash/internal/baseForIn.js ***!
   \****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseFor = __webpack_require__(/*! ./baseFor */ 14),
-	    keysIn = __webpack_require__(/*! ../object/keysIn */ 11);
+	var baseFor = __webpack_require__(/*! ./baseFor */ 15),
+	    keysIn = __webpack_require__(/*! ../object/keysIn */ 12);
 	
 	/**
 	 * The base implementation of `_.forIn` without support for callback
@@ -2062,14 +2109,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /*!*****************************************!*\
   !*** ./~/lodash/internal/baseForOwn.js ***!
   \*****************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseFor = __webpack_require__(/*! ./baseFor */ 14),
-	    keys = __webpack_require__(/*! ../object/keys */ 7);
+	var baseFor = __webpack_require__(/*! ./baseFor */ 15),
+	    keys = __webpack_require__(/*! ../object/keys */ 6);
 	
 	/**
 	 * The base implementation of `_.forOwn` without support for callback
@@ -2088,13 +2135,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 44 */
+/* 45 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/baseIndexOf.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var indexOfNaN = __webpack_require__(/*! ./indexOfNaN */ 64);
+	var indexOfNaN = __webpack_require__(/*! ./indexOfNaN */ 65);
 	
 	/**
 	 * The base implementation of `_.indexOf` without support for binary searches.
@@ -2124,17 +2171,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /*!**********************************************!*\
   !*** ./~/lodash/internal/baseIsEqualDeep.js ***!
   \**********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var equalArrays = __webpack_require__(/*! ./equalArrays */ 60),
-	    equalByTag = __webpack_require__(/*! ./equalByTag */ 61),
-	    equalObjects = __webpack_require__(/*! ./equalObjects */ 62),
+	var equalArrays = __webpack_require__(/*! ./equalArrays */ 61),
+	    equalByTag = __webpack_require__(/*! ./equalByTag */ 62),
+	    equalObjects = __webpack_require__(/*! ./equalObjects */ 63),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1),
-	    isTypedArray = __webpack_require__(/*! ../lang/isTypedArray */ 72);
+	    isTypedArray = __webpack_require__(/*! ../lang/isTypedArray */ 73);
 	
 	/** `Object#toString` result references. */
 	var argsTag = '[object Arguments]',
@@ -2235,13 +2282,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 47 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/baseIsMatch.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIsEqual = __webpack_require__(/*! ./baseIsEqual */ 16),
+	var baseIsEqual = __webpack_require__(/*! ./baseIsEqual */ 17),
 	    toObject = __webpack_require__(/*! ./toObject */ 3);
 	
 	/**
@@ -2296,14 +2343,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 47 */
+/* 48 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/baseMatches.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseIsMatch = __webpack_require__(/*! ./baseIsMatch */ 46),
-	    getMatchData = __webpack_require__(/*! ./getMatchData */ 63),
+	var baseIsMatch = __webpack_require__(/*! ./baseIsMatch */ 47),
+	    getMatchData = __webpack_require__(/*! ./getMatchData */ 64),
 	    toObject = __webpack_require__(/*! ./toObject */ 3);
 	
 	/**
@@ -2335,15 +2382,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 48 */
+/* 49 */
 /*!**************************************************!*\
   !*** ./~/lodash/internal/baseMatchesProperty.js ***!
   \**************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseGet = __webpack_require__(/*! ./baseGet */ 15),
-	    baseIsEqual = __webpack_require__(/*! ./baseIsEqual */ 16),
-	    baseSlice = __webpack_require__(/*! ./baseSlice */ 51),
+	var baseGet = __webpack_require__(/*! ./baseGet */ 16),
+	    baseIsEqual = __webpack_require__(/*! ./baseIsEqual */ 17),
+	    baseSlice = __webpack_require__(/*! ./baseSlice */ 52),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1),
 	    isKey = __webpack_require__(/*! ./isKey */ 20),
 	    isStrictComparable = __webpack_require__(/*! ./isStrictComparable */ 21),
@@ -2389,13 +2436,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 50 */
 /*!***********************************************!*\
   !*** ./~/lodash/internal/basePropertyDeep.js ***!
   \***********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseGet = __webpack_require__(/*! ./baseGet */ 15),
+	var baseGet = __webpack_require__(/*! ./baseGet */ 16),
 	    toPath = __webpack_require__(/*! ./toPath */ 22);
 	
 	/**
@@ -2417,7 +2464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 51 */
 /*!*****************************************!*\
   !*** ./~/lodash/internal/baseReduce.js ***!
   \*****************************************/
@@ -2450,7 +2497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 52 */
 /*!****************************************!*\
   !*** ./~/lodash/internal/baseSlice.js ***!
   \****************************************/
@@ -2491,7 +2538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 53 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/baseToString.js ***!
   \*******************************************/
@@ -2513,7 +2560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 54 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/cacheIndexOf.js ***!
   \*******************************************/
@@ -2541,7 +2588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 54 */
+/* 55 */
 /*!****************************************!*\
   !*** ./~/lodash/internal/cachePush.js ***!
   \****************************************/
@@ -2570,13 +2617,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 55 */
+/* 56 */
 /*!*********************************************!*\
   !*** ./~/lodash/internal/createBaseEach.js ***!
   \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var getLength = __webpack_require__(/*! ./getLength */ 18),
+	var getLength = __webpack_require__(/*! ./getLength */ 9),
 	    isLength = __webpack_require__(/*! ./isLength */ 5),
 	    toObject = __webpack_require__(/*! ./toObject */ 3);
 	
@@ -2610,7 +2657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 57 */
 /*!********************************************!*\
   !*** ./~/lodash/internal/createBaseFor.js ***!
   \********************************************/
@@ -2646,14 +2693,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 57 */
+/* 58 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/createCache.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {var SetCache = __webpack_require__(/*! ./SetCache */ 33),
-	    getNative = __webpack_require__(/*! ./getNative */ 6);
+	/* WEBPACK VAR INJECTION */(function(global) {var SetCache = __webpack_require__(/*! ./SetCache */ 34),
+	    getNative = __webpack_require__(/*! ./getNative */ 7);
 	
 	/** Native method references. */
 	var Set = getNative(global, 'Set');
@@ -2677,7 +2724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 58 */
+/* 59 */
 /*!********************************************!*\
   !*** ./~/lodash/internal/createForEach.js ***!
   \********************************************/
@@ -2706,14 +2753,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 59 */
+/* 60 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/createReduce.js ***!
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseCallback = __webpack_require__(/*! ./baseCallback */ 39),
-	    baseReduce = __webpack_require__(/*! ./baseReduce */ 50),
+	var baseCallback = __webpack_require__(/*! ./baseCallback */ 40),
+	    baseReduce = __webpack_require__(/*! ./baseReduce */ 51),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1);
 	
 	/**
@@ -2737,13 +2784,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 61 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/equalArrays.js ***!
   \******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var arraySome = __webpack_require__(/*! ./arraySome */ 38);
+	var arraySome = __webpack_require__(/*! ./arraySome */ 39);
 	
 	/**
 	 * A specialized version of `baseIsEqualDeep` for arrays with support for
@@ -2797,7 +2844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 61 */
+/* 62 */
 /*!*****************************************!*\
   !*** ./~/lodash/internal/equalByTag.js ***!
   \*****************************************/
@@ -2854,13 +2901,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 63 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/equalObjects.js ***!
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var keys = __webpack_require__(/*! ../object/keys */ 7);
+	var keys = __webpack_require__(/*! ../object/keys */ 6);
 	
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -2930,14 +2977,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 64 */
 /*!*******************************************!*\
   !*** ./~/lodash/internal/getMatchData.js ***!
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var isStrictComparable = __webpack_require__(/*! ./isStrictComparable */ 21),
-	    pairs = __webpack_require__(/*! ../object/pairs */ 74);
+	    pairs = __webpack_require__(/*! ../object/pairs */ 75);
 	
 	/**
 	 * Gets the propery names, values, and compare flags of `object`.
@@ -2960,7 +3007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 64 */
+/* 65 */
 /*!*****************************************!*\
   !*** ./~/lodash/internal/indexOfNaN.js ***!
   \*****************************************/
@@ -2992,7 +3039,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 65 */
+/* 66 */
 /*!******************************************!*\
   !*** ./~/lodash/internal/pickByArray.js ***!
   \******************************************/
@@ -3029,13 +3076,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 66 */
+/* 67 */
 /*!*********************************************!*\
   !*** ./~/lodash/internal/pickByCallback.js ***!
   \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseForIn = __webpack_require__(/*! ./baseForIn */ 42);
+	var baseForIn = __webpack_require__(/*! ./baseForIn */ 43);
 	
 	/**
 	 * A specialized version of `_.pick` which picks `object` properties `predicate`
@@ -3060,17 +3107,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 67 */
+/* 68 */
 /*!***************************************!*\
   !*** ./~/lodash/internal/shimKeys.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArguments = __webpack_require__(/*! ../lang/isArguments */ 10),
+	var isArguments = __webpack_require__(/*! ../lang/isArguments */ 11),
 	    isArray = __webpack_require__(/*! ../lang/isArray */ 1),
 	    isIndex = __webpack_require__(/*! ./isIndex */ 19),
 	    isLength = __webpack_require__(/*! ./isLength */ 5),
-	    keysIn = __webpack_require__(/*! ../object/keysIn */ 11);
+	    keysIn = __webpack_require__(/*! ../object/keysIn */ 12);
 	
 	/** Used for native method references. */
 	var objectProto = Object.prototype;
@@ -3110,7 +3157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 68 */
+/* 69 */
 /*!************************************!*\
   !*** ./~/lodash/lang/isBoolean.js ***!
   \************************************/
@@ -3154,7 +3201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 69 */
+/* 70 */
 /*!***********************************!*\
   !*** ./~/lodash/lang/isNative.js ***!
   \***********************************/
@@ -3211,7 +3258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /*!***********************************!*\
   !*** ./~/lodash/lang/isNumber.js ***!
   \***********************************/
@@ -3261,7 +3308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 71 */
+/* 72 */
 /*!***********************************!*\
   !*** ./~/lodash/lang/isString.js ***!
   \***********************************/
@@ -3305,7 +3352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /*!***************************************!*\
   !*** ./~/lodash/lang/isTypedArray.js ***!
   \***************************************/
@@ -3388,20 +3435,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 73 */
+/* 74 */
 /*!*********************************!*\
   !*** ./~/lodash/object/omit.js ***!
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayMap = __webpack_require__(/*! ../internal/arrayMap */ 35),
-	    baseDifference = __webpack_require__(/*! ../internal/baseDifference */ 40),
-	    baseFlatten = __webpack_require__(/*! ../internal/baseFlatten */ 41),
+	var arrayMap = __webpack_require__(/*! ../internal/arrayMap */ 36),
+	    baseDifference = __webpack_require__(/*! ../internal/baseDifference */ 41),
+	    baseFlatten = __webpack_require__(/*! ../internal/baseFlatten */ 42),
 	    bindCallback = __webpack_require__(/*! ../internal/bindCallback */ 8),
-	    keysIn = __webpack_require__(/*! ./keysIn */ 11),
-	    pickByArray = __webpack_require__(/*! ../internal/pickByArray */ 65),
-	    pickByCallback = __webpack_require__(/*! ../internal/pickByCallback */ 66),
-	    restParam = __webpack_require__(/*! ../function/restParam */ 32);
+	    keysIn = __webpack_require__(/*! ./keysIn */ 12),
+	    pickByArray = __webpack_require__(/*! ../internal/pickByArray */ 66),
+	    pickByCallback = __webpack_require__(/*! ../internal/pickByCallback */ 67),
+	    restParam = __webpack_require__(/*! ../function/restParam */ 33);
 	
 	/**
 	 * The opposite of `_.pick`; this method creates an object composed of the
@@ -3444,13 +3491,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 74 */
+/* 75 */
 /*!**********************************!*\
   !*** ./~/lodash/object/pairs.js ***!
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var keys = __webpack_require__(/*! ./keys */ 7),
+	var keys = __webpack_require__(/*! ./keys */ 6),
 	    toObject = __webpack_require__(/*! ../internal/toObject */ 3);
 	
 	/**
@@ -3486,14 +3533,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 75 */
+/* 76 */
 /*!**************************************!*\
   !*** ./~/lodash/utility/property.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseProperty = __webpack_require__(/*! ../internal/baseProperty */ 17),
-	    basePropertyDeep = __webpack_require__(/*! ../internal/basePropertyDeep */ 49),
+	var baseProperty = __webpack_require__(/*! ../internal/baseProperty */ 18),
+	    basePropertyDeep = __webpack_require__(/*! ../internal/basePropertyDeep */ 50),
 	    isKey = __webpack_require__(/*! ../internal/isKey */ 20);
 	
 	/**
@@ -3526,7 +3573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 77 */
 /*!***************************!*\
   !*** ./~/qs/lib/index.js ***!
   \***************************/
@@ -3534,8 +3581,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// Load modules
 	
-	var Stringify = __webpack_require__(/*! ./stringify */ 78);
-	var Parse = __webpack_require__(/*! ./parse */ 77);
+	var Stringify = __webpack_require__(/*! ./stringify */ 79);
+	var Parse = __webpack_require__(/*! ./parse */ 78);
 	
 	
 	// Declare internals
@@ -3550,7 +3597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 77 */
+/* 78 */
 /*!***************************!*\
   !*** ./~/qs/lib/parse.js ***!
   \***************************/
@@ -3746,7 +3793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 78 */
+/* 79 */
 /*!*******************************!*\
   !*** ./~/qs/lib/stringify.js ***!
   \*******************************/
@@ -3897,7 +3944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 79 */
+/* 80 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -3916,7 +3963,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 80 */
+/* 81 */
 /*!************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/punycode/punycode.js ***!
   \************************************************************/
@@ -4451,10 +4498,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	}(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/buildin/module.js */ 79)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/buildin/module.js */ 80)(module), (function() { return this; }())))
 
 /***/ },
-/* 81 */
+/* 82 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/querystring/decode.js ***!
   \*******************************************************************/
@@ -4543,7 +4590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 82 */
+/* 83 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/querystring/encode.js ***!
   \*******************************************************************/
@@ -4616,7 +4663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 83 */
+/* 84 */
 /*!******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/querystring/index.js ***!
   \******************************************************************/
@@ -4624,12 +4671,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 81);
-	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 82);
+	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 82);
+	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 83);
 
 
 /***/ },
-/* 84 */
+/* 85 */
 /*!**************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/url.js ***!
   \**************************************************/
@@ -4656,7 +4703,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var punycode = __webpack_require__(/*! punycode */ 80);
+	var punycode = __webpack_require__(/*! punycode */ 81);
 	
 	exports.parse = urlParse;
 	exports.resolve = urlResolve;
@@ -4728,7 +4775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      'gopher:': true,
 	      'file:': true
 	    },
-	    querystring = __webpack_require__(/*! querystring */ 83);
+	    querystring = __webpack_require__(/*! querystring */ 84);
 	
 	function urlParse(url, parseQueryString, slashesDenoteHost) {
 	  if (url && isObject(url) && url instanceof Url) return url;
