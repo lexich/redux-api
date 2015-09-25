@@ -138,4 +138,19 @@ describe("actionFn", function() {
     expect(callOptions).to.eql(1);
     expect(checkOptions).to.eql({params: 1, test: 1});
   });
+
+  it("check server mode", function() {
+    function getServerState() {
+      return {
+        "@redux-api": { server: true },
+        test: {loading: false, syncing: false, sync: true, data: {}}
+      };
+    }
+    const api = actionFn("/test/:id", "test", null, ACTIONS, fetchSuccess);
+    let callDispatch = 0;
+    api.sync()(function() {
+      callDispatch++;
+    }, getServerState);
+    expect(callDispatch).to.eql(1);
+  });
 });
