@@ -13,8 +13,9 @@ import each from "lodash/collection/each";
  * @param  {[type]} fetchAdapter adapter for fetching data
  * @return {Function+Object}     action function object
  */
-export default function actionFn(url, name, options, ACTIONS={}, fetchAdapter) {
+export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = ACTIONS;
+
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -29,21 +30,19 @@ export default function actionFn(url, name, options, ACTIONS={}, fetchAdapter) {
       callback && callback("request still loading");
       return;
     }
-    dispatch({ type: actionFetch, syncing: !!info.syncing });
+    !meta.virtual && dispatch({ type: actionFetch, syncing: !!info.syncing });
     const _url = urlTransform(url, pathvars);
     const baseOptions = isFunction(options) ? options(_url, params) : options;
     const opts = { ...baseOptions, ...params };
-    const broadcast = opts.broadcast;
-    delete opts.broadcast;
 
-    fetchAdapter(_url, opts)
+    meta.fetch(_url, opts)
       .then((data)=> {
-        dispatch({ type: actionSuccess, syncing: false, data });
-        each(broadcast, (btype)=> dispatch({type: btype, data}));
+        !meta.virtual && dispatch({ type: actionSuccess, syncing: false, data });
+        each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
         callback && callback(null, data);
       })
       .catch((error)=> {
-        dispatch({ type: actionFail, syncing: false, error });
+        !meta.virtual && dispatch({ type: actionFail, syncing: false, error });
         callback && callback(error);
       });
   };

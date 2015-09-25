@@ -19,14 +19,20 @@ export default function routes({dispatch}) {
       component: User,
       onEnter(state, replaceState, callback) {
         const {user} = state.params;
-        dispatch(actions.userRepos({ user }, null, callback));
+        dispatch(actions.userRepos.sync({ user }, null, callback));
+      },
+      onLeave() {
+        dispatch(actions.userRepos.reset());
       }
     }, {
       path: "/:user/:repo",
       component: Repo,
       onEnter(state, replaceState, callback) {
         const {user, repo} = state.params;
-        dispatch(actions.repo({ user, repo}, null, callback));
+        dispatch(actions.repo.sync({ user, repo}, null, callback));
+      },
+      onLeave() {
+        dispatch(actions.repo.reset());
       }
     }]
   };

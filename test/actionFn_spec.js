@@ -39,10 +39,10 @@ describe("actionFn", function() {
 
   it("check sync method", function() {
     let executeCounter = 0;
-    const api = actionFn("/test", "test", null, ACTIONS, ()=> {
+    const api = actionFn("/test", "test", null, ACTIONS, {fetch: ()=> {
       executeCounter++;
       return fetchSuccess();
-    });
+    }});
 
     const async1 = new Promise((resolve)=> {
       const initialState = getState();
@@ -75,7 +75,7 @@ describe("actionFn", function() {
   });
 
   it("check normal usage", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, fetchSuccess);
+    const api = actionFn("/test", "test", null, ACTIONS, {fetch: fetchSuccess});
     expect(api.reset()).to.eql({type: ACTIONS.actionReset });
     const expectedEvent = [
       {
@@ -104,7 +104,7 @@ describe("actionFn", function() {
   });
 
   it("check fail fetch", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, fetchFail);
+    const api = actionFn("/test", "test", null, ACTIONS, {fetch: fetchFail});
 
     const expectedEvent = [
       {
@@ -129,7 +129,7 @@ describe("actionFn", function() {
   });
 
   it("check double request", function() {
-    const api = actionFn("/test/:id", "test", null, ACTIONS, fetchSuccess);
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {fetch: fetchSuccess});
     function dispatch(msg) {
       expect(msg, "dispatch mustn't call").to.be.false;
     }
@@ -146,10 +146,10 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", function(url, params) {
       callOptions++;
       return { ...params,  test: 1 };
-    }, ACTIONS, function(url, opts) {
+    }, ACTIONS, {fetch: function(url, opts) {
       checkOptions = opts;
       return fetchSuccess();
-    });
+    }});
     function dispatch() {}
     return new Promise((resolve)=> {
       api("", {params: 1}, resolve)(dispatch, getState);
@@ -165,7 +165,7 @@ describe("actionFn", function() {
         test: {loading: false, syncing: false, sync: true, data: {}}
       };
     }
-    const api = actionFn("/test/:id", "test", null, ACTIONS, fetchSuccess);
+    const api = actionFn("/test/:id", "test", null, ACTIONS, { fetch: fetchSuccess });
 
     const expectedEvent = [
       { type: "actionFetch", syncing: true },
@@ -184,9 +184,6 @@ describe("actionFn", function() {
 
   it("check broadcast option", function() {
     const BROADCAST_ACTION = "BROADCAST_ACTION";
-    const options = {
-      broadcast: [BROADCAST_ACTION]
-    };
     const expectedEvent = [
       {
         type: ACTIONS.actionFetch,
@@ -200,7 +197,35 @@ describe("actionFn", function() {
         data: {msg: "hello"}
       }
     ];
-    const api = actionFn("/test/:id", "test", options, ACTIONS, fetchSuccess);
+    const meta = {
+      fetch: fetchSuccess,
+      broadcast: [BROADCAST_ACTION]
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+
+    return new Promise((resolve)=> {
+      api(null, null, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
+  });
+
+  it("check virtual + broadcast option", function() {
+    const BROADCAST_ACTION = "BROADCAST_ACTION";
+    const expectedEvent = [{
+      type: BROADCAST_ACTION,
+      data: {msg: "hello"}
+    }];
+    const meta = {
+      fetch: fetchSuccess,
+      broadcast: [BROADCAST_ACTION],
+      virtual: true
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
 
     return new Promise((resolve)=> {
       api(null, null, resolve)(function(msg) {

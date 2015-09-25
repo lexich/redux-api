@@ -127,6 +127,9 @@ function (state, action) {
 }
 ```
 
+- @param **options.{endpoint}.virtual** - if virtual is `true` this endpoint doesn't create reducer and doesn't emit redux-api actions. All data broadcasting by actions from `broadcast` list. If `broadcast` list is empty `virtual` value will be `false` anyway.
+  > *type*: Array
+  > *default*: false
 
 #### reduxApi object
 `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.

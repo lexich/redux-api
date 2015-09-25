@@ -35,11 +35,7 @@ describe("index", function() {
       expect(url).to.eql("/plain/url");
       expect(data).to.eql({});
       return new Promise(function(resolve) {
-        resolve({
-          json: function() {
-            return {msg: "hello"};
-          }
-        });
+        resolve({msg: "hello"});
       });
     }
     const res = reduxApi({
@@ -49,23 +45,27 @@ describe("index", function() {
     expect(size(res.reducers)).to.eql(2);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
-    const action = res.actions.test();
     const expectedEvent = [
       {
-        type: "@@redux-api@1@test",
+        type: "@@redux-api@test",
         syncing: false
       }, {
-        type: "@@redux-api@1@test_success",
+        type: "@@redux-api@test_success",
         data: {msg: "hello"},
         syncing: false
       }
     ];
-    function dispatch(msg) {
-      expect(expectedEvent).to.have.length.above(0);
-      const exp = expectedEvent.shift();
-      expect(msg).to.eql(exp);
-    }
-    action(dispatch, getState);
+    return new Promise((resolve)=> {
+      const action = res.actions.test(null, null, resolve);
+      function dispatch(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }
+      action(dispatch, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
   });
   it("check object url", function() {
     function fetchSuccess(url, options) {
@@ -76,11 +76,7 @@ describe("index", function() {
         }
       });
       return new Promise(function(resolve) {
-        resolve({
-          json: function() {
-            return {msg: "hello"};
-          }
-        });
+        resolve({msg: "hello"});
       });
     }
     const res = reduxApi({
@@ -95,23 +91,26 @@ describe("index", function() {
     }).init(fetchSuccess);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
-    const action = res.actions.test({id: 1});
-    const expectedEvent = [
-      {
-        type: "@@redux-api@2@test",
-        syncing: false
-      }, {
-        type: "@@redux-api@2@test_success",
-        data: {msg: "hello"},
-        syncing: false
+
+    const expectedEvent = [{
+      type: "@@redux-api@test",
+      syncing: false
+    }, {
+      type: "@@redux-api@test_success",
+      data: {msg: "hello"},
+      syncing: false
+    }];
+    return new Promise((resolve)=> {
+      const action = res.actions.test({id: 1}, null, resolve);
+      function dispatch(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
       }
-    ];
-    function dispatch(msg) {
-      expect(expectedEvent).to.have.length.above(0);
-      const exp = expectedEvent.shift();
-      expect(msg).to.eql(exp);
-    }
-    action(dispatch, getState);
+      action(dispatch, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+    });
   });
   it("use provided reducerName when avaliable", function() {
     const res = reduxApi({
@@ -128,5 +127,29 @@ describe("index", function() {
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
     expect(res.reducers.foo).to.exist;
+  });
+
+  it("check virtual option with broadcast", function() {
+    const BROADCAST_ACTION = "BROADCAST_ACTION";
+    const res = reduxApi({
+      test: {
+        url: "/api",
+        broadcast: [BROADCAST_ACTION],
+        virtual: true
+      }
+    }).init(function fetchSuccess() {});
+    expect(res.actions.test).to.exist;
+    expect(res.reducers.test).to.not.exist;
+  });
+
+  it("check virtual option without broadcast", function() {
+    const res = reduxApi({
+      test: {
+        url: "/api",
+        virtual: true
+      }
+    }).init(function fetchSuccess() {});
+    expect(res.actions.test).to.exist;
+    expect(res.reducers.test).to.exist;
   });
 });

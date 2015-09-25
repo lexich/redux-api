@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -15,7 +15,7 @@
     "build": "npm run browser-dev && npm run browser-min && npm run compile",
     "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "eslint": "node_modules/.bin/eslint src test examples/isomorphic/app examples/isomorphic/server.js",
-    "compile": "node_modules/.bin/babel src --out-dir lib",
+    "compile": "node_modules/.bin/babel src --out-dir lib --source-maps",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
     "browser-min": "NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
     "precommit": "npm test",
