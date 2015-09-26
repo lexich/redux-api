@@ -13,7 +13,6 @@ function fetchSuccess() {
 
 function getState() {
   return {
-    "@redux-api": { server: false },
     test: {loading: false, syncing: false, sync: false, data: {}}
   };
 }
@@ -39,10 +38,10 @@ describe("actionFn", function() {
 
   it("check sync method", function() {
     let executeCounter = 0;
-    const api = actionFn("/test", "test", null, ACTIONS, {fetch: ()=> {
+    const api = actionFn("/test", "test", null, ACTIONS, {holder: {fetch: ()=> {
       executeCounter++;
       return fetchSuccess();
-    }});
+    }}});
 
     const async1 = new Promise((resolve)=> {
       const initialState = getState();
@@ -75,7 +74,7 @@ describe("actionFn", function() {
   });
 
   it("check normal usage", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, {fetch: fetchSuccess});
+    const api = actionFn("/test", "test", null, ACTIONS, {holder: { fetch: fetchSuccess}});
     expect(api.reset()).to.eql({type: ACTIONS.actionReset });
     const expectedEvent = [
       {
@@ -104,7 +103,7 @@ describe("actionFn", function() {
   });
 
   it("check fail fetch", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, {fetch: fetchFail});
+    const api = actionFn("/test", "test", null, ACTIONS, {holder: {fetch: fetchFail}});
 
     const expectedEvent = [
       {
@@ -129,7 +128,7 @@ describe("actionFn", function() {
   });
 
   it("check double request", function() {
-    const api = actionFn("/test/:id", "test", null, ACTIONS, {fetch: fetchSuccess});
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {holder: {fetch: fetchSuccess}});
     function dispatch(msg) {
       expect(msg, "dispatch mustn't call").to.be.false;
     }
@@ -146,10 +145,10 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", function(url, params) {
       callOptions++;
       return { ...params,  test: 1 };
-    }, ACTIONS, {fetch: function(url, opts) {
+    }, ACTIONS, {holder: {fetch: function(url, opts) {
       checkOptions = opts;
       return fetchSuccess();
-    }});
+    }}});
     function dispatch() {}
     return new Promise((resolve)=> {
       api("", {params: 1}, resolve)(dispatch, getState);
@@ -161,11 +160,15 @@ describe("actionFn", function() {
   it("check server mode", function() {
     function getServerState() {
       return {
-        "@redux-api": { server: true },
         test: {loading: false, syncing: false, sync: true, data: {}}
       };
     }
-    const api = actionFn("/test/:id", "test", null, ACTIONS, { fetch: fetchSuccess });
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      holder: {
+        fetch: fetchSuccess,
+        server: true
+      }
+    });
 
     const expectedEvent = [
       { type: "actionFetch", syncing: true },
@@ -198,7 +201,7 @@ describe("actionFn", function() {
       }
     ];
     const meta = {
-      fetch: fetchSuccess,
+      holder: {fetch: fetchSuccess},
       broadcast: [BROADCAST_ACTION]
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -221,7 +224,7 @@ describe("actionFn", function() {
       data: {msg: "hello"}
     }];
     const meta = {
-      fetch: fetchSuccess,
+      holder: {fetch: fetchSuccess},
       broadcast: [BROADCAST_ACTION],
       virtual: true
     };

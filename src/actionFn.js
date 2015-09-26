@@ -35,7 +35,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const baseOptions = isFunction(options) ? options(_url, params) : options;
     const opts = { ...baseOptions, ...params };
 
-    meta.fetch(_url, opts)
+    meta.holder.fetch(_url, opts)
       .then((data)=> {
         !meta.virtual && dispatch({ type: actionSuccess, syncing: false, data });
         each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
@@ -60,7 +60,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   fn.sync = (pathvars, params, callback)=> (dispatch, getState)=> {
     const state = getState();
     const store = state[name];
-    if (!state["@redux-api"].server && store && store.sync) {
+    if (!meta.holder.server && store && store.sync) {
       callback && callback();
       return;
     }

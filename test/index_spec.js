@@ -44,7 +44,7 @@ describe("index", function() {
     expect(size(res.actions)).to.eql(1);
     expect(size(res.events)).to.eql(1);
 
-    expect(size(res.reducers)).to.eql(2);
+    expect(size(res.reducers)).to.eql(1);
     expect(res.actions.test).to.exist;
     expect(res.events.test).to.have.keys(
       "actionFetch",
