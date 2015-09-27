@@ -142,7 +142,9 @@ describe("actionFn", function() {
   it("check options param", function() {
     let callOptions = 0;
     let checkOptions = null;
-    const api = actionFn("/test/:id", "test", function(url, params) {
+    const api = actionFn("/test/:id", "test", function(url, params, _getState) {
+      expect(_getState).to.exist;
+      expect(getState === _getState).to.be.true;
       callOptions++;
       return { ...params,  test: 1 };
     }, ACTIONS, {holder: {fetch: function(url, opts) {

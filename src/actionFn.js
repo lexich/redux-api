@@ -32,7 +32,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     }
     dispatch({ type: actionFetch, syncing: !!info.syncing });
     const _url = urlTransform(url, pathvars);
-    const baseOptions = isFunction(options) ? options(_url, params) : options;
+    const baseOptions = isFunction(options) ? options(_url, params, getState) : options;
     const opts = { ...baseOptions, ...params };
 
     meta.holder.fetch(_url, opts)
