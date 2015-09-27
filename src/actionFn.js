@@ -30,19 +30,19 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       callback && callback("request still loading");
       return;
     }
-    !meta.virtual && dispatch({ type: actionFetch, syncing: !!info.syncing });
+    dispatch({ type: actionFetch, syncing: !!info.syncing });
     const _url = urlTransform(url, pathvars);
     const baseOptions = isFunction(options) ? options(_url, params) : options;
     const opts = { ...baseOptions, ...params };
 
     meta.holder.fetch(_url, opts)
       .then((data)=> {
-        !meta.virtual && dispatch({ type: actionSuccess, syncing: false, data });
+        dispatch({ type: actionSuccess, syncing: false, data });
         each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
         callback && callback(null, data);
       })
       .catch((error)=> {
-        !meta.virtual && dispatch({ type: actionFail, syncing: false, error });
+        dispatch({ type: actionFail, syncing: false, error });
         callback && callback(error);
       });
   };

@@ -7,7 +7,6 @@ import isNumber from "lodash/lang/isNumber";
 import isBoolean from "lodash/lang/isBoolean";
 
 import reduce from "lodash/collection/reduce";
-import size from "lodash/collection/size";
 
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
@@ -95,7 +94,7 @@ export default function reduxApi(config) {
 
     const {
       url, options, transformer,
-      broadcast, virtual, reducerName
+      broadcast, reducerName
     } = opts;
 
     const ACTIONS = {
@@ -108,7 +107,7 @@ export default function reduxApi(config) {
     const meta = {
       holder: opts.fetch ? { fetch: opts.fetch } : fetchHolder,
       broadcast,
-      virtual: size(broadcast) > 0 ? !!virtual : false
+      virtual: !!opts.virtual
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
@@ -121,8 +120,8 @@ export default function reduxApi(config) {
         data: transformer()
       };
       memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, transformer);
-      memo.events[reducerName] = ACTIONS;
     }
+    memo.events[reducerName] = ACTIONS;
     return memo;
   }, cfg);
 

@@ -149,15 +149,4 @@ describe("index", function() {
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
   });
-
-  it("check virtual option without broadcast", function() {
-    const res = reduxApi({
-      test: {
-        url: "/api",
-        virtual: true
-      }
-    }).init(function fetchSuccess() {});
-    expect(res.actions.test).to.exist;
-    expect(res.reducers.test).to.exist;
-  });
 });

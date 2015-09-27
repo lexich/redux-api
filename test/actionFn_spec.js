@@ -216,28 +216,4 @@ describe("actionFn", function() {
       expect(expectedEvent).to.have.length(0);
     });
   });
-
-  it("check virtual + broadcast option", function() {
-    const BROADCAST_ACTION = "BROADCAST_ACTION";
-    const expectedEvent = [{
-      type: BROADCAST_ACTION,
-      data: {msg: "hello"}
-    }];
-    const meta = {
-      holder: {fetch: fetchSuccess},
-      broadcast: [BROADCAST_ACTION],
-      virtual: true
-    };
-    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-
-    return new Promise((resolve)=> {
-      api(null, null, resolve)(function(msg) {
-        expect(expectedEvent).to.have.length.above(0);
-        const exp = expectedEvent.shift();
-        expect(msg).to.eql(exp);
-      }, getState);
-    }).then(()=> {
-      expect(expectedEvent).to.have.length(0);
-    });
-  });
 });
