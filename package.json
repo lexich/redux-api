@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -12,10 +12,10 @@
   "scripts": {
     "test": "npm run eslint && npm run mocha",
     "mocha": "istanbul test _mocha --report html -- --require babel/register test/*_spec.js --reporter spec",
-    "build": "npm run browser-dev && npm run browser-min && npm run compile",
+    "build": "rm -rf dist lib && npm run browser-dev && npm run browser-min && npm run compile",
     "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "eslint": "node_modules/.bin/eslint src test examples/isomorphic/app examples/isomorphic/server.js",
-    "compile": "node_modules/.bin/babel src --out-dir lib --source-maps",
+    "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
     "browser-min": "NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
     "precommit": "npm test",
@@ -33,7 +33,7 @@
     "chai": "^3.3.0",
     "coveralls": "^2.11.4",
     "eslint": "^1.5.1",
-    "eslint-config-airbnb": "0.0.9",
+    "eslint-config-airbnb": "^0.1.0",
     "eslint-plugin-react": "^3.4.2",
     "husky": "^0.10.1",
     "istanbul": "^0.3.21",

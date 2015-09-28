@@ -44,7 +44,7 @@ describe("index", function() {
     expect(size(res.actions)).to.eql(1);
     expect(size(res.events)).to.eql(1);
 
-    expect(size(res.reducers)).to.eql(2);
+    expect(size(res.reducers)).to.eql(1);
     expect(res.actions.test).to.exist;
     expect(res.events.test).to.have.keys(
       "actionFetch",
@@ -64,7 +64,7 @@ describe("index", function() {
       }
     ];
     return new Promise((resolve)=> {
-      const action = res.actions.test(null, null, resolve);
+      const action = res.actions.test(resolve);
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -109,7 +109,7 @@ describe("index", function() {
       syncing: false
     }];
     return new Promise((resolve)=> {
-      const action = res.actions.test({id: 1}, null, resolve);
+      const action = res.actions.test({id: 1}, resolve);
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -150,14 +150,30 @@ describe("index", function() {
     expect(res.reducers.test).to.not.exist;
   });
 
-  it("check virtual option without broadcast", function() {
+  it("check prefetch options", function() {
+    const expectUrls = [];
+    function fetchSuccess(url) {
+      expectUrls.push(url);
+      return new Promise((resolve)=> resolve({url}));
+    }
     const res = reduxApi({
-      test: {
-        url: "/api",
-        virtual: true
+      test: "/test",
+      test1: {
+        url: "/test1",
+        prefetch: [
+          function(opts, cb) {
+            opts.actions.test(cb)(
+              opts.dispatch, opts.getState
+            );
+          }
+        ]
       }
-    }).init(function fetchSuccess() {});
-    expect(res.actions.test).to.exist;
-    expect(res.reducers.test).to.exist;
+    }).init(fetchSuccess);
+    return new Promise((resolve)=> {
+      const action = res.actions.test1(resolve);
+      action(function() {}, getState);
+    }).then(()=> {
+      expect(expectUrls).to.eql(["/test", "/test1"]);
+    });
   });
 });

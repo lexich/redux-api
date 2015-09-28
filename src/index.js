@@ -7,7 +7,6 @@ import isNumber from "lodash/lang/isNumber";
 import isBoolean from "lodash/lang/isBoolean";
 
 import reduce from "lodash/collection/reduce";
-import size from "lodash/collection/size";
 
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
@@ -76,14 +75,26 @@ const PREFIX = "@@redux-api";
  * ```
  */
 export default function reduxApi(config) {
-  const initApi = (cfg, fetch, isServer=false)=> reduce(config, (memo, value, key)=> {
+  const fetchHolder = {
+    fetch: null,
+    server: false
+  };
+
+  const cfg = {
+    init: null,
+    actions: {},
+    reducers: {},
+    events: {}
+  };
+
+  const reduxApiObject = reduce(config, (memo, value, key)=> {
     const opts = typeof value === "object" ?
       { ...defaultEndpointConfig, reducerName: key, ...value } :
       { ...defaultEndpointConfig, reducerName: key, url: value };
 
     const {
       url, options, transformer,
-      broadcast, virtual, reducerName
+      broadcast, reducerName, prefetch
     } = opts;
 
     const ACTIONS = {
@@ -94,9 +105,11 @@ export default function reduxApi(config) {
     };
 
     const meta = {
-      fetch: opts.fetch || fetch,
+      holder: opts.fetch ? { fetch: opts.fetch } : fetchHolder,
       broadcast,
-      virtual: size(broadcast) > 0 ? !!virtual : false
+      virtual: !!opts.virtual,
+      actions: memo.actions,
+      prefetch
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
@@ -108,16 +121,17 @@ export default function reduxApi(config) {
         loading: false,
         data: transformer()
       };
-      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, transformer, isServer);
-      memo.events[reducerName] = ACTIONS;
+      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, transformer);
     }
+    memo.events[reducerName] = ACTIONS;
     return memo;
   }, cfg);
 
-  const reduxApiObject = { actions: {}, reducers: {}, events: {} };
   reduxApiObject.init = function(fetch, isServer=false) {
-    reduxApiObject.reducers["@redux-api"] = ()=> ({ server: isServer });
-    return initApi(reduxApiObject, fetch, isServer);
+    fetchHolder.fetch = fetch;
+    fetchHolder.server = isServer;
+    return reduxApiObject;
   };
+
   return reduxApiObject;
 }
