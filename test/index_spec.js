@@ -149,4 +149,31 @@ describe("index", function() {
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
   });
+
+  it("check prefetch options", function() {
+    const expectUrls = [];
+    function fetchSuccess(url) {
+      expectUrls.push(url);
+      return new Promise((resolve)=> resolve({url}));
+    }
+    const res = reduxApi({
+      test: "/test",
+      test1: {
+        url: "/test1",
+        prefetch: [
+          function(opts, cb) {
+            opts.actions.test(null, null, cb)(
+              opts.dispatch, opts.getState
+            );
+          }
+        ]
+      }
+    }).init(fetchSuccess);
+    return new Promise((resolve)=> {
+      const action = res.actions.test1(null, null, resolve);
+      action(function() {}, getState);
+    }).then(()=> {
+      expect(expectUrls).to.eql(["/test", "/test1"]);
+    });
+  });
 });

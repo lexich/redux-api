@@ -3,6 +3,9 @@
 import urlTransform from "./urlTransform";
 import isFunction from "lodash/lang/isFunction";
 import each from "lodash/collection/each";
+import fetchResolver from "./fetchResolver";
+
+function none() {}
 
 /**
  * Constructor for create action
@@ -23,28 +26,37 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Function} callback)   callback execute after end request
    * @param  {Object}   info        addition system information for internal usage
    */
-  const fn = (pathvars, params={}, callback, info={})=> (dispatch, getState)=> {
-    const state = getState();
-    const store = state[name];
-    if (store && store.loading) {
-      callback && callback("request still loading");
-      return;
-    }
-    dispatch({ type: actionFetch, syncing: !!info.syncing });
-    const _url = urlTransform(url, pathvars);
-    const baseOptions = isFunction(options) ? options(_url, params, getState) : options;
-    const opts = { ...baseOptions, ...params };
+  const fn = (pathvars, params={}, callback=none, info={})=> {
+    const urlT = urlTransform(url, pathvars);
+    return (dispatch, getState)=> {
+      const state = getState();
+      const store = state[name];
+      if (store && store.loading) {
+        callback("request still loading");
+        return;
+      }
+      dispatch({ type: actionFetch, syncing: !!info.syncing });
+      const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
+      const opts = { ...baseOptions, ...params };
 
-    meta.holder.fetch(_url, opts)
-      .then((data)=> {
-        dispatch({ type: actionSuccess, syncing: false, data });
-        each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
-        callback && callback(null, data);
-      })
-      .catch((error)=> {
-        dispatch({ type: actionFail, syncing: false, error });
-        callback && callback(error);
-      });
+      const fetchResolverOpts = {
+        dispatch, getState,
+        actions: meta.actions,
+        prefetch: meta.prefetch
+      };
+
+      fetchResolver(0, fetchResolverOpts,
+        (err)=> err ? callback(err) : meta.holder.fetch(urlT, opts)
+          .then((data)=> {
+            dispatch({ type: actionSuccess, syncing: false, data });
+            each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
+            callback(null, data);
+          })
+          .catch((error)=> {
+            dispatch({ type: actionFail, syncing: false, error });
+            callback(error);
+          }));
+    };
   };
   /**
    * Reset store to initial state
@@ -57,11 +69,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object} params      fetch params
    * @param  {Function} callback) callback execute after end request
    */
-  fn.sync = (pathvars, params, callback)=> (dispatch, getState)=> {
+  fn.sync = (pathvars, params, callback=none)=> (dispatch, getState)=> {
     const state = getState();
     const store = state[name];
     if (!meta.holder.server && store && store.sync) {
-      callback && callback();
+      callback();
       return;
     }
     return fn(pathvars, params, callback, {syncing: true})(dispatch, getState);

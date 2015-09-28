@@ -218,4 +218,46 @@ describe("actionFn", function() {
       expect(expectedEvent).to.have.length(0);
     });
   });
+  it("check prefetch option", function() {
+    const checkPrefetch = [];
+    const meta = {
+      holder: {fetch: fetchSuccess},
+      prefetch: [
+        function(opts, cb) {
+          checkPrefetch.push(["one", opts]);
+          cb();
+        },
+        function(opts, cb) {
+          checkPrefetch.push(["two", opts]);
+          cb();
+        },
+      ]
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {msg: "hello"},
+        syncing: false
+      }
+    ];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      const exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    const expOpts = {dispatch, getState, actions: undefined, prefetch: meta.prefetch };
+    return new Promise((resolve)=> {
+      api(null, null, resolve)(dispatch, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+      expect(checkPrefetch).to.eql([
+        ["one", expOpts],
+        ["two", expOpts],
+      ]);
+    });
+  });
 });

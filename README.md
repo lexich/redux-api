@@ -131,6 +131,35 @@ function (state, action) {
   > *type*: Array
   > *default*: false
 
+- @param **options.{endpoint}.prefetch - you can organize chain of calling events before the current endpoint will be executed
+  > *type*: Array<Function>
+  > *default*: null
+  > *example*
+}
+```js
+{
+  user: "/user/info",
+  profile: "/user/:name",
+  changeName: {
+    url: "/user/changename",
+    prefetch: [
+      function({actions, dispatch, getState}, cb) {
+        const {user: {data: {name}}} = getState();
+        name ? cb() : dispatch(actions.user(null, null, cb));
+      }, 
+      function({actions, dispatch, getState}, cb) {
+        const {user: {data: {name}}, profile: {data: {uuid}} = getState();
+        uuid ? cb() : dispatch(actions.profile({name}, null, cb));
+      }
+    ]
+    options: function(url, params, getState) {      
+      const {user: {data: {uuid}}} = getState();
+      return { ...params, body: { ...params.body, uuid }};
+    }
+  }
+}
+```
+
 #### reduxApi object
 `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
 ```js
