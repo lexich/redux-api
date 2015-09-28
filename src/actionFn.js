@@ -7,6 +7,21 @@ import fetchResolver from "./fetchResolver";
 
 function none() {}
 
+function extractArgs(args) {
+  let pathvars, params={}, callback;
+  if (isFunction(args[0])) {
+    callback = args[0];
+  } else if (isFunction(args[1])) {
+    pathvars = args[0];
+    callback = args[1];
+  } else {
+    pathvars = args[0];
+    params = args[1];
+    callback = args[2] || none;
+  }
+  return [pathvars, params, callback];
+}
+
 /**
  * Constructor for create action
  * @param  {String} url          endpoint's url
@@ -25,7 +40,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object}   params      fetch params
    * @param  {Function} callback)   callback execute after end request
    */
-  const fn = (pathvars, params={}, callback=none)=> {
+  const fn = (...args)=> {
+    const [pathvars, params, callback] = extractArgs(args);
+
     const urlT = urlTransform(url, pathvars);
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
@@ -71,15 +88,18 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object} params      fetch params
    * @param  {Function} callback) callback execute after end request
    */
-  fn.sync = (pathvars, params, callback=none)=> (dispatch, getState)=> {
-    const state = getState();
-    const store = state[name];
-    if (!meta.holder.server && store && store.sync) {
-      callback();
-      return;
-    }
-    const modifyParams = {...params, syncing: true};
-    return fn(pathvars, modifyParams, callback)(dispatch, getState);
+  fn.sync = (...args)=> {
+    const [pathvars, params, callback] = extractArgs(args);
+    return (dispatch, getState)=> {
+      const state = getState();
+      const store = state[name];
+      if (!meta.holder.server && store && store.sync) {
+        callback();
+        return;
+      }
+      const modifyParams = {...params, syncing: true};
+      return fn(pathvars, modifyParams, callback)(dispatch, getState);
+    };
   };
   return fn;
 }

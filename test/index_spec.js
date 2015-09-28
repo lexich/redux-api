@@ -64,7 +64,7 @@ describe("index", function() {
       }
     ];
     return new Promise((resolve)=> {
-      const action = res.actions.test(null, null, resolve);
+      const action = res.actions.test(resolve);
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -109,7 +109,7 @@ describe("index", function() {
       syncing: false
     }];
     return new Promise((resolve)=> {
-      const action = res.actions.test({id: 1}, null, resolve);
+      const action = res.actions.test({id: 1}, resolve);
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -162,7 +162,7 @@ describe("index", function() {
         url: "/test1",
         prefetch: [
           function(opts, cb) {
-            opts.actions.test(null, null, cb)(
+            opts.actions.test(cb)(
               opts.dispatch, opts.getState
             );
           }
@@ -170,7 +170,7 @@ describe("index", function() {
       }
     }).init(fetchSuccess);
     return new Promise((resolve)=> {
-      const action = res.actions.test1(null, null, resolve);
+      const action = res.actions.test1(resolve);
       action(function() {}, getState);
     }).then(()=> {
       expect(expectUrls).to.eql(["/test", "/test1"]);

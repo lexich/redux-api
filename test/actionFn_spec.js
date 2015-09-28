@@ -47,7 +47,7 @@ describe("actionFn", function() {
       const initialState = getState();
       initialState.test.sync = true;
 
-      api.sync(null, null, resolve)(function() {}, ()=> initialState);
+      api.sync(resolve)(function() {}, ()=> initialState);
       expect(executeCounter).to.be.eql(0);
     });
 
@@ -60,7 +60,7 @@ describe("actionFn", function() {
       syncing: false
     }];
     const async2 = new Promise((resolve)=> {
-      api.sync(null, null, resolve)((msg)=> {
+      api.sync(resolve)((msg)=> {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
@@ -87,7 +87,7 @@ describe("actionFn", function() {
       }
     ];
     return new Promise((resolve)=> {
-      const action = api(null, null, resolve);
+      const action = api(resolve);
       expect(isFunction(action)).to.be.true;
 
 
@@ -121,7 +121,7 @@ describe("actionFn", function() {
       expect(msg).to.eql(exp);
     }
     return new Promise((resolve)=> {
-      api(null, null, resolve)(dispatch, getState);
+      api(resolve)(dispatch, getState);
     }).then(()=> {
       expect(expectedEvent).to.have.length(0);
     });
@@ -177,7 +177,7 @@ describe("actionFn", function() {
       { type: "actionSuccess", syncing: false, data: { msg: "hello" } }
     ];
     return new Promise((resolve)=> {
-      api.sync(null, null, resolve)(function(msg) {
+      api.sync(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
@@ -209,7 +209,7 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
 
     return new Promise((resolve)=> {
-      api(null, null, resolve)(function(msg) {
+      api(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
@@ -251,7 +251,7 @@ describe("actionFn", function() {
     }
     const expOpts = {dispatch, getState, actions: undefined, prefetch: meta.prefetch };
     return new Promise((resolve)=> {
-      api(null, null, resolve)(dispatch, getState);
+      api(resolve)(dispatch, getState);
     }).then(()=> {
       expect(expectedEvent).to.have.length(0);
       expect(checkPrefetch).to.eql([
