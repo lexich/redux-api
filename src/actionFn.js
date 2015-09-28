@@ -24,10 +24,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object}   pathvars    path vars for url
    * @param  {Object}   params      fetch params
    * @param  {Function} callback)   callback execute after end request
-   * @param  {Object}   info        addition system information for internal usage
    */
-  const fn = (pathvars, params={}, callback=none, info={})=> {
+  const fn = (pathvars, params={}, callback=none)=> {
     const urlT = urlTransform(url, pathvars);
+    const syncing = params ? !!params.syncing : false;
+    params && delete params.syncing;
     return (dispatch, getState)=> {
       const state = getState();
       const store = state[name];
@@ -35,7 +36,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         callback("request still loading");
         return;
       }
-      dispatch({ type: actionFetch, syncing: !!info.syncing });
+
+      dispatch({ type: actionFetch, syncing});
       const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
       const opts = { ...baseOptions, ...params };
 
@@ -76,7 +78,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       callback();
       return;
     }
-    return fn(pathvars, params, callback, {syncing: true})(dispatch, getState);
+    const modifyParams = {...params, syncing: true};
+    return fn(pathvars, modifyParams, callback)(dispatch, getState);
   };
   return fn;
 }
