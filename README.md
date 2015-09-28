@@ -145,11 +145,11 @@ function (state, action) {
     prefetch: [
       function({actions, dispatch, getState}, cb) {
         const {user: {data: {name}}} = getState();
-        name ? cb() : dispatch(actions.user(null, null, cb));
+        name ? cb() : dispatch(actions.user(cb));
       }, 
       function({actions, dispatch, getState}, cb) {
         const {user: {data: {name}}, profile: {data: {uuid}} = getState();
-        uuid ? cb() : dispatch(actions.profile({name}, null, cb));
+        uuid ? cb() : dispatch(actions.profile({name}, cb));
       }
     ]
     options: function(url, params, getState) {      
