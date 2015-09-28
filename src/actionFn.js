@@ -4,6 +4,7 @@ import urlTransform from "./urlTransform";
 import isFunction from "lodash/lang/isFunction";
 import each from "lodash/collection/each";
 import fetchResolver from "./fetchResolver";
+import PubSub from "./PubSub";
 
 function none() {}
 
@@ -33,7 +34,7 @@ function extractArgs(args) {
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = ACTIONS;
-
+  const pubsub = new PubSub();
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -46,11 +47,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const urlT = urlTransform(url, pathvars);
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
+    pubsub.push(callback);
     return (dispatch, getState)=> {
       const state = getState();
       const store = state[name];
       if (store && store.loading) {
-        callback("request still loading");
         return;
       }
 
@@ -65,15 +66,15 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       };
 
       fetchResolver(0, fetchResolverOpts,
-        (err)=> err ? callback(err) : meta.holder.fetch(urlT, opts)
+        (err)=> err ? pubsub.reject(err) : meta.holder.fetch(urlT, opts)
           .then((data)=> {
             dispatch({ type: actionSuccess, syncing: false, data });
             each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
-            callback(null, data);
+            pubsub.resolve(store);
           })
           .catch((error)=> {
             dispatch({ type: actionFail, syncing: false, error });
-            callback(error);
+            pubsub.reject(error);
           }));
     };
   };
@@ -94,7 +95,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const state = getState();
       const store = state[name];
       if (!meta.holder.server && store && store.sync) {
-        callback();
+        callback(null, store);
         return;
       }
       const modifyParams = {...params, syncing: true};

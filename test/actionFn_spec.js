@@ -1,9 +1,10 @@
 "use strict";
 /* global describe, it */
 
-const expect = require("chai").expect;
-const actionFn = require("../src/actionFn");
-const isFunction = require("lodash/lang/isFunction");
+import {expect} from "chai";
+import actionFn from "../src/actionFn";
+import isFunction from "lodash/lang/isFunction";
+import after from "lodash/function/after";
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
@@ -127,16 +128,34 @@ describe("actionFn", function() {
     });
   });
 
-  it("check double request", function() {
+  it("check double request", function(_done) {
     const api = actionFn("/test/:id", "test", null, ACTIONS, {holder: {fetch: fetchSuccess}});
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false
+      }, {
+        type: ACTIONS.actionSuccess,
+        data: {msg: "hello"},
+        syncing: false
+      }
+    ];
+    let modify = 0;
+    let loading = false;
     function dispatch(msg) {
-      expect(msg, "dispatch mustn't call").to.be.false;
+      modify++;
+      expect(expectedEvent).to.have.length.above(0);
+      const exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
     }
-    return new Promise((resolve)=> {
-      api({id: 1}, null, resolve)(dispatch, function() {
-        return {test: {loading: true, data: {}}};
-      });
-    });
+    function getState() {
+      loading = !loading;
+      return {test: {loading, data: {}}};
+    }
+    const done = after(2, _done);
+    api({id: 1}, done)(dispatch, getState);
+    expect(modify).to.eql(0);
+    api({id: 1}, done)(dispatch, getState);
   });
 
   it("check options param", function() {
