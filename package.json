@@ -33,7 +33,7 @@
     "chai": "^3.3.0",
     "coveralls": "^2.11.4",
     "eslint": "^1.5.1",
-    "eslint-config-airbnb": "0.0.9",
+    "eslint-config-airbnb": "^0.1.0",
     "eslint-plugin-react": "^3.4.2",
     "husky": "^0.10.1",
     "istanbul": "^0.3.21",
