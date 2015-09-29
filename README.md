@@ -160,7 +160,7 @@ function (state, action) {
 }
 ```
 
-- @param **options.{endpoint}.validate(data, cb) - validation function
+- @param **options.{endpoint}.validation(data, cb) - validation function
   > *type*: Function(data, cb) 
   > *default*: null
   > *example*
