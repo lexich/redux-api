@@ -186,6 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var broadcast = opts.broadcast;
 	    var reducerName = opts.reducerName;
 	    var prefetch = opts.prefetch;
+	    var validation = opts.validation;
 	
 	    var ACTIONS = {
 	      actionFetch: PREFIX + "@" + reducerName,
@@ -199,7 +200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      broadcast: broadcast,
 	      virtual: !!opts.virtual,
 	      actions: memo.actions,
-	      prefetch: prefetch
+	      prefetch: prefetch, validation: validation
 	    };
 	
 	    memo.actions[key] = _actionFn2["default"](url, key, options, ACTIONS, meta);
