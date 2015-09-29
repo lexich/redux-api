@@ -1450,6 +1450,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      _fetchResolver2["default"](0, fetchResolverOpts, function (err) {
 	        return err ? pubsub.reject(err) : meta.holder.fetch(urlT, opts).then(function (data) {
+	          return !meta.validation ? data : new Promise(function (resolve, reject) {
+	            return meta.validation(data, function (err) {
+	              return err ? reject(err) : resolve(data);
+	            });
+	          });
+	        }).then(function (data) {
 	          dispatch({ type: actionSuccess, syncing: false, data: data });
 	          _lodashCollectionEach2["default"](meta.broadcast, function (btype) {
 	            return dispatch({ type: btype, data: data });
