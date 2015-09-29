@@ -67,6 +67,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
 
       fetchResolver(0, fetchResolverOpts,
         (err)=> err ? pubsub.reject(err) : meta.holder.fetch(urlT, opts)
+          .then((data)=> !meta.validation ? data :
+              new Promise((resolve, reject)=> meta.validation(data,
+                (err)=> err ? reject(err) : resolve(data))))
           .then((data)=> {
             dispatch({ type: actionSuccess, syncing: false, data });
             each(meta.broadcast, (btype)=> dispatch({type: btype, data}));

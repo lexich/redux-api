@@ -135,7 +135,7 @@ function (state, action) {
   > *type*: Array<Function>
   > *default*: null
   > *example*
-}
+
 ```js
 {
   user: "/user/info",
@@ -148,13 +148,33 @@ function (state, action) {
         name ? cb() : dispatch(actions.user(cb));
       }, 
       function({actions, dispatch, getState}, cb) {
-        const {user: {data: {name}}, profile: {data: {uuid}} = getState();
+        const {user: {data: {name}}, profile: {data: {uuid}}} = getState();
         uuid ? cb() : dispatch(actions.profile({name}, cb));
       }
-    ]
+    ],
     options: function(url, params, getState) {      
       const {user: {data: {uuid}}} = getState();
       return { ...params, body: { ...params.body, uuid }};
+    }
+  }
+}
+```
+
+- @param **options.{endpoint}.validate(data, cb) - validation function
+  > *type*: Function(data, cb) 
+  > *default*: null
+  > *example*
+```js
+{
+  test: {
+    url: "/api/test",
+    validation: (data, cb) {
+      // check data format
+      let error;
+      if (data instanceOf Array) {
+        error = "Data must be array";
+      }
+      cb(error);
     }
   }
 }

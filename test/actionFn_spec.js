@@ -237,6 +237,69 @@ describe("actionFn", function() {
       expect(expectedEvent).to.have.length(0);
     });
   });
+  it("check success validation", function() {
+    let expData, counter = 0;
+    const meta = {
+      holder: {fetch: fetchSuccess},
+      validation(data, cb) {
+        counter++;
+        expData = data;
+        cb();
+      }
+    };
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: {msg: "hello"},
+      syncing: false
+    }];
+
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    return new Promise((resolve)=> {
+      api(resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+      expect(counter).to.eql(1);
+      expect(expData).to.eql({ msg: "hello" });
+    });
+  });
+  it("check unsuccess validation", function() {
+    let expData, counter = 0;
+    const meta = {
+      holder: {fetch: fetchSuccess},
+      validation(data, cb) {
+        counter++;
+        expData = data;
+        cb("invalid");
+      }
+    };
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionFail,
+      error: "invalid",
+      syncing: false
+    }];
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    return new Promise((resolve)=> {
+      api(resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> {
+      expect(expectedEvent).to.have.length(0);
+      expect(counter).to.eql(1);
+      expect(expData).to.eql({ msg: "hello" });
+    });
+  });
   it("check prefetch option", function() {
     const checkPrefetch = [];
     const meta = {
