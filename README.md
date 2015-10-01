@@ -180,6 +180,32 @@ function (state, action) {
 }
 ```
 
+- @param **options.{endpoint}.helpers** - object 
+```js
+{
+  test: {
+    url: "/api/test/:name/:id",
+    helpers: {
+      get(id, name) {
+        return [{id, name}], {}]
+      },
+      post(id, name, data) {
+        const {uuid} = this.getState().test;
+        const urlparams = {id, name};
+        const params = {body: {uuid, data}};
+        return [urlparams, params];
+      }
+    }
+  }
+}
+// using helpers
+rest.actions.test.get(1, "admin");
+// with callback
+rest.actions.post(1, "admin", {msg: "Hello"}, (err)=> {
+// end of action
+});
+```
+
 #### reduxApi object
 `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
 ```js

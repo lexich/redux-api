@@ -94,7 +94,7 @@ export default function reduxApi(config) {
 
     const {
       url, options, transformer, broadcast,
-      reducerName, prefetch, validation
+      reducerName, prefetch, validation, helpers
     } = opts;
 
     const ACTIONS = {
@@ -109,7 +109,7 @@ export default function reduxApi(config) {
       broadcast,
       virtual: !!opts.virtual,
       actions: memo.actions,
-      prefetch, validation
+      prefetch, validation, helpers
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);

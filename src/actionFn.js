@@ -3,8 +3,10 @@
 import urlTransform from "./urlTransform";
 import isFunction from "lodash/lang/isFunction";
 import each from "lodash/collection/each";
+import reduce from "lodash/collection/reduce";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
+import fastApply from "fast-apply";
 
 function none() {}
 
@@ -105,5 +107,18 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       return fn(pathvars, modifyParams, callback)(dispatch, getState);
     };
   };
-  return fn;
+  return reduce(meta.helpers, (memo, func, name)=> {
+    const {sync, call} = isFunction(func) ? {call: func} : func;
+    memo[name] = (...args)=> (dispatch, getState)=> {
+      const index = args.length - 1;
+      const callback = isFunction(args[index]) ? args[index] : none;
+      const newArgs = fastApply(call, {getState}, args);
+      return fastApply(
+        sync ? fn.sync : fn,
+        null,
+        newArgs.concat(callback)
+      )(dispatch, getState);
+    };
+    return memo;
+  }, fn);
 }
