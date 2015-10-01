@@ -176,4 +176,62 @@ describe("index", function() {
       expect(expectUrls).to.eql(["/test", "/test1"]);
     });
   });
+
+  it("check helpers", function() {
+    const result = [];
+    function getState() {
+      return {
+        params: {id: 9, name: "kitty"},
+        hello: {loading: false, data: {}}
+      };
+    }
+    function dispatch() {}
+    const res = reduxApi({
+      hello: {
+        url: "/test/:name/:id",
+        helpers: {
+          test1(id, name) {
+            return [{id, name}];
+          },
+          test2() {
+            const {id, name} = this.getState().params;
+            return [{id, name}];
+          },
+          testSync: {
+            sync: true,
+            call(id) {
+              return [{ id, name: "admin" }, { method: "post" }];
+            }
+          }
+        }
+      }
+    }).init(function(url, opts) {
+      result.push({url, opts});
+      return new Promise(
+        (resolve)=> resolve({hello: "world"}));
+    });
+    const a1 = new Promise((resolve)=> {
+      res.actions.hello.test1(2, "lexich", resolve)(dispatch, getState);
+    });
+    const a2 = new Promise((resolve)=> {
+      res.actions.hello.test2(resolve)(dispatch, getState);
+    });
+    const a3 = new Promise((resolve)=> {
+      const mockSync = res.actions.hello.sync;
+      let counter = 0;
+      res.actions.hello.sync = function() {
+        counter++;
+        return mockSync.apply(this, arguments);
+      };
+      res.actions.hello.testSync(1, resolve)(dispatch, getState);
+      expect(counter).to.eql(1);
+    });
+    return Promise.all([a1, a2, a3]).then(()=> {
+      expect(result).to.eql([
+        { url: "/test/lexich/2", opts: {} },
+        { url: "/test/kitty/9", opts: {} },
+        { url: "/test/admin/1", opts: { method: "post" }}
+      ]);
+    });
+  });
 });

@@ -1,13 +1,14 @@
 {
   "name": "redux-api",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
     "url": "https://github.com/lexich"
   },
   "main": "lib/index.js",
-  "description": "",
+  "license": "MIT",
+  "description": "Flux REST API for redux infrastructure",
   "repository": "http://github.com/lexich/redux-api",
   "scripts": {
     "test": "npm run eslint && npm run mocha",
@@ -23,6 +24,7 @@
     "postmerge": "npm install"
   },
   "dependencies": {
+    "fast-apply": "0.0.3",
     "lodash": "^3.10.1",
     "qs": "^5.1.0"
   },
