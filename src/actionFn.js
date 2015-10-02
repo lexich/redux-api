@@ -107,17 +107,34 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       return fn(pathvars, modifyParams, callback)(dispatch, getState);
     };
   };
-  return reduce(meta.helpers, (memo, func, name)=> {
+
+  return reduce(meta.helpers, (memo, func, helpername)=> {
+    if (memo[helpername]) {
+      throw new Error(`Helper name: "${helpername}" for endpoint "${name}" has been already reserved`);
+    }
     const {sync, call} = isFunction(func) ? {call: func} : func;
-    memo[name] = (...args)=> (dispatch, getState)=> {
+    memo[helpername] = (...args)=> (dispatch, getState)=> {
       const index = args.length - 1;
       const callback = isFunction(args[index]) ? args[index] : none;
-      const newArgs = fastApply(call, {getState}, args);
-      return fastApply(
-        sync ? fn.sync : fn,
-        null,
-        newArgs.concat(callback)
-      )(dispatch, getState);
+      const helpersResult = fastApply(call, {getState, dispatch}, args);
+
+      // If helper alias using async functionality
+      if (isFunction(helpersResult)) {
+        helpersResult((error, newArgs=[])=> {
+          if (error) {
+            callback(error);
+          } else {
+            fastApply(
+              sync ? fn.sync : fn, null, newArgs.concat(callback)
+            )(dispatch, getState);
+          }
+        });
+      } else {
+        // if helper alias is synchronous
+        fastApply(
+          sync ? fn.sync : fn, null, helpersResult.concat(callback)
+        )(dispatch, getState);
+      }
     };
     return memo;
   }, fn);

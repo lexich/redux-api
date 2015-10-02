@@ -342,4 +342,53 @@ describe("actionFn", function() {
       ]);
     });
   });
+  it("check incorrect helpers name", function() {
+    expect(
+      ()=> actionFn("/test/:id", "test", null, ACTIONS, { helpers: { reset() {} }})
+    ).to.throw(Error, `Helper name: "reset" for endpoint "test" has been already reserved`);
+    expect(
+      ()=> actionFn("/test/:id", "test", null, ACTIONS, { helpers: { sync() {} }})
+    ).to.throw(Error, `Helper name: "sync" for endpoint "test" has been already reserved`);
+  });
+  it("check helpers with async functionality", function() {
+    const meta = {
+      holder: {fetch(url, opts) {
+        return new Promise((resolve)=> resolve({url, opts}));
+      }},
+      helpers: {
+        asyncSuccess: ()=> (cb)=> cb(null, [{id: 1}, {async: true}]),
+        asyncFail: ()=> (cb)=> cb("Error")
+      }
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    const expectedEvent1 = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false
+      }, {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: { url: "/test/1", opts: { async: true }}
+      }
+    ];
+    const wait1 = new Promise((resolve)=> {
+      api.asyncSuccess(resolve)(function(msg) {
+        expect(expectedEvent1).to.have.length.above(0);
+        const exp = expectedEvent1.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    });
+    let errorMsg;
+    const wait2 = new Promise((resolve)=> {
+      api.asyncFail(function(err) {
+        errorMsg = err;
+        resolve();
+      })(function() {}, getState);
+    });
+    return Promise.all([wait1, wait2])
+      .then(()=> {
+        expect(expectedEvent1).to.have.length(0);
+        expect(errorMsg).to.eql("Error");
+      });
+  });
 });
