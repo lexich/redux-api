@@ -1470,7 +1470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _lodashCollectionEach2["default"](meta.broadcast, function (btype) {
 	            return dispatch({ type: btype, data: data });
 	          });
-	          pubsub.resolve(store);
+	          pubsub.resolve(getState()[name]);
 	        })["catch"](function (error) {
 	          dispatch({ type: actionFail, syncing: false, error: error });
 	          pubsub.reject(error);
