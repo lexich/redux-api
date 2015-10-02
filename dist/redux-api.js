@@ -1513,13 +1513,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return fn(pathvars, modifyParams, callback)(dispatch, getState);
 	    };
 	  };
-	  return _lodashCollectionReduce2["default"](meta.helpers, function (memo, func, name) {
+	
+	  return _lodashCollectionReduce2["default"](meta.helpers, function (memo, func, helpername) {
+	    if (memo[helpername]) {
+	      throw new Error("Helper name: \"" + helpername + "\" for endpoint \"" + name + "\" has been already reserved");
+	    }
+	
 	    var _ref = _lodashLangIsFunction2["default"](func) ? { call: func } : func;
 	
 	    var sync = _ref.sync;
 	    var call = _ref.call;
 	
-	    memo[name] = function () {
+	    memo[helpername] = function () {
 	      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
 	        args[_key3] = arguments[_key3];
 	      }
@@ -1527,8 +1532,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return function (dispatch, getState) {
 	        var index = args.length - 1;
 	        var callback = _lodashLangIsFunction2["default"](args[index]) ? args[index] : none;
-	        var newArgs = _fastApply2["default"](call, { getState: getState }, args);
-	        return _fastApply2["default"](sync ? fn.sync : fn, null, newArgs.concat(callback))(dispatch, getState);
+	        var helpersResult = _fastApply2["default"](call, { getState: getState, dispatch: dispatch }, args);
+	
+	        // If helper alias using async functionality
+	        if (_lodashLangIsFunction2["default"](helpersResult)) {
+	          helpersResult(function (error) {
+	            var newArgs = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+	
+	            if (error) {
+	              callback(error);
+	            } else {
+	              _fastApply2["default"](sync ? fn.sync : fn, null, newArgs.concat(callback))(dispatch, getState);
+	            }
+	          });
+	        } else {
+	          // if helper alias is synchronous
+	          _fastApply2["default"](sync ? fn.sync : fn, null, helpersResult.concat(callback))(dispatch, getState);
+	        }
 	      };
 	    };
 	    return memo;

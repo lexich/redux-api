@@ -182,7 +182,8 @@ function (state, action) {
 
 - @param **options.{endpoint}.helpers** - object 
 ```js
-{
+{  
+  logger: "/api/logger",
   test: {
     url: "/api/test/:name/:id",
     helpers: {
@@ -194,6 +195,16 @@ function (state, action) {
         const urlparams = {id, name};
         const params = {body: {uuid, data}};
         return [urlparams, params];
+      },
+      // complicated async logic
+      async() {
+        const {dispatch} = this;
+        return (cb)=> {
+          dispatch(rest.actions.logger((err)=> {
+            const args = [{id: 1, name: "admin"}];
+            cb(err, args);
+          }));
+        };
       }
     }
   }
@@ -201,9 +212,10 @@ function (state, action) {
 // using helpers
 rest.actions.test.get(1, "admin");
 // with callback
-rest.actions.post(1, "admin", {msg: "Hello"}, (err)=> {
+rest.actions.test.post(1, "admin", {msg: "Hello"}, (err)=> {
 // end of action
 });
+rest.actions.test.async();
 ```
 
 #### reduxApi object
