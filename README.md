@@ -22,15 +22,18 @@ bower install redux-api --save
 [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github api
 
 ## Documentation
+###Initialization redux-api endpoint
+
 ```js
 import reduxApi, {transformers} from "redux-api";
 ```
+
 #### reduxApi(options)
 - @description create endpoint  
-- @param **options** - configuration rest-api endpoints  
-  > *type*: Object
-  > *default*: {}
-  > *example*:
+- @param **options** - configuration of rest-api endpoints  
+  > @type: Object
+  > @default: {}
+  > @example:
   Simple endpoint definition `GET /api/v1/entry` where response is Object  
 ```js
     {
@@ -61,12 +64,25 @@ import reduxApi, {transformers} from "redux-api";
       }
     }
 ```
-- @param **options.{endpoint}.url** - endpoint for rest api 
-  > *type*: String  
-- @param  **options.{endpoint}.transformer** - response transformer  
-  > *type*: Function  
-  > *default*: transformers.object  
-  > *example*: It's a good idea to write custom transformer  
+
+###Configuration options
+#### url
+- @description: url endpoint
+- @type: String
+- @example: 
+```js
+{
+  entry: {
+    url: "/api/v1/entry"
+  }
+}
+```
+
+#### transformer
+- @description: function for rest responce transformation
+- @type: Function  
+- @default: transformers.object  
+- @example: It's a good idea to write custom transformer  
     for example you have responce  
 ```json
   { "title": "Hello", "message": "World" }
@@ -78,10 +94,12 @@ import reduxApi, {transformers} from "redux-api";
     return { title: (data.title || ""), message: (data.message || "")};
   }
 ```
-- @param **options.{endpoint}.options** - Options for rest-api backend. `function(url, options)`
-    > *type*: Object | Funtions  
-    > *default*: null  
-    > *example*: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend  
+
+#### options
+- @description: options for rest-api backend. `function(url, options)`
+- @type: Object | Funtions 
+- @default: null  
+- @example: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend  
 ```js
       options: {
         method: "post",
@@ -102,10 +120,11 @@ import reduxApi, {transformers} from "redux-api";
       }
 ```
 
-- @param **options.{endpoint}.broadcast** - list of actions which would emit after data fetching.
-  > *type*: Array
-  > *default*: null
-  > *example*
+####broadcast
+@description: list of actions which would emit after data fetching.
+@type: Array
+@default: null
+@example:
 ```js
 import {ACTION_ENTRY_UPDATE} from "./constants";
 ....
@@ -127,14 +146,16 @@ function (state, action) {
 }
 ```
 
-- @param **options.{endpoint}.virtual** - if virtual is `true` this endpoint doesn't create reducer and doesn't emit redux-api actions. All data broadcasting by actions from `broadcast` list.
-  > *type*: Array
-  > *default*: false
+####virtual
+- @description: if virtual is `true` this endpoint doesn't create reducer and doesn't emit redux-api actions. All data broadcasting by actions from `broadcast` list.
+- @type: Array
+- @default: false
 
-- @param **options.{endpoint}.prefetch - you can organize chain of calling events before the current endpoint will be executed
-  > *type*: Array<Function>
-  > *default*: null
-  > *example*
+####prefetch
+- @description: you can organize chain of calling events before the current endpoint will be executed
+- @type: Array<Function>
+- @default: null
+- @example:
 
 ```js
 {
@@ -160,10 +181,14 @@ function (state, action) {
 }
 ```
 
-- @param **options.{endpoint}.validation(data, cb) - validation function
-  > *type*: Function(data, cb) 
-  > *default*: null
-  > *example*
+####validation (data, callback)
+- @param **data** - responce data
+  > type: Object
+
+- @param **callback** - you need to execute this callback function to finish data validation
+  > type: Function
+
+- @example
 ```js
 {
   test: {
@@ -180,7 +205,42 @@ function (state, action) {
 }
 ```
 
-- @param **options.{endpoint}.helpers** - object 
+#### reducerName
+- @description:  Sometimes though, you might want named actions that go back to the same reducer. For example:
+- @type: String
+- @example:
+```js
+import reduxApi, {transformers} from "redux-api";
+const rest = reduxApi({
+  getUser: {
+    reducerName: "user"
+    url: "/user/1", // return a user object
+  }
+  updateUser: {
+    reducerName: "user"
+    url: "/user/1/update",
+    options: {
+      method: "post"
+    }
+  }
+});
+const {actions} = rest;
+
+// In component with redux support (see example section)
+const {dispatch} = this.props;
+dispatch(rest.actions.getUser()); // GET "/api/v1/entry"
+dispatch(rest.actions.updateUser({}, {
+  body: JSON.stringify({ name: "Hubot", login: "hubot"})
+}));  // POST "/api/v1/entry/1" with body
+
+```
+In the above example, both getUser, and updateUser update the same user reducer as they share the same reducerName
+For example used es7 javascript
+
+####helpers
+- @description: you can create custom helper function which work with this rest endpoint but with different parameters.
+- @type: Object
+- @example:
 ```js
 {  
   logger: "/api/logger",
@@ -218,8 +278,15 @@ rest.actions.test.post(1, "admin", {msg: "Hello"}, (err)=> {
 rest.actions.test.async();
 ```
 
-#### reduxApi object
-`reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
+### reduxApi object
+
+####init(adapter, isServer)
+- @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
+- @type: Function
+- @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
+- @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode. 
+- @example:
+
 ```js
 import "isomorphic-fetch";
 import reduxApi from "redux-api";
@@ -229,12 +296,11 @@ const rest = reduxApi({
 });
 rest.init(adapterFetch(fetch), false);
 ```
-- **reduxApi().init(adapter, isServer)**  
-> *type*: Function - initialize reduxApi object  
-> @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
-> @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.  
 
 #### actions
+- @descritpion: list of redux actions for rest manipulations
+- @type: Object
+- @example:
 ```js
 const rest = reduxApi({
   entries: "/api/v1/entry",
@@ -245,9 +311,8 @@ const rest = reduxApi({
     }
   }
 });
-....
+// ....
 const {actions} = rest;
-
 /*
 initialState for store
 store = {
@@ -266,48 +331,55 @@ dispatch(rest.actions.entries()); // GET "/api/v1/entry"
 dispatch(rest.actions.entry({id: 1}, {
   body: JSON.stringify({ name: "Hubot", login: "hubot"
 }}));  // POST "/api/v1/entry/1" with body
-
-//also available helper methods
-dispatch(rest.actions.entries.reset()) // set initialState to store
-dispatch(rest.actions.entries.sync()) // this mathod save you from twice requests
-                                    // flag `sync`. if `sync===true` requst
-                                    // wouldnt execute.
-                                    // In server-side mode calls twice
+dispatch(rest.actions.entries.reset()); 
+dispatch(rest.actions.entries.sync());
 ```
 
-#### reducerName
+###Actions sub methods
 
-Sometimes though, you might want named actions that go back to the same reducer. For example:
+#### sync
+- @description: this method save you from twice requests flag `sync`. if `sync===true` requst wouldn't execute. In server-side mode calls twice
+- @type: Function
+- @example:
+
 ```js
-import reduxApi, {transformers} from "redux-api";
-const rest = reduxApi({
-  getUser: {
-    reducerName: "user"
-    url: "/user/1", // return a user object
-  }
-  updateUser: {
-    reducerName: "user"
-    url: "/user/1/update",
-    options: {
-      method: "post"
-    }
-  }
-});
-const {actions} = rest;
-
-// In component with redux support (see example section)
-const {dispatch} = this.props;
-dispatch(rest.actions.getUser()); // GET "/api/v1/entry"
-dispatch(rest.actions.updateUser({}, {
-  body: JSON.stringify({ name: "Hubot", login: "hubot"})
-}));  // POST "/api/v1/entry/1" with body
+import {actions} from "./rest";
+function onEnter(state, replaceState, callback) {
+  dispatch(rest.actions.entries.sync(callback));  
+}
 
 ```
-In the above example, both getUser, and updateUser update the same user reducer as they share the same reducerName
 
-For example used es7 javascript, [Redux@1.0.0-rc](https://github.com/gaearon/redux/tree/v1.0.0-rc), but it's pretty simple to migrate this code to [Redux@v0.12.0](https://github.com/gaearon/redux/tree/v0.12.0)
+#### reset
+- @description: Reset state of current reducer
+- @type: Function
+- @example:
+```js
+import {actions} from "./rest";
+function onLeave(state, replaceState, callback) {
+  dispatch(rest.actions.entries.sync(callback));  
+}
 
-###Example
+```
+
+
+### Url schema
+/api/v1/user/:id
+```js
+rest.actions.user({id: 1}) // /api/v1/user/1
+```
+
+/api/v1/user/(:id)
+```js
+rest.actions.user({id: 1}) // /api/v1/user/1
+```
+
+/api/v1/user/(:id)
+```js
+rest.actions.user({id: 1, test: 2}) // /api/v1/user/1?test=2
+```
+
+### Full example Example
 rest.js
 ```js
 import "isomorphic-fetch";
@@ -399,20 +471,6 @@ const rest = reduxApi({
 }
 ```
 
-### Url schema
-/api/v1/user/:id
-```js
-rest.actions.user({id: 1}) // /api/v1/user/1
-```
 
-/api/v1/user/(:id)
-```js
-rest.actions.user({id: 1}) // /api/v1/user/1
-```
-
-/api/v1/user/(:id)
-```js
-rest.actions.user({id: 1, test: 2}) // /api/v1/user/1?test=2
-```
 
 ### [Releases Changelog](https://github.com/lexich/redux-api/releases)
