@@ -2,7 +2,7 @@ import React, {PropTypes} from "react";
 import { connect } from "react-redux";
 import {Link} from "react-router";
 
-class User {
+class User extends React.Component {
   render() {
     const { userRepos } = this.props;
     const Repos = userRepos.data.map(

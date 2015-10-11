@@ -1,5 +1,6 @@
 "use strict";
 import React from "react";
+import {renderToString} from "react/lib/ReactDOMServer"; /* react-dom/server */
 import express from "express";
 import path from "path";
 
@@ -10,7 +11,8 @@ import thunk from "redux-thunk";
 
 // React-router
 import {RoutingContext, match} from "react-router";
-import createLocation from "history/lib/createLocation";
+import {createMemoryHistory as createHistory} from "history";
+
 import routes from "./routes/routes";
 
 // Redux-api
@@ -19,6 +21,8 @@ import {init as initRest, reducers} from "./utils/rest";
 import adapterFetch from "../../../src/adapters/fetch";
 
 initRest(adapterFetch(fetch), true)
+
+const history = createHistory();
 
 // Init express app
 const app = express();
@@ -33,7 +37,7 @@ app.set("views", path.join(__dirname, "..", "views"));
 app.set("view engine", path.join(__dirname, "..", "ejs"));
 
 app.use(function(req, res, next) {
-  const location = createLocation(req.url);
+  const location = history.createLocation(req.url);
   const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
   const reducer = combineReducers(reducers);
   const store = createStoreWithMiddleware(reducer);
@@ -46,9 +50,9 @@ app.use(function(req, res, next) {
     } else if (renderProps === null) {
       res.status(404).render("404.ejs");
     } else {
-      const html = React.renderToString(
+      const html = renderToString(
         <Provider store={store}>
-          {() => <RoutingContext {...renderProps} />}
+          <RoutingContext {...renderProps} />
         </Provider>
       );
       res.render("index.ejs", { html, json: JSON.stringify(store.getState()) });

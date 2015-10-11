@@ -2,7 +2,7 @@ import React, {PropTypes} from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router";
 
-class Repo {
+class Repo extends React.Component {
   render() {
     const { repo } = this.props;
     const data = repo.data;

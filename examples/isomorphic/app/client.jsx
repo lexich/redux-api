@@ -1,9 +1,10 @@
 "use strict";
 import React from "react";
+import {render} from "react/lib/ReactDOM"; /* react-dom */
 
 // React-Router
 import Router from "react-router";
-import createHistory from 'history/lib/createBrowserHistory'
+import {createHistory} from "history";
 import routes from "./routes/routes";
 
 // Redux
@@ -30,9 +31,9 @@ const childRoutes = routes(store);
 const history = createHistory();
 const el = document.getElementById("react-main-mount");
 
-React.render(
+render(
   <Provider store={store}>
-    {()=> <Router key="ta-app" history={history} children={childRoutes}/>}
+    <Router key="ta-app" history={history} children={childRoutes}/>
   </Provider>,
   document.getElementById("react-main-mount")
 );
