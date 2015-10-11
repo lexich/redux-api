@@ -1420,6 +1420,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var actionReset = ACTIONS.actionReset;
 	
 	  var pubsub = new _PubSub2["default"]();
+	
+	  /**
+	   * Fetch data from server
+	   * @param  {Object}   pathvars    path vars for url
+	   * @param  {Object}   params      fetch params
+	   * @param  {Function} getState    helper meta function
+	  */
+	  var request = function request(pathvars, params) {
+	    var getState = arguments.length <= 2 || arguments[2] === undefined ? none : arguments[2];
+	
+	    var urlT = _urlTransform2["default"](url, pathvars);
+	    var baseOptions = _lodashLangIsFunction2["default"](options) ? options(urlT, params, getState) : options;
+	    var opts = _extends({}, baseOptions, params);
+	    return meta.holder.fetch(urlT, opts);
+	  };
+	
 	  /**
 	   * Fetch data from server
 	   * @param  {Object}   pathvars    path vars for url
@@ -1437,7 +1453,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var params = _extractArgs[1];
 	    var callback = _extractArgs[2];
 	
-	    var urlT = _urlTransform2["default"](url, pathvars);
 	    var syncing = params ? !!params.syncing : false;
 	    params && delete params.syncing;
 	    pubsub.push(callback);
@@ -1447,11 +1462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (store && store.loading) {
 	        return;
 	      }
-	
 	      dispatch({ type: actionFetch, syncing: syncing });
-	      var baseOptions = _lodashLangIsFunction2["default"](options) ? options(urlT, params, getState) : options;
-	      var opts = _extends({}, baseOptions, params);
-	
 	      var fetchResolverOpts = {
 	        dispatch: dispatch, getState: getState,
 	        actions: meta.actions,
@@ -1459,7 +1470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	
 	      _fetchResolver2["default"](0, fetchResolverOpts, function (err) {
-	        return err ? pubsub.reject(err) : meta.holder.fetch(urlT, opts).then(function (data) {
+	        return err ? pubsub.reject(err) : request(pathvars, params, getState).then(function (data) {
 	          return !meta.validation ? data : new Promise(function (resolve, reject) {
 	            return meta.validation(data, function (err) {
 	              return err ? reject(err) : resolve(data);
@@ -1478,12 +1489,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    };
 	  };
+	
+	  /*
+	    Pure rest request
+	   */
+	  fn.request = request;
+	
 	  /**
 	   * Reset store to initial state
 	   */
 	  fn.reset = function () {
 	    return { type: actionReset };
 	  };
+	
 	  /**
 	   * Sync store with server. In server mode works as usual method.
 	   * If data have already synced, data would not fetch after call this method.
