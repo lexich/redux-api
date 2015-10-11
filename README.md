@@ -31,9 +31,9 @@ import reduxApi, {transformers} from "redux-api";
 #### reduxApi(options)
 - @description create endpoint  
 - @param **options** - configuration of rest-api endpoints  
-  > @type: Object
-  > @default: {}
-  > @example:
+  > @type: Object  
+  > @default: {}  
+  > @example:  
   Simple endpoint definition `GET /api/v1/entry` where response is Object  
 ```js
     {
@@ -121,10 +121,10 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 ####broadcast
-@description: list of actions which would emit after data fetching.
-@type: Array
-@default: null
-@example:
+- @description: list of actions which would emit after data fetching.
+- @type: Array
+- @default: null
+- @example:
 ```js
 import {ACTION_ENTRY_UPDATE} from "./constants";
 ....
