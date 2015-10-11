@@ -37,6 +37,20 @@ function extractArgs(args) {
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const {actionFetch, actionSuccess, actionFail, actionReset} = ACTIONS;
   const pubsub = new PubSub();
+
+  /**
+   * Fetch data from server
+   * @param  {Object}   pathvars    path vars for url
+   * @param  {Object}   params      fetch params
+   * @param  {Function} getState    helper meta function
+  */
+  const request = (pathvars, params, getState=none)=> {
+    const urlT = urlTransform(url, pathvars);
+    const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
+    const opts = { ...baseOptions, ...params };
+    return meta.holder.fetch(urlT, opts);
+  };
+
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -45,8 +59,6 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    */
   const fn = (...args)=> {
     const [pathvars, params, callback] = extractArgs(args);
-
-    const urlT = urlTransform(url, pathvars);
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
     pubsub.push(callback);
@@ -56,11 +68,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       if (store && store.loading) {
         return;
       }
-
       dispatch({ type: actionFetch, syncing});
-      const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
-      const opts = { ...baseOptions, ...params };
-
       const fetchResolverOpts = {
         dispatch, getState,
         actions: meta.actions,
@@ -68,7 +76,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       };
 
       fetchResolver(0, fetchResolverOpts,
-        (err)=> err ? pubsub.reject(err) : meta.holder.fetch(urlT, opts)
+        (err)=> err ? pubsub.reject(err) : request(pathvars, params, getState)
           .then((data)=> !meta.validation ? data :
               new Promise((resolve, reject)=> meta.validation(data,
                 (err)=> err ? reject(err) : resolve(data))))
@@ -83,10 +91,17 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           }));
     };
   };
+
+  /*
+    Pure rest request
+   */
+  fn.request = request;
+
   /**
    * Reset store to initial state
    */
   fn.reset = ()=> ({type: actionReset});
+
   /**
    * Sync store with server. In server mode works as usual method.
    * If data have already synced, data would not fetch after call this method.
