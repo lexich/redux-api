@@ -337,8 +337,11 @@ dispatch(rest.actions.entries.sync());
 
 ###Actions sub methods
 
-#### sync
+#### sync(urlparams, params, callback)
 - @description: this method save you from twice requests flag `sync`. if `sync===true` requst wouldn't execute. In server-side mode calls twice
+- @param **urlparams**  - update url according Url schema
+- @param **params**     - add additional params to rest request
+- @param **callback**   - callback function when action ends
 - @type: Function
 - @example:
 
@@ -350,7 +353,7 @@ function onEnter(state, replaceState, callback) {
 
 ```
 
-#### reset
+#### reset()
 - @description: Reset state of current reducer
 - @type: Function
 - @example:
@@ -362,6 +365,16 @@ function onLeave(state, replaceState, callback) {
 
 ```
 
+#### request()
+- @description: Pure xhr request without sending events or catching reducers.
+- @type: Function
+- @example:
+```js
+import {actions} from "./rest";
+actions.entries.request().then((data)=> {
+  ....
+});
+```
 
 ### Url schema
 /api/v1/user/:id
