@@ -74,6 +74,19 @@ describe("actionFn", function() {
     return Promise.all([async1, async2]);
   });
 
+  it("check request method", function() {
+    let executeCounter = 0;
+    const api = actionFn("/test", "test", null, ACTIONS, {holder: {fetch: ()=> {
+      executeCounter++;
+      return fetchSuccess();
+    }}});
+    const async = api.request();
+    expect(async).to.be.an.instanceof(Promise);
+    return async.then((data)=> {
+      expect(data).to.eql({msg: "hello"});
+    });
+  });
+
   it("check normal usage", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {holder: { fetch: fetchSuccess}});
     expect(api.reset()).to.eql({type: ACTIONS.actionReset });
