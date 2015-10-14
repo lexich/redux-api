@@ -12,15 +12,14 @@
   "dependencies": {
     "ejs": "^2.3.4",
     "express": "^4.13.3",
-    "history": "^1.11.1",
+    "history": "^1.12.5",
     "isomorphic-fetch": "^2.1.1",
     "react": "^0.14.0",
+    "react-dom": "^0.14.0",
     "react-redux": "^3.0.0",
     "react-router": "^1.0.0-rc3",
     "redux": "^3.0.2",
-    "redux-thunk": "^1.0.0",
-    "react-dom": "^0.14.0",
-    "whatwg-fetch": "^0.9.0"
+    "redux-thunk": "^1.0.0"
   },
   "devDependencies": {
     "babel-core": "^5.8.25",
