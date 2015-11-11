@@ -76,14 +76,21 @@ describe("actionFn", function() {
 
   it("check request method", function() {
     let executeCounter = 0;
-    const api = actionFn("/test", "test", null, ACTIONS, {holder: {fetch: ()=> {
-      executeCounter++;
-      return fetchSuccess();
-    }}});
-    const async = api.request();
+    let urlFetch, paramsFetch;
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {holder: {
+      fetch: (url, params)=> {
+        executeCounter++;
+        urlFetch = url;
+        paramsFetch = params;
+        return fetchSuccess();
+      }
+    }});
+    const async = api.request({id: 2}, {hello: "world"});
     expect(async).to.be.an.instanceof(Promise);
     return async.then((data)=> {
       expect(data).to.eql({msg: "hello"});
+      expect(urlFetch).to.eql("/test/2");
+      expect(paramsFetch).to.eql({hello: "world"});
     });
   });
 
@@ -248,6 +255,23 @@ describe("actionFn", function() {
       }, getState);
     }).then(()=> {
       expect(expectedEvent).to.have.length(0);
+    });
+  });
+  it("check validation with request method", function() {
+    let expData, counter = 0;
+    const meta = {
+      holder: {fetch: fetchSuccess},
+      validation(data, cb) {
+        counter++;
+        expData = data;
+        cb();
+      }
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    return api.request({id: 1}).then((data)=> {
+      expect(data).to.eql({msg: "hello"});
+      expect(counter).to.eql(1);
+      expect(expData).to.eql({msg: "hello"});
     });
   });
   it("check success validation", function() {
