@@ -1,9 +1,9 @@
 "use strict";
 /* global describe, it */
 
-const expect = require("chai").expect;
-const reducerFn = require("../src/reducerFn");
-const isFunction = require("lodash/lang/isFunction");
+import {expect} from "chai";
+import reducerFn from "../src/reducerFn";
+import isFunction from "lodash/lang/isFunction";
 
 describe("reducerFn", function() {
   it("check null params", function() {

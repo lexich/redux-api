@@ -1,8 +1,8 @@
 "use strict";
 /* global describe, it */
 
-const expect = require("chai").expect;
-const urlTransform = require("../src/urlTransform");
+import {expect} from "chai";
+import urlTransform from "../src/urlTransform";
 
 describe("urlTransform", function() {
   it("check null params", function() {
