@@ -59,37 +59,37 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	exports.__esModule = true;
-	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	exports["default"] = reduxApi;
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.transformers = undefined;
+	exports.default = reduxApi;
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	var _isArray = __webpack_require__(/*! lodash/lang/isArray */ 1);
 	
-	var _lodashLangIsArray = __webpack_require__(/*! lodash/lang/isArray */ 1);
+	var _isArray2 = _interopRequireDefault(_isArray);
 	
-	var _lodashLangIsArray2 = _interopRequireDefault(_lodashLangIsArray);
+	var _isObject = __webpack_require__(/*! lodash/lang/isObject */ 4);
 	
-	var _lodashLangIsObject = __webpack_require__(/*! lodash/lang/isObject */ 4);
+	var _isObject2 = _interopRequireDefault(_isObject);
 	
-	var _lodashLangIsObject2 = _interopRequireDefault(_lodashLangIsObject);
+	var _isString = __webpack_require__(/*! lodash/lang/isString */ 74);
 	
-	var _lodashLangIsString = __webpack_require__(/*! lodash/lang/isString */ 74);
+	var _isString2 = _interopRequireDefault(_isString);
 	
-	var _lodashLangIsString2 = _interopRequireDefault(_lodashLangIsString);
+	var _isNumber = __webpack_require__(/*! lodash/lang/isNumber */ 73);
 	
-	var _lodashLangIsNumber = __webpack_require__(/*! lodash/lang/isNumber */ 73);
+	var _isNumber2 = _interopRequireDefault(_isNumber);
 	
-	var _lodashLangIsNumber2 = _interopRequireDefault(_lodashLangIsNumber);
+	var _isBoolean = __webpack_require__(/*! lodash/lang/isBoolean */ 71);
 	
-	var _lodashLangIsBoolean = __webpack_require__(/*! lodash/lang/isBoolean */ 71);
+	var _isBoolean2 = _interopRequireDefault(_isBoolean);
 	
-	var _lodashLangIsBoolean2 = _interopRequireDefault(_lodashLangIsBoolean);
+	var _reduce = __webpack_require__(/*! lodash/collection/reduce */ 8);
 	
-	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 8);
-	
-	var _lodashCollectionReduce2 = _interopRequireDefault(_lodashCollectionReduce);
+	var _reduce2 = _interopRequireDefault(_reduce);
 	
 	var _reducerFn = __webpack_require__(/*! ./reducerFn */ 29);
 	
@@ -99,18 +99,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _actionFn2 = _interopRequireDefault(_actionFn);
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	
 	/**
 	 * Default responce transformens
 	 */
-	var transformers = {
+	var transformers = exports.transformers = {
 	  array: function array(data) {
-	    return !data ? [] : _lodashLangIsArray2["default"](data) ? data : [data];
+	    return !data ? [] : (0, _isArray2.default)(data) ? data : [data];
 	  },
 	  object: function object(data) {
 	    if (!data) {
 	      return {};
 	    }
-	    if (_lodashLangIsArray2["default"](data) || _lodashLangIsString2["default"](data) || _lodashLangIsNumber2["default"](data) || _lodashLangIsBoolean2["default"](data) || !_lodashLangIsObject2["default"](data)) {
+	    if ((0, _isArray2.default)(data) || (0, _isString2.default)(data) || (0, _isNumber2.default)(data) || (0, _isBoolean2.default)(data) || !(0, _isObject2.default)(data)) {
 	      return { data: data };
 	    } else {
 	      return data;
@@ -118,7 +122,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	exports.transformers = transformers;
 	/**
 	 * Default configuration for each endpoint
 	 * @type {Object}
@@ -163,7 +166,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *   }));
 	 * ```
 	 */
-	
 	function reduxApi(config) {
 	  var fetchHolder = {
 	    fetch: null,
@@ -177,8 +179,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    events: {}
 	  };
 	
-	  var reduxApiObject = _lodashCollectionReduce2["default"](config, function (memo, value, key) {
-	    var opts = typeof value === "object" ? _extends({}, defaultEndpointConfig, { reducerName: key }, value) : _extends({}, defaultEndpointConfig, { reducerName: key, url: value });
+	  var reduxApiObject = (0, _reduce2.default)(config, function (memo, value, key) {
+	    var opts = (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object" ? _extends({}, defaultEndpointConfig, { reducerName: key }, value) : _extends({}, defaultEndpointConfig, { reducerName: key, url: value });
 	
 	    var url = opts.url;
 	    var options = opts.options;
@@ -204,7 +206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      prefetch: prefetch, validation: validation, helpers: helpers
 	    };
 	
-	    memo.actions[key] = _actionFn2["default"](url, key, options, ACTIONS, meta);
+	    memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
 	
 	    if (!meta.virtual && !memo.reducers[reducerName]) {
 	      var initialState = {
@@ -213,7 +215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        loading: false,
 	        data: transformer()
 	      };
-	      memo.reducers[reducerName] = _reducerFn2["default"](initialState, ACTIONS, transformer);
+	      memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, transformer);
 	    }
 	    memo.events[reducerName] = ACTIONS;
 	    return memo;
@@ -1296,15 +1298,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	exports.__esModule = true;
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _isFunction = __webpack_require__(/*! lodash/lang/isFunction */ 12);
+	
+	var _isFunction2 = _interopRequireDefault(_isFunction);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var _lodashLangIsFunction = __webpack_require__(/*! lodash/lang/isFunction */ 12);
-	
-	var _lodashLangIsFunction2 = _interopRequireDefault(_lodashLangIsFunction);
 	
 	var PubSub = (function () {
 	  function PubSub() {
@@ -1313,29 +1319,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.container = [];
 	  }
 	
-	  PubSub.prototype.push = function push(cb) {
-	    _lodashLangIsFunction2["default"](cb) && this.container.push(cb);
-	  };
-	
-	  PubSub.prototype.resolve = function resolve(data) {
-	    this.container.forEach(function (cb) {
-	      return cb(null, data);
-	    });
-	    this.container = [];
-	  };
-	
-	  PubSub.prototype.reject = function reject(err) {
-	    this.container.forEach(function (cb) {
-	      return cb(err);
-	    });
-	    this.container = [];
-	  };
+	  _createClass(PubSub, [{
+	    key: "push",
+	    value: function push(cb) {
+	      (0, _isFunction2.default)(cb) && this.container.push(cb);
+	    }
+	  }, {
+	    key: "resolve",
+	    value: function resolve(data) {
+	      this.container.forEach(function (cb) {
+	        return cb(null, data);
+	      });
+	      this.container = [];
+	    }
+	  }, {
+	    key: "reject",
+	    value: function reject(err) {
+	      this.container.forEach(function (cb) {
+	        return cb(err);
+	      });
+	      this.container = [];
+	    }
+	  }]);
 	
 	  return PubSub;
 	})();
 	
-	exports["default"] = PubSub;
-	module.exports = exports["default"];
+	exports.default = PubSub;
 
 /***/ },
 /* 27 */
@@ -1346,29 +1356,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	exports.__esModule = true;
+	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	exports["default"] = actionFn;
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = actionFn;
 	
 	var _urlTransform = __webpack_require__(/*! ./urlTransform */ 30);
 	
 	var _urlTransform2 = _interopRequireDefault(_urlTransform);
 	
-	var _lodashLangIsFunction = __webpack_require__(/*! lodash/lang/isFunction */ 12);
+	var _isFunction = __webpack_require__(/*! lodash/lang/isFunction */ 12);
 	
-	var _lodashLangIsFunction2 = _interopRequireDefault(_lodashLangIsFunction);
+	var _isFunction2 = _interopRequireDefault(_isFunction);
 	
-	var _lodashCollectionEach = __webpack_require__(/*! lodash/collection/each */ 33);
+	var _each = __webpack_require__(/*! lodash/collection/each */ 33);
 	
-	var _lodashCollectionEach2 = _interopRequireDefault(_lodashCollectionEach);
+	var _each2 = _interopRequireDefault(_each);
 	
-	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 8);
+	var _reduce = __webpack_require__(/*! lodash/collection/reduce */ 8);
 	
-	var _lodashCollectionReduce2 = _interopRequireDefault(_lodashCollectionReduce);
+	var _reduce2 = _interopRequireDefault(_reduce);
 	
 	var _fetchResolver = __webpack_require__(/*! ./fetchResolver */ 28);
 	
@@ -1382,15 +1393,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _fastApply2 = _interopRequireDefault(_fastApply);
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	function none() {}
 	
 	function extractArgs(args) {
 	  var pathvars = undefined,
 	      params = {},
 	      callback = undefined;
-	  if (_lodashLangIsFunction2["default"](args[0])) {
+	  if ((0, _isFunction2.default)(args[0])) {
 	    callback = args[0];
-	  } else if (_lodashLangIsFunction2["default"](args[1])) {
+	  } else if ((0, _isFunction2.default)(args[1])) {
 	    pathvars = args[0];
 	    callback = args[1];
 	  } else {
@@ -1410,7 +1423,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {[type]} fetchAdapter adapter for fetching data
 	 * @return {Function+Object}     action function object
 	 */
-	
 	function actionFn(url, name, options) {
 	  var ACTIONS = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 	  var meta = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
@@ -1419,7 +1431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var actionFail = ACTIONS.actionFail;
 	  var actionReset = ACTIONS.actionReset;
 	
-	  var pubsub = new _PubSub2["default"]();
+	  var pubsub = new _PubSub2.default();
 	
 	  /**
 	   * Fetch data from server
@@ -1430,8 +1442,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var request = function request(pathvars, params) {
 	    var getState = arguments.length <= 2 || arguments[2] === undefined ? none : arguments[2];
 	
-	    var urlT = _urlTransform2["default"](url, pathvars);
-	    var baseOptions = _lodashLangIsFunction2["default"](options) ? options(urlT, params, getState) : options;
+	    var urlT = (0, _urlTransform2.default)(url, pathvars);
+	    var baseOptions = (0, _isFunction2.default)(options) ? options(urlT, params, getState) : options;
 	    var opts = _extends({}, baseOptions, params);
 	    var response = meta.holder.fetch(urlT, opts);
 	    return !meta.validation ? response : response.then(function (data) {
@@ -1456,9 +1468,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var _extractArgs = extractArgs(args);
 	
-	    var pathvars = _extractArgs[0];
-	    var params = _extractArgs[1];
-	    var callback = _extractArgs[2];
+	    var _extractArgs2 = _slicedToArray(_extractArgs, 3);
+	
+	    var pathvars = _extractArgs2[0];
+	    var params = _extractArgs2[1];
+	    var callback = _extractArgs2[2];
 	
 	    var syncing = params ? !!params.syncing : false;
 	    params && delete params.syncing;
@@ -1476,14 +1490,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        prefetch: meta.prefetch
 	      };
 	
-	      _fetchResolver2["default"](0, fetchResolverOpts, function (err) {
+	      (0, _fetchResolver2.default)(0, fetchResolverOpts, function (err) {
 	        return err ? pubsub.reject(err) : request(pathvars, params, getState).then(function (data) {
 	          dispatch({ type: actionSuccess, syncing: false, data: data });
-	          _lodashCollectionEach2["default"](meta.broadcast, function (btype) {
+	          (0, _each2.default)(meta.broadcast, function (btype) {
 	            return dispatch({ type: btype, data: data });
 	          });
 	          pubsub.resolve(getState()[name]);
-	        })["catch"](function (error) {
+	        }).catch(function (error) {
 	          dispatch({ type: actionFail, syncing: false, error: error });
 	          pubsub.reject(error);
 	        });
@@ -1515,11 +1529,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      args[_key2] = arguments[_key2];
 	    }
 	
-	    var _extractArgs2 = extractArgs(args);
+	    var _extractArgs3 = extractArgs(args);
 	
-	    var pathvars = _extractArgs2[0];
-	    var params = _extractArgs2[1];
-	    var callback = _extractArgs2[2];
+	    var _extractArgs4 = _slicedToArray(_extractArgs3, 3);
+	
+	    var pathvars = _extractArgs4[0];
+	    var params = _extractArgs4[1];
+	    var callback = _extractArgs4[2];
 	
 	    return function (dispatch, getState) {
 	      var state = getState();
@@ -1533,12 +1549,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 	
-	  return _lodashCollectionReduce2["default"](meta.helpers, function (memo, func, helpername) {
+	  return (0, _reduce2.default)(meta.helpers, function (memo, func, helpername) {
 	    if (memo[helpername]) {
 	      throw new Error("Helper name: \"" + helpername + "\" for endpoint \"" + name + "\" has been already reserved");
 	    }
 	
-	    var _ref = _lodashLangIsFunction2["default"](func) ? { call: func } : func;
+	    var _ref = (0, _isFunction2.default)(func) ? { call: func } : func;
 	
 	    var sync = _ref.sync;
 	    var call = _ref.call;
@@ -1550,31 +1566,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return function (dispatch, getState) {
 	        var index = args.length - 1;
-	        var callback = _lodashLangIsFunction2["default"](args[index]) ? args[index] : none;
-	        var helpersResult = _fastApply2["default"](call, { getState: getState, dispatch: dispatch }, args);
+	        var callback = (0, _isFunction2.default)(args[index]) ? args[index] : none;
+	        var helpersResult = (0, _fastApply2.default)(call, { getState: getState, dispatch: dispatch }, args);
 	
 	        // If helper alias using async functionality
-	        if (_lodashLangIsFunction2["default"](helpersResult)) {
+	        if ((0, _isFunction2.default)(helpersResult)) {
 	          helpersResult(function (error) {
 	            var newArgs = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 	
 	            if (error) {
 	              callback(error);
 	            } else {
-	              _fastApply2["default"](sync ? fn.sync : fn, null, newArgs.concat(callback))(dispatch, getState);
+	              (0, _fastApply2.default)(sync ? fn.sync : fn, null, newArgs.concat(callback))(dispatch, getState);
 	            }
 	          });
 	        } else {
 	          // if helper alias is synchronous
-	          _fastApply2["default"](sync ? fn.sync : fn, null, helpersResult.concat(callback))(dispatch, getState);
+	          (0, _fastApply2.default)(sync ? fn.sync : fn, null, helpersResult.concat(callback))(dispatch, getState);
 	        }
 	      };
 	    };
 	    return memo;
 	  }, fn);
 	}
-	
-	module.exports = exports["default"];
 
 /***/ },
 /* 28 */
@@ -1585,8 +1599,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	exports.__esModule = true;
-	exports["default"] = fetchResolver;
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = fetchResolver;
 	function none() {}
 	
 	function fetchResolver() {
@@ -1602,8 +1618,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	}
-	
-	module.exports = exports["default"];
 
 /***/ },
 /* 29 */
@@ -1612,7 +1626,7 @@ return /******/ (function(modules) { // webpackBootstrap
   \**************************/
 /***/ function(module, exports) {
 
-	"use strict";
+	"use strict"
 	/**
 	 * Reducer contructor
 	 * @param  {Object}   initialState default initial state
@@ -1620,12 +1634,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {Function} transformer  transformer function
 	 * @return {Function}              reducer function
 	 */
-	exports.__esModule = true;
+	;
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	exports["default"] = reducerFn;
-	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = reducerFn;
 	function reducerFn(initialState) {
 	  var actions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	  var transformer = arguments.length <= 2 || arguments[2] === undefined ? function (val) {
@@ -1636,8 +1652,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var actionFail = actions.actionFail;
 	  var actionReset = actions.actionReset;
 	
-	  return function (state, action) {
-	    if (state === undefined) state = initialState;
+	  return function () {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	    var action = arguments[1];
 	
 	    switch (action.type) {
 	      case actionFetch:
@@ -1667,8 +1684,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	}
-	
-	module.exports = exports["default"];
 
 /***/ },
 /* 30 */
@@ -1678,31 +1693,33 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	exports.__esModule = true;
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	exports["default"] = urlTransform;
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = urlTransform;
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	var _reduce = __webpack_require__(/*! lodash/collection/reduce */ 8);
 	
-	var _lodashCollectionReduce = __webpack_require__(/*! lodash/collection/reduce */ 8);
+	var _reduce2 = _interopRequireDefault(_reduce);
 	
-	var _lodashCollectionReduce2 = _interopRequireDefault(_lodashCollectionReduce);
+	var _omit = __webpack_require__(/*! lodash/object/omit */ 76);
 	
-	var _lodashObjectOmit = __webpack_require__(/*! lodash/object/omit */ 76);
+	var _omit2 = _interopRequireDefault(_omit);
 	
-	var _lodashObjectOmit2 = _interopRequireDefault(_lodashObjectOmit);
+	var _keys = __webpack_require__(/*! lodash/object/keys */ 7);
 	
-	var _lodashObjectKeys = __webpack_require__(/*! lodash/object/keys */ 7);
-	
-	var _lodashObjectKeys2 = _interopRequireDefault(_lodashObjectKeys);
+	var _keys2 = _interopRequireDefault(_keys);
 	
 	var _qs = __webpack_require__(/*! qs */ 79);
 	
 	var _qs2 = _interopRequireDefault(_qs);
 	
 	var _url = __webpack_require__(/*! url */ 87);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 	
@@ -1712,7 +1729,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {Object} params params for url template
 	 * @return {String}        result url
 	 */
-	
 	function urlTransform(url) {
 	  var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	
@@ -1720,7 +1736,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return "";
 	  }
 	  var usedKeys = {};
-	  var urlWithParams = _lodashCollectionReduce2["default"](params, function (url, value, key) {
+	  var urlWithParams = (0, _reduce2.default)(params, function (url, value, key) {
 	    return url.replace(new RegExp("(\\(:" + key + "\\)|:" + key + ")", "g"), function () {
 	      return usedKeys[key] = value;
 	    });
@@ -1729,23 +1745,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return urlWithParams;
 	  }
 	
-	  var _parse = _url.parse(urlWithParams);
+	  var _parse = (0, _url.parse)(urlWithParams);
 	
 	  var protocol = _parse.protocol;
 	  var host = _parse.host;
 	  var path = _parse.path;
 	
 	  var cleanURL = host ? protocol + "//" + host + path.replace(rxClean, "") : path.replace(rxClean, "");
-	  var usedKeysArray = _lodashObjectKeys2["default"](usedKeys);
-	  if (usedKeysArray.length !== _lodashObjectKeys2["default"](params).length) {
+	  var usedKeysArray = (0, _keys2.default)(usedKeys);
+	  if (usedKeysArray.length !== (0, _keys2.default)(params).length) {
 	    var urlObject = cleanURL.split("?");
-	    var mergeParams = _extends({}, urlObject[1] && _qs2["default"].parse(urlObject[1]), _lodashObjectOmit2["default"](params, usedKeysArray));
-	    return urlObject[0] + "?" + _qs2["default"].stringify(mergeParams);
+	    var mergeParams = _extends({}, urlObject[1] && _qs2.default.parse(urlObject[1]), (0, _omit2.default)(params, usedKeysArray));
+	    return urlObject[0] + "?" + _qs2.default.stringify(mergeParams);
 	  }
 	  return cleanURL;
 	}
-	
-	module.exports = exports["default"];
 
 /***/ },
 /* 31 */
@@ -4710,7 +4724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	}(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/buildin/module.js */ 82)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../buildin/module.js */ 82)(module), (function() { return this; }())))
 
 /***/ },
 /* 84 */
