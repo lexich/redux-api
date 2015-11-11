@@ -1,8 +1,8 @@
 "use strict";
 /* global describe, it */
 
-const expect = require("chai").expect;
-const fetch = require("../src/adapters/fetch");
+import {expect} from "chai";
+import fetch from "../src/adapters/fetch";
 
 describe("fetch adapters", function() {
   it("check", function() {

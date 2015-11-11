@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -12,9 +12,9 @@
   "repository": "http://github.com/lexich/redux-api",
   "scripts": {
     "test": "npm run eslint && npm run mocha",
-    "mocha": "istanbul test _mocha --report html -- --require babel/register test/*_spec.js --reporter spec",
+    "mocha": "istanbul test _mocha --report html -- --require babel-core/register test/*_spec.js --reporter spec",
     "build": "rm -rf dist lib && npm run browser-dev && npm run browser-min && npm run compile",
-    "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel-core/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "eslint": "node_modules/.bin/eslint src test examples/isomorphic/app examples/isomorphic/server.js",
     "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
@@ -29,9 +29,13 @@
     "qs": "^6.0.0"
   },
   "devDependencies": {
-    "babel": "^5.8.23",
+    "babel": "^6.0.15",
+    "babel-cli": "^6.1.2",
+    "babel-core": "^6.1.2",
     "babel-eslint": "^4.1.3",
-    "babel-loader": "^5.3.2",
+    "babel-loader": "^6.1.0",
+    "babel-preset-es2015": "^6.1.2",
+    "babel-preset-stage-0": "^6.1.2",
     "chai": "^3.4.1",
     "coveralls": "^2.11.4",
     "eslint": "^1.9.0",

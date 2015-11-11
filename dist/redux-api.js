@@ -1433,7 +1433,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var urlT = _urlTransform2["default"](url, pathvars);
 	    var baseOptions = _lodashLangIsFunction2["default"](options) ? options(urlT, params, getState) : options;
 	    var opts = _extends({}, baseOptions, params);
-	    return meta.holder.fetch(urlT, opts);
+	    var response = meta.holder.fetch(urlT, opts);
+	    return !meta.validation ? response : response.then(function (data) {
+	      return new Promise(function (resolve, reject) {
+	        return meta.validation(data, function (err) {
+	          return err ? reject(err) : resolve(data);
+	        });
+	      });
+	    });
 	  };
 	
 	  /**
@@ -1471,12 +1478,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      _fetchResolver2["default"](0, fetchResolverOpts, function (err) {
 	        return err ? pubsub.reject(err) : request(pathvars, params, getState).then(function (data) {
-	          return !meta.validation ? data : new Promise(function (resolve, reject) {
-	            return meta.validation(data, function (err) {
-	              return err ? reject(err) : resolve(data);
-	            });
-	          });
-	        }).then(function (data) {
 	          dispatch({ type: actionSuccess, syncing: false, data: data });
 	          _lodashCollectionEach2["default"](meta.broadcast, function (btype) {
 	            return dispatch({ type: btype, data: data });

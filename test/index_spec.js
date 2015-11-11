@@ -1,11 +1,11 @@
 "use strict";
 /* global describe, it */
 
-const expect = require("chai").expect;
-const reduxApi = require("../src/index.js").default;
-const transformers = require("../src/index.js").transformers;
-const isFunction = require("lodash/lang/isFunction");
-const size = require("lodash/collection/size");
+import {expect} from "chai";
+import reduxApi from "../src/index.js";
+import {transformers} from "../src/index.js";
+import isFunction from "lodash/lang/isFunction";
+import size from "lodash/collection/size";
 
 function getState() {
   return {test: {loading: false, data: {}}};
