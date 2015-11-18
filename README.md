@@ -79,11 +79,11 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 #### transformer
-- @description: function for rest responce transformation
+- @description: function for rest response transformation
 - @type: Function  
 - @default: transformers.object  
 - @example: It's a good idea to write custom transformer  
-    for example you have responce  
+    for example you have response  
 ```json
   { "title": "Hello", "message": "World" }
 ```
@@ -182,7 +182,7 @@ function (state, action) {
 ```
 
 ####validation (data, callback)
-- @param **data** - responce data
+- @param **data** - response data
   > type: Object
 
 - @param **callback** - you need to execute this callback function to finish data validation
@@ -478,8 +478,8 @@ const rest = reduxApi({
     sync: false,    // State was update once
     syncing: false, // State syncing is in progress
     loading: false, // State updating is in progress
-    error: null,    // responce error
-    data: []        // responce data
+    error: null,    // response error
+    data: []        // response data
   }
 }
 ```
