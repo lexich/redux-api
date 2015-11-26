@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -12,9 +12,9 @@
   "repository": "http://github.com/lexich/redux-api",
   "scripts": {
     "test": "npm run eslint && npm run mocha",
-    "mocha": "istanbul test _mocha --report html -- --require babel-core/register test/*_spec.js --reporter spec",
+    "mocha": "node --harmony node_modules/.bin/istanbul test node_modules/.bin/_mocha --report html -- --compilers js:babel-core/register test/*_spec.js --reporter spec",
     "build": "rm -rf dist lib && npm run browser-dev && npm run browser-min && npm run compile",
-    "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel-core/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "coveralls": "node --harmony node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel-core/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "eslint": "node_modules/.bin/eslint src test examples/isomorphic/app examples/isomorphic/server.js",
     "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
@@ -26,26 +26,26 @@
   "dependencies": {
     "fast-apply": "0.0.3",
     "lodash": "^3.10.1",
-    "qs": "^5.2.0"
+    "qs": "^6.0.1"
   },
   "devDependencies": {
-    "babel": "^6.0.15",
-    "babel-cli": "^6.1.2",
-    "babel-core": "^6.1.2",
-    "babel-eslint": "^4.1.3",
-    "babel-loader": "^6.1.0",
-    "babel-preset-es2015": "^6.1.2",
-    "babel-preset-stage-0": "^6.1.2",
+    "babel": "^6.2.4",
+    "babel-cli": "^6.2.4",
+    "babel-core": "^6.2.4",
+    "babel-eslint": "^4.1.6",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.2.4",
+    "babel-preset-stage-0": "^6.2.4",
     "chai": "^3.4.1",
     "coveralls": "^2.11.4",
-    "eslint": "^1.9.0",
+    "eslint": "^1.10.1",
     "eslint-config-airbnb": "^1.0.0",
-    "eslint-plugin-react": "^3.8.0",
-    "husky": "^0.10.1",
-    "istanbul": "^0.4.0",
-    "mocha": "^2.3.3",
+    "eslint-plugin-react": "^3.10.0",
+    "husky": "^0.10.2",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
     "mocha-lcov-reporter": "^1.0.0",
-    "webpack": "^1.12.4"
+    "webpack": "^1.12.9"
   },
   "engines": {
     "node": ">=0.12.0"
