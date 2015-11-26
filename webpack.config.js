@@ -23,7 +23,8 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
   module: {
     loaders: [
-      { test: /\.js$/, loaders: ['babel-loader'], exclude: /node_modules/ }
+      { test: /\.js$/, loaders: ['babel-loader'], exclude: /node_modules/ },
+			{ test: /qs\/lib\/.+\.js$/, loaders: ['babel-loader'] }
     ]
   },
   output: {
