@@ -12,9 +12,9 @@
   "repository": "http://github.com/lexich/redux-api",
   "scripts": {
     "test": "npm run eslint && npm run mocha",
-    "mocha": "node_modules/.bin/babel-node --harmony node_modules/.bin/istanbul test node_modules/.bin/_mocha --report html -- --compilers js:babel-core/register test/*_spec.js --reporter spec",
+    "mocha": "node --harmony node_modules/.bin/istanbul test node_modules/.bin/_mocha --report html -- --compilers js:babel-core/register test/*_spec.js --reporter spec",
     "build": "rm -rf dist lib && npm run browser-dev && npm run browser-min && npm run compile",
-    "coveralls": "istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel-core/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "coveralls": "node --harmony node_modules/.bin/istanbul cover node_modules/.bin/_mocha --report html --report lcovonly -- --require babel-core/register  test/*_spec.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "eslint": "node_modules/.bin/eslint src test examples/isomorphic/app examples/isomorphic/server.js",
     "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
