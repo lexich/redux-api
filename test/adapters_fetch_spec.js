@@ -1,7 +1,7 @@
 "use strict";
 /* global describe, it */
 
-import {expect} from "chai";
+import { expect } from "chai";
 import fetch from "../src/adapters/fetch";
 
 describe("fetch adapters", function() {
@@ -10,9 +10,11 @@ describe("fetch adapters", function() {
     const fetchApi = (url, opts)=> new Promise((resolve)=> {
       expect(url).to.eql("url");
       expect(opts).to.eql("opts");
-      resolve({ json() {
-        jsonCall++;
-      }});
+      resolve({
+        json() {
+          jsonCall++;
+        }
+      });
     });
     fetch(fetchApi)("url", "opts").then(()=> {
       expect(jsonCall).to.eql(1);

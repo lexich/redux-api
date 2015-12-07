@@ -35,7 +35,7 @@ function extractArgs(args) {
  * @return {Function+Object}     action function object
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
-  const {actionFetch, actionSuccess, actionFail, actionReset} = ACTIONS;
+  const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
   const pubsub = new PubSub();
 
   /**
@@ -72,7 +72,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       if (store && store.loading) {
         return;
       }
-      dispatch({ type: actionFetch, syncing});
+      dispatch({ type: actionFetch, syncing });
       const fetchResolverOpts = {
         dispatch, getState,
         actions: meta.actions,
@@ -83,7 +83,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         (err)=> err ? pubsub.reject(err) : request(pathvars, params, getState)
           .then((data)=> {
             dispatch({ type: actionSuccess, syncing: false, data });
-            each(meta.broadcast, (btype)=> dispatch({type: btype, data}));
+            each(meta.broadcast, (btype)=> dispatch({ type: btype, data }));
             pubsub.resolve(getState()[name]);
           })
           .catch((error)=> {
@@ -101,7 +101,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   /**
    * Reset store to initial state
    */
-  fn.reset = ()=> ({type: actionReset});
+  fn.reset = ()=> ({ type: actionReset });
 
   /**
    * Sync store with server. In server mode works as usual method.
@@ -119,7 +119,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         callback(null, store);
         return;
       }
-      const modifyParams = {...params, syncing: true};
+      const modifyParams = { ...params, syncing: true };
       return fn(pathvars, modifyParams, callback)(dispatch, getState);
     };
   };
@@ -128,11 +128,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     if (memo[helpername]) {
       throw new Error(`Helper name: "${helpername}" for endpoint "${name}" has been already reserved`);
     }
-    const {sync, call} = isFunction(func) ? {call: func} : func;
+    const { sync, call } = isFunction(func) ? { call: func } : func;
     memo[helpername] = (...args)=> (dispatch, getState)=> {
       const index = args.length - 1;
       const callback = isFunction(args[index]) ? args[index] : none;
-      const helpersResult = fastApply(call, {getState, dispatch}, args);
+      const helpersResult = fastApply(call, { getState, dispatch }, args);
 
       // If helper alias using async functionality
       if (isFunction(helpersResult)) {

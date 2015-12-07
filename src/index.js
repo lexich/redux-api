@@ -23,7 +23,7 @@ export const transformers = {
       return {};
     }
     if (isArray(data) || isString(data) || isNumber(data) || isBoolean(data) || !isObject(data)) {
-      return {data};
+      return { data };
     } else {
       return data;
     }
