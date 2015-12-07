@@ -1,20 +1,20 @@
 "use strict";
 /* global describe, it */
 
-import {expect} from "chai";
+import { expect } from "chai";
 import actionFn from "../src/actionFn";
 import isFunction from "lodash/lang/isFunction";
 import after from "lodash/function/after";
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
-    resolve({ msg: "hello"});
+    resolve({ msg: "hello" });
   });
 }
 
 function getState() {
   return {
-    test: {loading: false, syncing: false, sync: false, data: {}}
+    test: { loading: false, syncing: false, sync: false, data: {} }
   };
 }
 
@@ -39,10 +39,14 @@ describe("actionFn", function() {
 
   it("check sync method", function() {
     let executeCounter = 0;
-    const api = actionFn("/test", "test", null, ACTIONS, {holder: {fetch: ()=> {
-      executeCounter++;
-      return fetchSuccess();
-    }}});
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      holder: {
+        fetch: ()=> {
+          executeCounter++;
+          return fetchSuccess();
+        }
+      }
+    });
 
     const async1 = new Promise((resolve)=> {
       const initialState = getState();
@@ -57,7 +61,7 @@ describe("actionFn", function() {
       syncing: true
     }, {
       type: ACTIONS.actionSuccess,
-      data: {msg: "hello"},
+      data: { msg: "hello" },
       syncing: false
     }];
     const async2 = new Promise((resolve)=> {
@@ -77,41 +81,43 @@ describe("actionFn", function() {
   it("check request method", function() {
     let executeCounter = 0;
     let urlFetch, paramsFetch;
-    const api = actionFn("/test/:id", "test", null, ACTIONS, {holder: {
-      fetch: (url, params)=> {
-        executeCounter++;
-        urlFetch = url;
-        paramsFetch = params;
-        return fetchSuccess();
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      holder: {
+        fetch: (url, params)=> {
+          executeCounter++;
+          urlFetch = url;
+          paramsFetch = params;
+          return fetchSuccess();
+        }
       }
-    }});
-    const async = api.request({id: 2}, {hello: "world"});
+    });
+    const async = api.request({ id: 2 }, { hello: "world" });
     expect(async).to.be.an.instanceof(Promise);
     return async.then((data)=> {
-      expect(data).to.eql({msg: "hello"});
+      expect(data).to.eql({ msg: "hello" });
       expect(urlFetch).to.eql("/test/2");
-      expect(paramsFetch).to.eql({hello: "world"});
+      expect(paramsFetch).to.eql({ hello: "world" });
     });
   });
 
   it("check normal usage", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, {holder: { fetch: fetchSuccess}});
-    expect(api.reset()).to.eql({type: ACTIONS.actionReset });
-    const expectedEvent = [
-      {
-        type: ACTIONS.actionFetch,
-        syncing: false
-      }, {
-        type: ACTIONS.actionSuccess,
-        data: {msg: "hello"},
-        syncing: false
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      holder: {
+        fetch: fetchSuccess
       }
-    ];
+    });
+    expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: { msg: "hello" },
+      syncing: false
+    }];
     return new Promise((resolve)=> {
       const action = api(resolve);
       expect(isFunction(action)).to.be.true;
-
-
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -124,18 +130,19 @@ describe("actionFn", function() {
   });
 
   it("check fail fetch", function() {
-    const api = actionFn("/test", "test", null, ACTIONS, {holder: {fetch: fetchFail}});
-
-    const expectedEvent = [
-      {
-        type: ACTIONS.actionFetch,
-        syncing: false
-      }, {
-        type: ACTIONS.actionFail,
-        error: "Error",
-        syncing: false
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      holder: {
+        fetch: fetchFail
       }
-    ];
+    });
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionFail,
+      error: "Error",
+      syncing: false
+    }];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
@@ -149,17 +156,19 @@ describe("actionFn", function() {
   });
 
   it("check double request", function(_done) {
-    const api = actionFn("/test/:id", "test", null, ACTIONS, {holder: {fetch: fetchSuccess}});
-    const expectedEvent = [
-      {
-        type: ACTIONS.actionFetch,
-        syncing: false
-      }, {
-        type: ACTIONS.actionSuccess,
-        data: {msg: "hello"},
-        syncing: false
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      holder: {
+        fetch: fetchSuccess
       }
-    ];
+    });
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: { msg: "hello" },
+      syncing: false
+    }];
     let modify = 0;
     let loading = false;
     function dispatch(msg) {
@@ -170,12 +179,12 @@ describe("actionFn", function() {
     }
     function getState() {
       loading = !loading;
-      return {test: {loading, data: {}}};
+      return { test: { loading, data: {} } };
     }
     const done = after(2, _done);
-    api({id: 1}, done)(dispatch, getState);
+    api({ id: 1 }, done)(dispatch, getState);
     expect(modify).to.eql(0);
-    api({id: 1}, done)(dispatch, getState);
+    api({ id: 1 }, done)(dispatch, getState);
   });
 
   it("check options param", function() {
@@ -186,22 +195,26 @@ describe("actionFn", function() {
       expect(getState === _getState).to.be.true;
       callOptions++;
       return { ...params,  test: 1 };
-    }, ACTIONS, {holder: {fetch: function(url, opts) {
-      checkOptions = opts;
-      return fetchSuccess();
-    }}});
+    }, ACTIONS, {
+      holder: {
+        fetch: function(url, opts) {
+          checkOptions = opts;
+          return fetchSuccess();
+        }
+      }
+    });
     function dispatch() {}
     return new Promise((resolve)=> {
-      api("", {params: 1}, resolve)(dispatch, getState);
+      api("", { params: 1 }, resolve)(dispatch, getState);
       expect(callOptions).to.eql(1);
-      expect(checkOptions).to.eql({params: 1, test: 1});
+      expect(checkOptions).to.eql({ params: 1, test: 1 });
     });
   });
 
   it("check server mode", function() {
     function getServerState() {
       return {
-        test: {loading: false, syncing: false, sync: true, data: {}}
+        test: { loading: false, syncing: false, sync: true, data: {} }
       };
     }
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
@@ -228,21 +241,19 @@ describe("actionFn", function() {
 
   it("check broadcast option", function() {
     const BROADCAST_ACTION = "BROADCAST_ACTION";
-    const expectedEvent = [
-      {
-        type: ACTIONS.actionFetch,
-        syncing: false
-      }, {
-        type: ACTIONS.actionSuccess,
-        data: {msg: "hello"},
-        syncing: false
-      }, {
-        type: BROADCAST_ACTION,
-        data: {msg: "hello"}
-      }
-    ];
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: { msg: "hello" },
+      syncing: false
+    }, {
+      type: BROADCAST_ACTION,
+      data: { msg: "hello" }
+    }];
     const meta = {
-      holder: {fetch: fetchSuccess},
+      holder: { fetch: fetchSuccess },
       broadcast: [BROADCAST_ACTION]
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -260,7 +271,7 @@ describe("actionFn", function() {
   it("check validation with request method", function() {
     let expData, counter = 0;
     const meta = {
-      holder: {fetch: fetchSuccess},
+      holder: { fetch: fetchSuccess },
       validation(data, cb) {
         counter++;
         expData = data;
@@ -268,16 +279,16 @@ describe("actionFn", function() {
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    return api.request({id: 1}).then((data)=> {
-      expect(data).to.eql({msg: "hello"});
+    return api.request({ id: 1 }).then((data)=> {
+      expect(data).to.eql({ msg: "hello" });
       expect(counter).to.eql(1);
-      expect(expData).to.eql({msg: "hello"});
+      expect(expData).to.eql({ msg: "hello" });
     });
   });
   it("check success validation", function() {
     let expData, counter = 0;
     const meta = {
-      holder: {fetch: fetchSuccess},
+      holder: { fetch: fetchSuccess },
       validation(data, cb) {
         counter++;
         expData = data;
@@ -289,7 +300,7 @@ describe("actionFn", function() {
       syncing: false
     }, {
       type: ACTIONS.actionSuccess,
-      data: {msg: "hello"},
+      data: { msg: "hello" },
       syncing: false
     }];
 
@@ -309,7 +320,7 @@ describe("actionFn", function() {
   it("check unsuccess validation", function() {
     let expData, counter = 0;
     const meta = {
-      holder: {fetch: fetchSuccess},
+      holder: { fetch: fetchSuccess },
       validation(data, cb) {
         counter++;
         expData = data;
@@ -340,7 +351,7 @@ describe("actionFn", function() {
   it("check prefetch option", function() {
     const checkPrefetch = [];
     const meta = {
-      holder: {fetch: fetchSuccess},
+      holder: { fetch: fetchSuccess },
       prefetch: [
         function(opts, cb) {
           checkPrefetch.push(["one", opts]);
@@ -353,22 +364,22 @@ describe("actionFn", function() {
       ]
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent = [
-      {
-        type: ACTIONS.actionFetch,
-        syncing: false
-      }, {
-        type: ACTIONS.actionSuccess,
-        data: {msg: "hello"},
-        syncing: false
-      }
-    ];
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: { msg: "hello" },
+      syncing: false
+    }];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
     }
-    const expOpts = {dispatch, getState, actions: undefined, prefetch: meta.prefetch };
+    const expOpts = {
+      dispatch, getState, actions: undefined, prefetch: meta.prefetch
+    };
     return new Promise((resolve)=> {
       api(resolve)(dispatch, getState);
     }).then(()=> {
@@ -381,33 +392,41 @@ describe("actionFn", function() {
   });
   it("check incorrect helpers name", function() {
     expect(
-      ()=> actionFn("/test/:id", "test", null, ACTIONS, { helpers: { reset() {} }})
+      ()=> actionFn("/test/:id", "test", null, ACTIONS, {
+        helpers: {
+          reset() {}
+        }
+      })
     ).to.throw(Error, `Helper name: "reset" for endpoint "test" has been already reserved`);
     expect(
-      ()=> actionFn("/test/:id", "test", null, ACTIONS, { helpers: { sync() {} }})
+      ()=> actionFn("/test/:id", "test", null, ACTIONS, {
+        helpers: {
+          sync() {}
+        }
+      })
     ).to.throw(Error, `Helper name: "sync" for endpoint "test" has been already reserved`);
   });
   it("check helpers with async functionality", function() {
     const meta = {
-      holder: {fetch(url, opts) {
-        return new Promise((resolve)=> resolve({url, opts}));
-      }},
+      holder: {
+        fetch(url, opts) {
+          return new Promise((resolve)=> resolve({ url, opts }));
+        }
+      },
       helpers: {
-        asyncSuccess: ()=> (cb)=> cb(null, [{id: 1}, {async: true}]),
+        asyncSuccess: ()=> (cb)=> cb(null, [{ id: 1 }, { async: true }]),
         asyncFail: ()=> (cb)=> cb("Error")
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent1 = [
-      {
-        type: ACTIONS.actionFetch,
-        syncing: false
-      }, {
-        type: ACTIONS.actionSuccess,
-        syncing: false,
-        data: { url: "/test/1", opts: { async: true }}
-      }
-    ];
+    const expectedEvent1 = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      syncing: false,
+      data: { url: "/test/1", opts: { async: true } }
+    }];
     const wait1 = new Promise((resolve)=> {
       api.asyncSuccess(resolve)(function(msg) {
         expect(expectedEvent1).to.have.length.above(0);

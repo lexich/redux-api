@@ -1,7 +1,7 @@
 "use strict";
 /* global describe, it */
 
-import {expect} from "chai";
+import { expect } from "chai";
 import fetchResolver from "../src/fetchResolver";
 import isFunction from "lodash/lang/isFunction";
 
@@ -17,7 +17,7 @@ describe("fetchResolver", function() {
   });
   it("call without callback", function() {
     expect(fetchResolver(0, {
-      prefetch: [ (opts, cb)=> cb() ]
+      prefetch: [(opts, cb)=> cb()]
     })).to.be.undefined;
   });
   it("check normal usage", function() {

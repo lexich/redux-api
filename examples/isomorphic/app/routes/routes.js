@@ -2,9 +2,9 @@ import Application from "../pages/Application";
 import User from "../pages/User";
 import Repo from "../pages/Repo";
 
-import {actions} from "../utils/rest";
+import { actions } from "../utils/rest";
 
-export default function routes({dispatch}) {
+export default function routes({ dispatch }) {
   return {
     path: "/",
     component: Application,
@@ -18,7 +18,7 @@ export default function routes({dispatch}) {
       path: "/:user",
       component: User,
       onEnter(state, replaceState, callback) {
-        const {user} = state.params;
+        const { user } = state.params;
         dispatch(actions.userRepos.sync({ user }, null, callback));
       },
       onLeave() {
@@ -28,8 +28,8 @@ export default function routes({dispatch}) {
       path: "/:user/:repo",
       component: Repo,
       onEnter(state, replaceState, callback) {
-        const {user, repo} = state.params;
-        dispatch(actions.repo.sync({ user, repo}, null, callback));
+        const { user, repo } = state.params;
+        dispatch(actions.repo.sync({ user, repo }, null, callback));
       },
       onLeave() {
         dispatch(actions.repo.reset());
