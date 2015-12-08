@@ -30,6 +30,50 @@ describe("index", function() {
     expect(api.actions).to.eql({});
     expect(api.reducers).to.eql({});
   });
+  it("check rootUrl", function() {
+    const urls = [];
+    function fetchUrl(url) {
+      urls.push(url);
+      return new Promise((resolve)=> resolve({ msg: "hello" }));
+    }
+    const res = reduxApi({
+      test1: "/url1/",
+      test2: "url2",
+      test3: "",
+      test4: "/"
+    }).init(fetchUrl, false, "http://api.com/root");
+
+    const res2 = reduxApi({
+      test1: "/url1/",
+      test2: "url2",
+      test3: "",
+      test4: "/"
+    }).init(fetchUrl, false, "http://api.ru/");
+
+    const act = res.actions;
+    const act2 = res2.actions;
+    return Promise.all([
+      act.test1.request(),
+      act.test2.request(),
+      act.test3.request(),
+      act.test4.request(),
+      act2.test1.request(),
+      act2.test2.request(),
+      act2.test3.request(),
+      act2.test4.request()
+    ]).then(()=> {
+      expect([
+        "http://api.com/root/url1/",
+        "http://api.com/root/url2",
+        "http://api.com/root/",
+        "http://api.com/root/",
+        "http://api.ru/url1/",
+        "http://api.ru/url2",
+        "http://api.ru/",
+        "http://api.ru/"
+      ]).to.eql(urls);
+    });
+  });
   it("check string url", function() {
     function fetchSuccess(url, data) {
       expect(url).to.eql("/plain/url");

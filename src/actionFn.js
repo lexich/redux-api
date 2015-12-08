@@ -8,6 +8,7 @@ import merge from "lodash/object/merge";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import fastApply from "fast-apply";
+import libUrl from "url";
 
 function none() {}
 
@@ -46,10 +47,20 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Function} getState    helper meta function
   */
   const request = (pathvars, params, getState=none)=> {
-    const urlT = urlTransform(url, pathvars);
+    const resultUrlT = urlTransform(url, pathvars);
+    const rootUrl = meta.holder ? meta.holder.rootUrl : null;
+    let urlT = resultUrlT;
+    if (rootUrl) {
+      const urlObject = libUrl.parse(url);
+      if (!urlObject.host) {
+        const urlPath = (rootUrl.path ? rootUrl.path.replace(/\/$/, "") : "") +
+          "/" + (urlObject.path ? urlObject.path.replace(/^\//, "") : "");
+        urlT = `${rootUrl.protocol}//${rootUrl.host}${urlPath}`;
+      }
+    }
     const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
     const opts = merge({}, baseOptions, params);
-    const response = meta.holder.fetch(urlT, opts);
+    const response = meta.fetch(urlT, opts);
     return !meta.validation ? response : response.then(
       (data)=> new Promise(
         (resolve, reject)=> meta.validation(data,
@@ -113,10 +124,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    */
   fn.sync = (...args)=> {
     const [pathvars, params, callback] = extractArgs(args);
+    const isServer = meta.holder ? meta.holder.server : false;
     return (dispatch, getState)=> {
       const state = getState();
       const store = state[name];
-      if (!meta.holder.server && store && store.sync) {
+      if (!isServer && store && store.sync) {
         callback(null, store);
         return;
       }
