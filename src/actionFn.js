@@ -4,6 +4,7 @@ import urlTransform from "./urlTransform";
 import isFunction from "lodash/lang/isFunction";
 import each from "lodash/collection/each";
 import reduce from "lodash/collection/reduce";
+import merge from "lodash/object/merge";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import fastApply from "fast-apply";
@@ -47,7 +48,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const request = (pathvars, params, getState=none)=> {
     const urlT = urlTransform(url, pathvars);
     const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
-    const opts = { ...baseOptions, ...params };
+    const opts = merge({}, baseOptions, params);
     const response = meta.holder.fetch(urlT, opts);
     return !meta.validation ? response : response.then(
       (data)=> new Promise(

@@ -447,4 +447,26 @@ describe("actionFn", function() {
         expect(errorMsg).to.eql("Error");
       });
   });
+  it("check merge params", function() {
+    let params;
+    const meta = {
+      holder: {
+        fetch: (urlparams, _params)=> {
+          params = _params;
+          return fetchSuccess();
+        }
+      }
+    };
+    const opts = { headers: { "One": 1 } };
+    const api = actionFn("/test", "test", opts, ACTIONS, meta);
+    return api.request(null, { headers: { "Two": 2 } }).then(()=> {
+      console.log(params);
+      expect(params).to.eql({
+        headers: {
+          "One": 1,
+          "Two": 2
+        }
+      });
+    });
+  });
 });
