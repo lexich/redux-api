@@ -40,11 +40,9 @@ describe("actionFn", function() {
   it("check sync method", function() {
     let executeCounter = 0;
     const api = actionFn("/test", "test", null, ACTIONS, {
-      holder: {
-        fetch: ()=> {
-          executeCounter++;
-          return fetchSuccess();
-        }
+      fetch: ()=> {
+        executeCounter++;
+        return fetchSuccess();
       }
     });
 
@@ -82,13 +80,11 @@ describe("actionFn", function() {
     let executeCounter = 0;
     let urlFetch, paramsFetch;
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
-      holder: {
-        fetch: (url, params)=> {
-          executeCounter++;
-          urlFetch = url;
-          paramsFetch = params;
-          return fetchSuccess();
-        }
+      fetch: (url, params)=> {
+        executeCounter++;
+        urlFetch = url;
+        paramsFetch = params;
+        return fetchSuccess();
       }
     });
     const async = api.request({ id: 2 }, { hello: "world" });
@@ -102,9 +98,7 @@ describe("actionFn", function() {
 
   it("check normal usage", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {
-      holder: {
-        fetch: fetchSuccess
-      }
+      fetch: fetchSuccess
     });
     expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
     const expectedEvent = [{
@@ -131,9 +125,7 @@ describe("actionFn", function() {
 
   it("check fail fetch", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {
-      holder: {
-        fetch: fetchFail
-      }
+      fetch: fetchFail
     });
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
@@ -157,9 +149,7 @@ describe("actionFn", function() {
 
   it("check double request", function(_done) {
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
-      holder: {
-        fetch: fetchSuccess
-      }
+      fetch: fetchSuccess
     });
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
@@ -196,11 +186,9 @@ describe("actionFn", function() {
       callOptions++;
       return { ...params,  test: 1 };
     }, ACTIONS, {
-      holder: {
-        fetch: function(url, opts) {
-          checkOptions = opts;
-          return fetchSuccess();
-        }
+      fetch: function(url, opts) {
+        checkOptions = opts;
+        return fetchSuccess();
       }
     });
     function dispatch() {}
@@ -218,8 +206,8 @@ describe("actionFn", function() {
       };
     }
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      fetch: fetchSuccess,
       holder: {
-        fetch: fetchSuccess,
         server: true
       }
     });
@@ -253,7 +241,7 @@ describe("actionFn", function() {
       data: { msg: "hello" }
     }];
     const meta = {
-      holder: { fetch: fetchSuccess },
+      fetch: fetchSuccess,
       broadcast: [BROADCAST_ACTION]
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -271,7 +259,7 @@ describe("actionFn", function() {
   it("check validation with request method", function() {
     let expData, counter = 0;
     const meta = {
-      holder: { fetch: fetchSuccess },
+      fetch: fetchSuccess,
       validation(data, cb) {
         counter++;
         expData = data;
@@ -288,7 +276,7 @@ describe("actionFn", function() {
   it("check success validation", function() {
     let expData, counter = 0;
     const meta = {
-      holder: { fetch: fetchSuccess },
+      fetch: fetchSuccess,
       validation(data, cb) {
         counter++;
         expData = data;
@@ -320,7 +308,7 @@ describe("actionFn", function() {
   it("check unsuccess validation", function() {
     let expData, counter = 0;
     const meta = {
-      holder: { fetch: fetchSuccess },
+      fetch: fetchSuccess,
       validation(data, cb) {
         counter++;
         expData = data;
@@ -351,7 +339,7 @@ describe("actionFn", function() {
   it("check prefetch option", function() {
     const checkPrefetch = [];
     const meta = {
-      holder: { fetch: fetchSuccess },
+      fetch: fetchSuccess,
       prefetch: [
         function(opts, cb) {
           checkPrefetch.push(["one", opts]);
@@ -408,10 +396,8 @@ describe("actionFn", function() {
   });
   it("check helpers with async functionality", function() {
     const meta = {
-      holder: {
-        fetch(url, opts) {
-          return new Promise((resolve)=> resolve({ url, opts }));
-        }
+      fetch(url, opts) {
+        return new Promise((resolve)=> resolve({ url, opts }));
       },
       helpers: {
         asyncSuccess: ()=> (cb)=> cb(null, [{ id: 1 }, { async: true }]),
@@ -446,5 +432,24 @@ describe("actionFn", function() {
         expect(expectedEvent1).to.have.length(0);
         expect(errorMsg).to.eql("Error");
       });
+  });
+  it("check merge params", function() {
+    let params;
+    const meta = {
+      fetch: (urlparams, _params)=> {
+        params = _params;
+        return fetchSuccess();
+      }
+    };
+    const opts = { headers: { "One": 1 } };
+    const api = actionFn("/test", "test", opts, ACTIONS, meta);
+    return api.request(null, { headers: { "Two": 2 } }).then(()=> {
+      expect(params).to.eql({
+        headers: {
+          "One": 1,
+          "Two": 2
+        }
+      });
+    });
   });
 });

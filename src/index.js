@@ -5,7 +5,7 @@ import isObject from "lodash/lang/isObject";
 import isString from "lodash/lang/isString";
 import isNumber from "lodash/lang/isNumber";
 import isBoolean from "lodash/lang/isBoolean";
-
+import libUrl from "url";
 import reduce from "lodash/collection/reduce";
 
 import reducerFn from "./reducerFn";
@@ -77,7 +77,8 @@ const PREFIX = "@@redux-api";
 export default function reduxApi(config) {
   const fetchHolder = {
     fetch: null,
-    server: false
+    server: false,
+    rootUrl: null
   };
 
   const cfg = {
@@ -105,11 +106,14 @@ export default function reduxApi(config) {
     };
 
     const meta = {
-      holder: opts.fetch ? { fetch: opts.fetch } : fetchHolder,
+      fetch: opts.fetch ? opts.fetch : function() {
+        return fetchHolder.fetch.apply(this, arguments);
+      },
+      holder: fetchHolder,
       broadcast,
       virtual: !!opts.virtual,
       actions: memo.actions,
-      prefetch, validation, helpers
+      prefetch, validation, helpers,
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
@@ -127,9 +131,10 @@ export default function reduxApi(config) {
     return memo;
   }, cfg);
 
-  reduxApiObject.init = function(fetch, isServer=false) {
+  reduxApiObject.init = function(fetch, isServer=false, rootUrl) {
     fetchHolder.fetch = fetch;
     fetchHolder.server = isServer;
+    fetchHolder.rootUrl = rootUrl ? libUrl.parse(rootUrl) : null;
     return reduxApiObject;
   };
 

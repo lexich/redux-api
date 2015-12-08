@@ -280,11 +280,12 @@ rest.actions.test.async();
 
 ### reduxApi object
 
-####init(adapter, isServer)
+####init(adapter, isServer, rootUrl)
 - @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
 - @type: Function
 - @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
 - @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode. 
+- @param **rootUrl** - root url for every endpoint. very usefull for isomorphic(universal) app. For clientsize use default rootUrl, and for backend use http://localhost:80 for example. For cliendsize for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`.
 - @example:
 
 ```js
@@ -294,7 +295,7 @@ import adapterFetch from "redux-api/adapters/fetch";
 const rest = reduxApi({
   ... //config
 });
-rest.init(adapterFetch(fetch), false);
+rest.init(adapterFetch(fetch), false, "http://localhost:3000");
 ```
 
 #### actions
