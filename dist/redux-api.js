@@ -2730,7 +2730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var rootUrl = meta.holder ? meta.holder.rootUrl : null;
 	    var urlT = resultUrlT;
 	    if (rootUrl) {
-	      var urlObject = _url2.default.parse(url);
+	      var urlObject = _url2.default.parse(urlT);
 	      if (!urlObject.host) {
 	        var urlPath = (rootUrl.path ? rootUrl.path.replace(/\/$/, "") : "") + "/" + (urlObject.path ? urlObject.path.replace(/^\//, "") : "");
 	        urlT = rootUrl.protocol + "//" + rootUrl.host + urlPath;

@@ -51,7 +51,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const rootUrl = meta.holder ? meta.holder.rootUrl : null;
     let urlT = resultUrlT;
     if (rootUrl) {
-      const urlObject = libUrl.parse(url);
+      const urlObject = libUrl.parse(urlT);
       if (!urlObject.host) {
         const urlPath = (rootUrl.path ? rootUrl.path.replace(/\/$/, "") : "") +
           "/" + (urlObject.path ? urlObject.path.replace(/^\//, "") : "");
