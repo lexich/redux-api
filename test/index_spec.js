@@ -40,14 +40,14 @@ describe("index", function() {
       test1: "/url1/",
       test2: "url2",
       test3: "",
-      test4: "/"
+      test4: "/(:id)"
     }).init(fetchUrl, false, "http://api.com/root");
 
     const res2 = reduxApi({
       test1: "/url1/",
       test2: "url2",
       test3: "",
-      test4: "/"
+      test4: "/(:id)"
     }).init(fetchUrl, false, "http://api.ru/");
 
     const act = res.actions;
@@ -56,21 +56,21 @@ describe("index", function() {
       act.test1.request(),
       act.test2.request(),
       act.test3.request(),
-      act.test4.request(),
+      act.test4.request({ id: 1 }),
       act2.test1.request(),
       act2.test2.request(),
       act2.test3.request(),
-      act2.test4.request()
+      act2.test4.request({ id: 2 })
     ]).then(()=> {
       expect([
         "http://api.com/root/url1/",
         "http://api.com/root/url2",
         "http://api.com/root/",
-        "http://api.com/root/",
+        "http://api.com/root/1",
         "http://api.ru/url1/",
         "http://api.ru/url2",
         "http://api.ru/",
-        "http://api.ru/"
+        "http://api.ru/2"
       ]).to.eql(urls);
     });
   });
