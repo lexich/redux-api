@@ -45,6 +45,7 @@
     "no-empty": 0,
     "guard-for-in": 0,
     "comma-dangle": 0,
-    "space-before-function-paren": 0
+    "space-before-function-paren": 0,
+    "arrow-spacing": [2, { "before": false, "after": true }]
   }
 }

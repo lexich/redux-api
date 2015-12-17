@@ -186,7 +186,7 @@ describe("actionFn", function() {
       callOptions++;
       return { ...params,  test: 1 };
     }, ACTIONS, {
-      fetch: function(url, opts) {
+      fetch(url, opts) {
         checkOptions = opts;
         return fetchSuccess();
       }
