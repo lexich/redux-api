@@ -193,6 +193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var broadcast = opts.broadcast;
 	    var reducerName = opts.reducerName;
 	    var prefetch = opts.prefetch;
+	    var postfetch = opts.postfetch;
 	    var validation = opts.validation;
 	    var helpers = opts.helpers;
 	
@@ -211,7 +212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      broadcast: broadcast,
 	      virtual: !!opts.virtual,
 	      actions: memo.actions,
-	      prefetch: prefetch, validation: validation, helpers: helpers
+	      prefetch: prefetch, postfetch: postfetch, validation: validation, helpers: helpers
 	    };
 	
 	    memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
@@ -2622,6 +2623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	
 	exports.default = PubSub;
+	module.exports = exports['default'];
 
 /***/ },
 /* 35 */
@@ -2789,6 +2791,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          (0, _each2.default)(meta.broadcast, function (btype) {
 	            return dispatch({ type: btype, data: data });
 	          });
+	          (0, _each2.default)(meta.postfetch, function (postfetch) {
+	            (0, _isFunction2.default)(postfetch) && postfetch({ data: data, getState: getState, dispatch: dispatch });
+	          });
 	          pubsub.resolve(getState()[name]);
 	        }).catch(function (error) {
 	          dispatch({ type: actionFail, syncing: false, error: error });
@@ -2883,6 +2888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return memo;
 	  }, fn);
 	}
+	module.exports = exports['default'];
 
 /***/ },
 /* 36 */
@@ -2912,6 +2918,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	}
+	module.exports = exports['default'];
 
 /***/ },
 /* 37 */
@@ -2978,6 +2985,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	}
+	module.exports = exports['default'];
 
 /***/ },
 /* 38 */
@@ -3054,6 +3062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  return cleanURL;
 	}
+	module.exports = exports['default'];
 
 /***/ },
 /* 39 */
