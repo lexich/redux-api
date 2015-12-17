@@ -96,6 +96,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           .then((data)=> {
             dispatch({ type: actionSuccess, syncing: false, data });
             each(meta.broadcast, (btype)=> dispatch({ type: btype, data }));
+            each(meta.postfetch, (postfetch)=> {
+              isFunction(postfetch) && postfetch({ data, getState, dispatch });
+            });
             pubsub.resolve(getState()[name]);
           })
           .catch((error)=> {
