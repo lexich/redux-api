@@ -186,7 +186,7 @@ describe("actionFn", function() {
       callOptions++;
       return { ...params,  test: 1 };
     }, ACTIONS, {
-      fetch: function(url, opts) {
+      fetch(url, opts) {
         checkOptions = opts;
         return fetchSuccess();
       }
@@ -336,6 +336,49 @@ describe("actionFn", function() {
       expect(expData).to.eql({ msg: "hello" });
     });
   });
+  it("check postfetch option", function() {
+    let expectedOpts;
+    const meta = {
+      fetch: fetchSuccess,
+      postfetch: [
+        function(opts) {
+          expectedOpts = opts;
+          opts.dispatch({ type: "One", data: opts.data });
+        },
+        function(opts) {
+          opts.dispatch({ type: "Two", data: opts.data });
+        }
+      ]
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    const expectedEvent = [{
+      type: ACTIONS.actionFetch,
+      syncing: false
+    }, {
+      type: ACTIONS.actionSuccess,
+      data: { msg: "hello" },
+      syncing: false
+    }, {
+      type: "One",
+      data: { msg: "hello" }
+    }, {
+      type: "Two",
+      data: { msg: "hello" }
+    }];
+    function dispatch(msg) {
+      expect(expectedEvent).to.have.length.above(0);
+      const exp = expectedEvent.shift();
+      expect(msg).to.eql(exp);
+    }
+    return new Promise((resolve)=> {
+      api(resolve)(dispatch, getState);
+    }).then(()=> {
+      expect(expectedOpts).to.exist;
+      expect(expectedOpts).to.include.keys("data", "getState", "dispatch");
+      expect(expectedOpts.getState).to.eql(getState);
+      expect(expectedOpts.dispatch).to.eql(dispatch);
+    });
+  });
   it("check prefetch option", function() {
     const checkPrefetch = [];
     const meta = {
@@ -348,7 +391,7 @@ describe("actionFn", function() {
         function(opts, cb) {
           checkPrefetch.push(["two", opts]);
           cb();
-        },
+        }
       ]
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);

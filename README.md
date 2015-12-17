@@ -181,6 +181,25 @@ function (state, action) {
 }
 ```
 
+####postfetch
+- @description: you can organize chain of calling events after the current endpoint will be successful executed
+- @type: Array<Function>
+- @default: null
+- @example:
+```js
+{
+  user: "/user/info",
+  logout: {
+    url: "/user/logout",
+    postfetch: [
+      function({data, dispatch, getState}) {
+        dispatch(actions.user.reset());
+      }      
+    ]    
+  }
+}
+```
+
 ####validation (data, callback)
 - @param **data** - response data
   > type: Object
