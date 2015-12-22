@@ -2779,7 +2779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return dispatch({ type: btype, data: data });
 	          });
 	          (0, _each2.default)(meta.postfetch, function (postfetch) {
-	            (0, _isFunction2.default)(postfetch) && postfetch({ data: data, getState: getState, dispatch: dispatch });
+	            (0, _isFunction2.default)(postfetch) && postfetch({ data: data, getState: getState, dispatch: dispatch, actions: meta.actions });
 	          });
 	          pubsub.resolve(getState()[name]);
 	        }).catch(function (error) {
