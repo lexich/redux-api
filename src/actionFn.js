@@ -58,8 +58,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         urlT = `${rootUrl.protocol}//${rootUrl.host}${urlPath}`;
       }
     }
+    const globalOptions = !meta.holder ? {} : isFunction(meta.holder.options) ?
+      meta.holder.options(urlT, params, getState) : (meta.holder.options);
     const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
-    const opts = merge({}, baseOptions, params);
+    const opts = merge({}, globalOptions, baseOptions, params);
     const response = meta.fetch(urlT, opts);
     return !meta.validation ? response : response.then(
       (data)=> new Promise(

@@ -299,7 +299,39 @@ rest.actions.test.async();
 
 ### reduxApi object
 
+####use(key, value)
+- @description initialize `reduxApi` with custom properties
+- @param **key** - name of property
+- @param **value** - value of property
+
+####list of properties
+####fetch 
+- @description backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
+- @example
+```js
+import adapterFetch from "redux-api/adapters/fetch";
+const rest = reduxApi({...});
+rest.use("fetch", adapterFetch(fetch));
+```
+
+####server
+- @description - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for clien-size mode. If `server===true` redux-api works in server-size mode. 
+- @default false
+```js
+const rest = reduxApi({...});
+rest.use("server", true); 
+```
+
+####rootUrl
+- @description - root url for every endpoint. very usefull for isomorphic(universal) app. For clientsize use default rootUrl, and for backend use http://localhost:80 for example. For cliendsize for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`
+- @example
+```js
+const rest = reduxApi({...});
+rest.use("rootUrl", "http://localhost:3000");
+```
+
 ####init(adapter, isServer, rootUrl)
+- @deprecated
 - @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
 - @type: Function
 - @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
@@ -410,6 +442,23 @@ rest.actions.user({id: 1}) // /api/v1/user/1
 /api/v1/user/(:id)
 ```js
 rest.actions.user({id: 1, test: 2}) // /api/v1/user/1?test=2
+```
+
+###Tools
+####async
+- @description - helps to organize chain call of actions
+- @example
+```js
+import reduxApi, { async } from "redux-api";
+const rest = reduxApi({
+  test: "/api/test",
+  test2: "/api/test2",
+  test3: "/api/test3"
+});
+async(dispatch, 
+  (cb)=> rest.actions.test(cb),
+  rest.actions.test2
+).then((data)=> async(rest.actions.test3));
 ```
 
 ### Full example Example

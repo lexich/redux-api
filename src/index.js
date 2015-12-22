@@ -1,34 +1,13 @@
 "use strict";
 
-import isArray from "lodash/lang/isArray";
-import isObject from "lodash/lang/isObject";
-import isString from "lodash/lang/isString";
-import isNumber from "lodash/lang/isNumber";
-import isBoolean from "lodash/lang/isBoolean";
 import libUrl from "url";
 import reduce from "lodash/collection/reduce";
-
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
+import transformers from "./transformers";
+import async from "./async";
 
-/**
- * Default responce transformens
- */
-export const transformers = {
-  array(data) {
-    return !data ? [] : isArray(data) ? data : [data];
-  },
-  object(data) {
-    if (!data) {
-      return {};
-    }
-    if (isArray(data) || isString(data) || isNumber(data) || isBoolean(data) || !isObject(data)) {
-      return { data };
-    } else {
-      return data;
-    }
-  }
-};
+// export { transformers, async };
 
 /**
  * Default configuration for each endpoint
@@ -74,15 +53,33 @@ const PREFIX = "@@redux-api";
  *   }));
  * ```
  */
+
 export default function reduxApi(config) {
   const fetchHolder = {
     fetch: null,
     server: false,
-    rootUrl: null
+    rootUrl: null,
+    options: {}
   };
 
   const cfg = {
-    init: null,
+    use(key, value) {
+      if (key === "rootUrl") {
+        value && (fetchHolder[key] = libUrl.parse(value));
+      } else {
+        fetchHolder[key] = value;
+      }
+
+      return this;
+    },
+    init(fetch, isServer=false, rootUrl) {
+      /* eslint no-console: 0 */
+      console.warn("Deprecated method, use `use` method");
+      this.use("fetch", fetch);
+      this.use("server", isServer);
+      this.use("rootUrl", rootUrl);
+      return this;
+    },
     actions: {},
     reducers: {},
     events: {}
@@ -131,12 +128,8 @@ export default function reduxApi(config) {
     return memo;
   }, cfg);
 
-  reduxApiObject.init = function(fetch, isServer=false, rootUrl) {
-    fetchHolder.fetch = fetch;
-    fetchHolder.server = isServer;
-    fetchHolder.rootUrl = rootUrl ? libUrl.parse(rootUrl) : null;
-    return reduxApiObject;
-  };
-
   return reduxApiObject;
 }
+
+reduxApi.transformers = transformers;
+reduxApi.async = async;

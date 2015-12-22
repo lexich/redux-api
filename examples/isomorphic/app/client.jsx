@@ -1,6 +1,6 @@
 "use strict";
 import React from "react";
-import {render} from "react/lib/ReactDOM"; /* react-dom */
+import { render } from "react-dom";
 
 // React-Router
 import Router from "react-router";
@@ -13,15 +13,15 @@ import thunk from "redux-thunk";
 import { Provider } from "react-redux";
 
 // Redux-api
-import {init as initRest, reducers} from "./utils/rest";
+import reduxApi from "./utils/rest";
 import adapterFetch from "../../../src/adapters/fetch";
 import "isomorphic-fetch";
 
 // Initialize react-api
-initRest(adapterFetch(fetch));
+reduxApi.use("fetch", adapterFetch(fetch));
 
 // Prepare store
-const reducer = combineReducers(reducers);
+const reducer = combineReducers(reduxApi.reducers);
 const finalCreateStore = applyMiddleware(thunk)(createStore);
 const initialState = window.$REDUX_STATE;
 const store = initialState ? finalCreateStore(reducer, initialState) : finalCreateStore(reducer);
