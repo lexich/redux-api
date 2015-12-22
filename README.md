@@ -192,7 +192,7 @@ function (state, action) {
   logout: {
     url: "/user/logout",
     postfetch: [
-      function({data, dispatch, getState}) {
+      function({data, actions, dispatch, getState}) {
         dispatch(actions.user.reset());
       }      
     ]    
