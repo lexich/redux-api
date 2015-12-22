@@ -41,14 +41,20 @@ describe("index", function() {
       test2: "url2",
       test3: "",
       test4: "/(:id)"
-    }).init(fetchUrl, false, "http://api.com/root");
+    })
+    .use("fetch", fetchUrl)
+    .use("server", false)
+    .use("rootUrl", "http://api.com/root");
 
     const res2 = reduxApi({
       test1: "/url1/",
       test2: "url2",
       test3: "",
       test4: "/(:id)"
-    }).init(fetchUrl, false, "http://api.ru/");
+    })
+    .use("fetch", fetchUrl)
+    .use("server", false)
+    .use("rootUrl", "http://api.ru/");
 
     const act = res.actions;
     const act2 = res2.actions;
@@ -84,7 +90,8 @@ describe("index", function() {
     }
     const res = reduxApi({
       test: "/plain/url"
-    }).init(fetchSuccess);
+    })
+    .use("fetch", fetchSuccess);
     expect(size(res.actions)).to.eql(1);
     expect(size(res.events)).to.eql(1);
 
@@ -140,7 +147,7 @@ describe("index", function() {
           }
         }
       }
-    }).init(fetchSuccess);
+    }).use("fetch", fetchSuccess);
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
 
@@ -175,7 +182,7 @@ describe("index", function() {
           }
         }
       }
-    }).init(function fetchSuccess() {});
+    }).use("fetch", function fetchSuccess() {});
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
     expect(res.reducers.foo).to.exist;
@@ -189,7 +196,7 @@ describe("index", function() {
         broadcast: [BROADCAST_ACTION],
         virtual: true
       }
-    }).init(function fetchSuccess() {});
+    }).use("fetch", function fetchSuccess() {});
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.not.exist;
   });
@@ -212,7 +219,7 @@ describe("index", function() {
           }
         ]
       }
-    }).init(fetchSuccess);
+    }).use("fetch", fetchSuccess);
     return new Promise((resolve)=> {
       const action = res.actions.test1(resolve);
       action(function() {}, getState);
@@ -251,7 +258,7 @@ describe("index", function() {
           }
         }
       }
-    }).init(function(url, opts) {
+    }).use("fetch", function(url, opts) {
       result.push({ url, opts });
       return new Promise(
         (resolve)=> resolve({ hello: "world" }));
@@ -278,6 +285,34 @@ describe("index", function() {
         { url: "/test/kitty/9", opts: {} },
         { url: "/test/admin/1", opts: { method: "post" } }
       ]);
+    });
+  });
+  it("check global options", ()=> {
+    let expOpts;
+    const rest = reduxApi({
+      test: {
+        options: {
+          headers: {
+            "X-Header": 1
+          }
+        },
+        url: "/api/test"
+      }
+    })
+    .use("options", {
+      headers: {
+        "Accept": "application/json"
+      }
+    })
+    .use("fetch", (url, options)=> {
+      expOpts=options;
+    });
+    rest.actions.test.request();
+    expect(expOpts).to.eql({
+      headers: {
+        "Accept": "application/json",
+        "X-Header": 1
+      }
     });
   });
 });

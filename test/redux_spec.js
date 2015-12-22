@@ -10,7 +10,7 @@ describe("redux", ()=> {
   it("check redux", ()=> {
     const rest = reduxApi({
       test: "/api/url",
-    }).init((url)=> {
+    }).use("fetch", (url)=> {
       return new Promise((resolve)=> resolve(url));
     });
     const reducer = combineReducers(rest.reducers);
@@ -26,7 +26,7 @@ describe("redux", ()=> {
     const rest = reduxApi({
       test: "/api/url",
       test2: "/api/url2",
-    }).init((url)=> {
+    }).use("fetch", (url)=> {
       return new Promise((resolve)=> resolve(url));
     });
     const reducer = combineReducers(rest.reducers);

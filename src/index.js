@@ -58,11 +58,28 @@ export default function reduxApi(config) {
   const fetchHolder = {
     fetch: null,
     server: false,
-    rootUrl: null
+    rootUrl: null,
+    options: {}
   };
 
   const cfg = {
-    init: null,
+    use(key, value) {
+      if (key === "rootUrl") {
+        value && (fetchHolder[key] = libUrl.parse(value));
+      } else {
+        fetchHolder[key] = value;
+      }
+
+      return this;
+    },
+    init(fetch, isServer=false, rootUrl) {
+      /* eslint no-console: 0 */
+      console.warn("Deprecated method, use `use` method");
+      this.use("fetch", fetch);
+      this.use("server", isServer);
+      this.use("rootUrl", rootUrl);
+      return this;
+    },
     actions: {},
     reducers: {},
     events: {}
@@ -110,13 +127,6 @@ export default function reduxApi(config) {
     memo.events[reducerName] = ACTIONS;
     return memo;
   }, cfg);
-
-  reduxApiObject.init = function(fetch, isServer=false, rootUrl) {
-    fetchHolder.fetch = fetch;
-    fetchHolder.server = isServer;
-    fetchHolder.rootUrl = rootUrl ? libUrl.parse(rootUrl) : null;
-    return reduxApiObject;
-  };
 
   return reduxApiObject;
 }
