@@ -150,7 +150,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     memo[helpername] = (...args)=> (dispatch, getState)=> {
       const index = args.length - 1;
       const callback = isFunction(args[index]) ? args[index] : none;
-      const helpersResult = fastApply(call, { getState, dispatch }, args);
+      const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
 
       // If helper alias using async functionality
       if (isFunction(helpersResult)) {

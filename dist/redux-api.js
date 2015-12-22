@@ -2853,7 +2853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return function (dispatch, getState) {
 	        var index = args.length - 1;
 	        var callback = (0, _isFunction2.default)(args[index]) ? args[index] : none;
-	        var helpersResult = (0, _fastApply2.default)(call, { getState: getState, dispatch: dispatch }, args);
+	        var helpersResult = (0, _fastApply2.default)(call, { getState: getState, dispatch: dispatch, actions: meta.actions }, args);
 	
 	        // If helper alias using async functionality
 	        if ((0, _isFunction2.default)(helpersResult)) {
