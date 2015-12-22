@@ -315,4 +315,37 @@ describe("index", function() {
       }
     });
   });
+  it("check global options as function", ()=> {
+    let expOpts;
+    const rest = reduxApi({
+      test: {
+        options: {
+          headers: {
+            "X-Header": 1
+          }
+        },
+        url: "/api/test/(:id)"
+      }
+    })
+    .use("options", (url, params /* , getState */)=> {
+      expect(url).to.eql("/api/test/1");
+      expect(params).to.eql({ a: "b" });
+      return {
+        headers: {
+          "Accept": "application/json"
+        }
+      };
+    })
+    .use("fetch", (url, options)=> {
+      expOpts=options;
+    });
+    rest.actions.test.request({ id: 1 }, { a: "b" });
+    expect(expOpts).to.eql({
+      a: "b",
+      headers: {
+        "Accept": "application/json",
+        "X-Header": 1
+      }
+    });
+  });
 });
