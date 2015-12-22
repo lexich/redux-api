@@ -1,6 +1,6 @@
 "use strict";
 import React from "react";
-import {renderToString} from "react/lib/ReactDOMServer"; /* react-dom/server */
+import ReactDom from "react-dom/server";
 import express from "express";
 import path from "path";
 
@@ -17,10 +17,12 @@ import routes from "./routes/routes";
 
 // Redux-api
 import "isomorphic-fetch";
-import {init as initRest, reducers} from "./utils/rest";
+import reduxApi from "./utils/rest";
 import adapterFetch from "../../../src/adapters/fetch";
 
-initRest(adapterFetch(fetch), true)
+reduxApi
+  .use("fetch", adapterFetch(fetch))
+  .use("server", true);
 
 const history = createHistory();
 
@@ -39,7 +41,7 @@ app.set("view engine", path.join(__dirname, "..", "ejs"));
 app.use(function(req, res, next) {
   const location = history.createLocation(req.url);
   const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-  const reducer = combineReducers(reducers);
+  const reducer = combineReducers(reduxApi.reducers);
   const store = createStoreWithMiddleware(reducer);
   const childRoutes = routes(store);
   match({ routes: childRoutes, location }, (error, redirectLocation, renderProps)=> {
@@ -50,7 +52,7 @@ app.use(function(req, res, next) {
     } else if (renderProps === null) {
       res.status(404).render("404.ejs");
     } else {
-      const html = renderToString(
+      const html = ReactDom.renderToString(
         <Provider store={store}>
           <RoutingContext {...renderProps} />
         </Provider>

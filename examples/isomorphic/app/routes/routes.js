@@ -2,7 +2,8 @@ import Application from "../pages/Application";
 import User from "../pages/User";
 import Repo from "../pages/Repo";
 
-import { actions } from "../utils/rest";
+import rest from "../utils/rest";
+const { actions } = rest;
 
 export default function routes({ dispatch }) {
   return {
