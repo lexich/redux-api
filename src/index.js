@@ -5,6 +5,9 @@ import reduce from "lodash/collection/reduce";
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
 import transformers from "./transformers";
+import async from "./async";
+
+// export { transformers, async };
 
 /**
  * Default configuration for each endpoint
@@ -50,6 +53,7 @@ const PREFIX = "@@redux-api";
  *   }));
  * ```
  */
+
 export default function reduxApi(config) {
   const fetchHolder = {
     fetch: null,
@@ -116,3 +120,6 @@ export default function reduxApi(config) {
 
   return reduxApiObject;
 }
+
+reduxApi.transformers = transformers;
+reduxApi.async = async;
