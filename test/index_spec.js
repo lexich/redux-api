@@ -3,7 +3,7 @@
 
 import { expect } from "chai";
 import reduxApi from "../src/index.js";
-import { transformers } from "../src/index.js";
+import transformers from "../src/transformers.js";
 import isFunction from "lodash/lang/isFunction";
 import size from "lodash/collection/size";
 
