@@ -43,4 +43,21 @@ describe("redux", ()=> {
       expect(store.getState().test2.data).to.eql({ data: "/api/url2" });
     });
   });
+  it("check async 2", (done)=> {
+    const rest = reduxApi({
+      test: "/api/url"
+    }).use("fetch", (url)=> new Promise((resolve)=> resolve(url)));
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+    function testAction() {
+      return (dispatch, getState)=> {
+        async(dispatch, rest.actions.test).then((data)=> {
+          expect(getState().test).to.eql(data);
+          done();
+        });
+      };
+    }
+    store.dispatch(testAction());
+  });
 });
