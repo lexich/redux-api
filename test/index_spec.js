@@ -107,11 +107,13 @@ describe("index", function() {
     const expectedEvent = [
       {
         type: "@@redux-api@test",
-        syncing: false
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
       }, {
         type: "@@redux-api@test_success",
         data: { msg: "hello" },
-        syncing: false
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
       }
     ];
     return new Promise((resolve)=> {
@@ -153,11 +155,13 @@ describe("index", function() {
 
     const expectedEvent = [{
       type: "@@redux-api@test",
-      syncing: false
+      syncing: false,
+      request: { pathvars: { id: 1 }, params: {} }
     }, {
       type: "@@redux-api@test_success",
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: { id: 1 }, params: {} }
     }];
     return new Promise((resolve)=> {
       const action = res.actions.test({ id: 1 }, resolve);
