@@ -56,11 +56,13 @@ describe("actionFn", function() {
 
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: true
+      syncing: true,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }];
     const async2 = new Promise((resolve)=> {
       api.sync(resolve)((msg)=> {
@@ -103,11 +105,13 @@ describe("actionFn", function() {
     expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }];
     return new Promise((resolve)=> {
       const action = api(resolve);
@@ -129,11 +133,13 @@ describe("actionFn", function() {
     });
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionFail,
       error: "Error",
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
@@ -153,11 +159,13 @@ describe("actionFn", function() {
     });
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: { id: 1 }, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: { id: 1 }, params: {} }
     }];
     let modify = 0;
     let loading = false;
@@ -213,8 +221,17 @@ describe("actionFn", function() {
     });
 
     const expectedEvent = [
-      { type: "actionFetch", syncing: true },
-      { type: "actionSuccess", syncing: false, data: { msg: "hello" } }
+      {
+        type: "actionFetch",
+        syncing: true,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: "actionSuccess",
+        syncing: false,
+        data: { msg: "hello" },
+        request: { pathvars: undefined, params: {} }
+      }
     ];
     return new Promise((resolve)=> {
       api.sync(resolve)(function(msg) {
@@ -231,14 +248,17 @@ describe("actionFn", function() {
     const BROADCAST_ACTION = "BROADCAST_ACTION";
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: BROADCAST_ACTION,
-      data: { msg: "hello" }
+      data: { msg: "hello" },
+      request: { pathvars: undefined, params: {} }
     }];
     const meta = {
       fetch: fetchSuccess,
@@ -285,11 +305,13 @@ describe("actionFn", function() {
     };
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }];
 
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -317,11 +339,13 @@ describe("actionFn", function() {
     };
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionFail,
       error: "invalid",
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }];
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     return new Promise((resolve)=> {
@@ -354,11 +378,13 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: "One",
       data: { msg: "hello" }
@@ -399,11 +425,13 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
-      syncing: false
+      syncing: false,
+      request: { pathvars: undefined, params: {} }
     }];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
@@ -452,11 +480,13 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     const expectedEvent1 = [{
       type: ACTIONS.actionFetch,
-      syncing: false
+      syncing: false,
+      request: { pathvars: { id: 1 }, params: { async: true } }
     }, {
       type: ACTIONS.actionSuccess,
       syncing: false,
-      data: { url: "/test/1", opts: { async: true } }
+      data: { url: "/test/1", opts: { async: true } },
+      request: { pathvars: { id: 1 }, params: { async: true } }
     }];
     const wait1 = new Promise((resolve)=> {
       api.asyncSuccess(resolve)(function(msg) {

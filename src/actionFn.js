@@ -83,10 +83,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     return (dispatch, getState)=> {
       const state = getState();
       const store = state[name];
+      const requestOptions = { pathvars, params };
       if (store && store.loading) {
         return;
       }
-      dispatch({ type: actionFetch, syncing });
+      dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch, getState,
         actions: meta.actions,
@@ -96,15 +97,15 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       fetchResolver(0, fetchResolverOpts,
         (err)=> err ? pubsub.reject(err) : request(pathvars, params, getState)
           .then((data)=> {
-            dispatch({ type: actionSuccess, syncing: false, data });
-            each(meta.broadcast, (btype)=> dispatch({ type: btype, data }));
+            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
+            each(meta.broadcast, (btype)=> dispatch({ type: btype, data, request: requestOptions }));
             each(meta.postfetch, (postfetch)=> {
               isFunction(postfetch) && postfetch({ data, getState, dispatch, actions: meta.actions });
             });
             pubsub.resolve(getState()[name]);
           })
           .catch((error)=> {
-            dispatch({ type: actionFail, syncing: false, error });
+            dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
             pubsub.reject(error);
           }));
     };
