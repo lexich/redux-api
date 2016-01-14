@@ -89,7 +89,7 @@ import reduxApi, {transformers} from "redux-api";
 ```
     Custom transformer
 ```js
-  function customTransformer(data) {
+  function customTransformer(data, prevData, action) {
     data || (data = {});
     return { title: (data.title || ""), message: (data.message || "")};
   }
