@@ -2968,13 +2968,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
-	/**
-	 * Reducer contructor
-	 * @param  {Object}   initialState default initial state
-	 * @param  {Object}   actions      actions map
-	 * @param  {Function} transformer  transformer function
-	 * @return {Function}              reducer function
-	 */
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
@@ -2982,11 +2975,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.default = reducerFn;
+	function fn(val) {
+	  return val;
+	}
+	
+	/**
+	 * Reducer contructor
+	 * @param  {Object}   initialState default initial state
+	 * @param  {Object}   actions      actions map
+	 * @param  {Function} transformer  transformer function
+	 * @return {Function}              reducer function
+	 */
 	function reducerFn(initialState) {
 	  var actions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	  var transformer = arguments.length <= 2 || arguments[2] === undefined ? function (val) {
-	    return val;
-	  } : arguments[2];
+	  var transformer = arguments.length <= 2 || arguments[2] === undefined ? fn : arguments[2];
 	  var actionFetch = actions.actionFetch;
 	  var actionSuccess = actions.actionSuccess;
 	  var actionFail = actions.actionFail;
@@ -3009,7 +3011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          sync: true,
 	          syncing: false,
 	          error: null,
-	          data: transformer(action.data)
+	          data: transformer(action.data, state.data, action)
 	        });
 	      case actionFail:
 	        return _extends({}, state, {
