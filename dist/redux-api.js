@@ -61,6 +61,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -91,8 +93,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _async2 = _interopRequireDefault(_async);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 	
 	// export { transformers, async };
 	
@@ -204,7 +204,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      broadcast: broadcast,
 	      virtual: !!opts.virtual,
 	      actions: memo.actions,
-	      prefetch: prefetch, postfetch: postfetch, validation: validation, helpers: helpers
+	      prefetch: prefetch, postfetch: postfetch, validation: validation,
+	      helpers: helpers, transformer: transformer
 	    };
 	
 	    memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
@@ -216,7 +217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        loading: false,
 	        data: transformer()
 	      };
-	      memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, transformer);
+	      memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS);
 	    }
 	    memo.events[reducerName] = ACTIONS;
 	    return memo;
@@ -1596,7 +1597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	// Load modules
 	
@@ -2410,7 +2411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	// Load modules
 	
@@ -2561,7 +2562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2575,7 +2576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var PubSub = (function () {
+	var PubSub = function () {
 	  function PubSub() {
 	    _classCallCheck(this, PubSub);
 	
@@ -2606,8 +2607,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 	
 	  return PubSub;
-	})();
-	
+	}();
+
 	exports.default = PubSub;
 	module.exports = exports['default'];
 
@@ -2622,7 +2623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2774,16 +2775,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	
 	      (0, _fetchResolver2.default)(0, fetchResolverOpts, function (err) {
-	        return err ? pubsub.reject(err) : request(pathvars, params, getState).then(function (data) {
+	        return err ? pubsub.reject(err) : request(pathvars, params, getState).then(function (d) {
+	          var gState = getState();
+	          var prevData = gState && gState[name] && gState[name].data;
+	          var data = meta.transformer(d, prevData, {
+	            type: actionSuccess, request: requestOptions
+	          });
 	          dispatch({ type: actionSuccess, syncing: false, data: data, request: requestOptions });
 	          (0, _each2.default)(meta.broadcast, function (btype) {
 	            return dispatch({ type: btype, data: data, request: requestOptions });
 	          });
 	          (0, _each2.default)(meta.postfetch, function (postfetch) {
-	            (0, _isFunction2.default)(postfetch) && postfetch({ data: data, getState: getState, dispatch: dispatch, actions: meta.actions });
+	            (0, _isFunction2.default)(postfetch) && postfetch({
+	              data: data, getState: getState, dispatch: dispatch, actions: meta.actions
+	            });
 	          });
-	          pubsub.resolve(getState()[name]);
-	        }).catch(function (error) {
+	          pubsub.resolve(data);
+	        }, function (error) {
 	          dispatch({ type: actionFail, syncing: false, error: error, request: requestOptions });
 	          pubsub.reject(error);
 	        });
@@ -2969,16 +2977,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = reducerFn;
-	function fn(val) {
-	  return val;
-	}
-	
 	/**
 	 * Reducer contructor
 	 * @param  {Object}   initialState default initial state
@@ -2986,9 +2984,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {Function} transformer  transformer function
 	 * @return {Function}              reducer function
 	 */
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = reducerFn;
 	function reducerFn(initialState) {
 	  var actions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	  var transformer = arguments.length <= 2 || arguments[2] === undefined ? fn : arguments[2];
 	  var actionFetch = actions.actionFetch;
 	  var actionSuccess = actions.actionSuccess;
 	  var actionFail = actions.actionFail;
@@ -3011,7 +3015,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          sync: true,
 	          syncing: false,
 	          error: null,
-	          data: transformer(action.data, state.data, action)
+	          data: action.data
 	        });
 	      case actionFail:
 	        return _extends({}, state, {

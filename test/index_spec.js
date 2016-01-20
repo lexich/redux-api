@@ -133,7 +133,7 @@ describe("index", function() {
       expect(url).to.eql("/plain/url/1");
       expect(options).to.eql({
         headers: {
-          "Accept": "application/json"
+          Accept: "application/json"
         }
       });
       return new Promise(function(resolve) {
@@ -145,7 +145,7 @@ describe("index", function() {
         url: "/plain/url/:id",
         options: {
           headers: {
-            "Accept": "application/json"
+            Accept: "application/json"
           }
         }
       }
@@ -182,7 +182,7 @@ describe("index", function() {
         url: "/plain/url/:id",
         options: {
           headers: {
-            "Accept": "application/json"
+            Accept: "application/json"
           }
         }
       }
@@ -305,7 +305,7 @@ describe("index", function() {
     })
     .use("options", {
       headers: {
-        "Accept": "application/json"
+        Accept: "application/json"
       }
     })
     .use("fetch", (url, options)=> {
@@ -314,7 +314,7 @@ describe("index", function() {
     rest.actions.test.request();
     expect(expOpts).to.eql({
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
         "X-Header": 1
       }
     });
@@ -336,7 +336,7 @@ describe("index", function() {
       expect(params).to.eql({ a: "b" });
       return {
         headers: {
-          "Accept": "application/json"
+          Accept: "application/json"
         }
       };
     })
@@ -347,7 +347,7 @@ describe("index", function() {
     expect(expOpts).to.eql({
       a: "b",
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
         "X-Header": 1
       }
     });

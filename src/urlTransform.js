@@ -22,7 +22,9 @@ export default function urlTransform(url, params={}) {
         ()=> (usedKeys[key] = value)), url);
   if (!urlWithParams) { return urlWithParams; }
   const { protocol, host, path } = parse(urlWithParams);
-  const cleanURL = (host) ? `${protocol}//${host}${path.replace(rxClean, "")}` : path.replace(rxClean, "");
+  const cleanURL = (host) ?
+    `${protocol}//${host}${path.replace(rxClean, "")}` :
+    path.replace(rxClean, "");
   const usedKeysArray = keys(usedKeys);
   if (usedKeysArray.length !== keys(params).length) {
     const urlObject = cleanURL.split("?");

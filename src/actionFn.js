@@ -96,15 +96,23 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
 
       fetchResolver(0, fetchResolverOpts,
         (err)=> err ? pubsub.reject(err) : request(pathvars, params, getState)
-          .then((data)=> {
-            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
-            each(meta.broadcast, (btype)=> dispatch({ type: btype, data, request: requestOptions }));
-            each(meta.postfetch, (postfetch)=> {
-              isFunction(postfetch) && postfetch({ data, getState, dispatch, actions: meta.actions });
+          .then((d)=> {
+            const gState = getState();
+            const prevData = gState && gState[name] && gState[name].data;
+            const data = meta.transformer(d, prevData, {
+              type: actionSuccess, request: requestOptions
             });
-            pubsub.resolve(getState()[name]);
-          })
-          .catch((error)=> {
+            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
+            each(meta.broadcast,
+              (btype)=> dispatch({ type: btype, data, request: requestOptions }));
+            each(meta.postfetch,
+              (postfetch)=> {
+                isFunction(postfetch) && postfetch({
+                  data, getState, dispatch, actions: meta.actions
+                });
+              });
+            pubsub.resolve(data);
+          }, (error)=> {
             dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
             pubsub.reject(error);
           }));
@@ -145,7 +153,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
 
   return reduce(meta.helpers, (memo, func, helpername)=> {
     if (memo[helpername]) {
-      throw new Error(`Helper name: "${helpername}" for endpoint "${name}" has been already reserved`);
+      throw new Error(
+        `Helper name: "${helpername}" for endpoint "${name}" has been already reserved`
+      );
     }
     const { sync, call } = isFunction(func) ? { call: func } : func;
     memo[helpername] = (...args)=> (dispatch, getState)=> {

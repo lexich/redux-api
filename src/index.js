@@ -110,7 +110,8 @@ export default function reduxApi(config) {
       broadcast,
       virtual: !!opts.virtual,
       actions: memo.actions,
-      prefetch, postfetch, validation, helpers
+      prefetch, postfetch, validation,
+      helpers, transformer
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
@@ -122,7 +123,7 @@ export default function reduxApi(config) {
         loading: false,
         data: transformer()
       };
-      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, transformer);
+      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS);
     }
     memo.events[reducerName] = ACTIONS;
     return memo;

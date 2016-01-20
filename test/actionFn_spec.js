@@ -24,6 +24,10 @@ function fetchFail() {
   });
 }
 
+function transformer(data) {
+  return data;
+}
+
 const ACTIONS = {
   actionFetch: "actionFetch",
   actionSuccess: "actionSuccess",
@@ -40,6 +44,7 @@ describe("actionFn", function() {
   it("check sync method", function() {
     let executeCounter = 0;
     const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
       fetch: ()=> {
         executeCounter++;
         return fetchSuccess();
@@ -82,6 +87,7 @@ describe("actionFn", function() {
     let executeCounter = 0;
     let urlFetch, paramsFetch;
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      transformer,
       fetch: (url, params)=> {
         executeCounter++;
         urlFetch = url;
@@ -100,6 +106,7 @@ describe("actionFn", function() {
 
   it("check normal usage", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
       fetch: fetchSuccess
     });
     expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
@@ -129,6 +136,7 @@ describe("actionFn", function() {
 
   it("check fail fetch", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
       fetch: fetchFail
     });
     const expectedEvent = [{
@@ -155,6 +163,7 @@ describe("actionFn", function() {
 
   it("check double request", function(_done) {
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      transformer,
       fetch: fetchSuccess
     });
     const expectedEvent = [{
@@ -194,6 +203,7 @@ describe("actionFn", function() {
       callOptions++;
       return { ...params,  test: 1 };
     }, ACTIONS, {
+      transformer,
       fetch(url, opts) {
         checkOptions = opts;
         return fetchSuccess();
@@ -214,6 +224,7 @@ describe("actionFn", function() {
       };
     }
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      transformer,
       fetch: fetchSuccess,
       holder: {
         server: true
@@ -261,6 +272,7 @@ describe("actionFn", function() {
       request: { pathvars: undefined, params: {} }
     }];
     const meta = {
+      transformer,
       fetch: fetchSuccess,
       broadcast: [BROADCAST_ACTION]
     };
@@ -279,6 +291,7 @@ describe("actionFn", function() {
   it("check validation with request method", function() {
     let expData, counter = 0;
     const meta = {
+      transformer,
       fetch: fetchSuccess,
       validation(data, cb) {
         counter++;
@@ -296,6 +309,7 @@ describe("actionFn", function() {
   it("check success validation", function() {
     let expData, counter = 0;
     const meta = {
+      transformer,
       fetch: fetchSuccess,
       validation(data, cb) {
         counter++;
@@ -330,6 +344,7 @@ describe("actionFn", function() {
   it("check unsuccess validation", function() {
     let expData, counter = 0;
     const meta = {
+      transformer,
       fetch: fetchSuccess,
       validation(data, cb) {
         counter++;
@@ -363,6 +378,7 @@ describe("actionFn", function() {
   it("check postfetch option", function() {
     let expectedOpts;
     const meta = {
+      transformer,
       fetch: fetchSuccess,
       postfetch: [
         function(opts) {
@@ -410,6 +426,7 @@ describe("actionFn", function() {
   it("check prefetch option", function() {
     const checkPrefetch = [];
     const meta = {
+      transformer,
       fetch: fetchSuccess,
       prefetch: [
         function(opts, cb) {
@@ -469,6 +486,7 @@ describe("actionFn", function() {
   });
   it("check helpers with async functionality", function() {
     const meta = {
+      transformer,
       fetch(url, opts) {
         return new Promise((resolve)=> resolve({ url, opts }));
       },
@@ -511,18 +529,19 @@ describe("actionFn", function() {
   it("check merge params", function() {
     let params;
     const meta = {
+      transformer,
       fetch: (urlparams, _params)=> {
         params = _params;
         return fetchSuccess();
       }
     };
-    const opts = { headers: { "One": 1 } };
+    const opts = { headers: { One: 1 } };
     const api = actionFn("/test", "test", opts, ACTIONS, meta);
-    return api.request(null, { headers: { "Two": 2 } }).then(()=> {
+    return api.request(null, { headers: { Two: 2 } }).then(()=> {
       expect(params).to.eql({
         headers: {
-          "One": 1,
-          "Two": 2
+          One: 1,
+          Two: 2
         }
       });
     });

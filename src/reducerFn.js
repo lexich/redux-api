@@ -1,9 +1,5 @@
 "use strict";
 
-function fn(val) {
-  return val;
-}
-
 /**
  * Reducer contructor
  * @param  {Object}   initialState default initial state
@@ -11,7 +7,7 @@ function fn(val) {
  * @param  {Function} transformer  transformer function
  * @return {Function}              reducer function
  */
-export default function reducerFn(initialState, actions={}, transformer=fn) {
+export default function reducerFn(initialState, actions={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset } = actions;
   return (state=initialState, action)=> {
     switch (action.type) {
@@ -29,7 +25,7 @@ export default function reducerFn(initialState, actions={}, transformer=fn) {
           sync: true,
           syncing: false,
           error: null,
-          data: transformer(action.data, state.data, action)
+          data: action.data
         };
       case actionFail:
         return {

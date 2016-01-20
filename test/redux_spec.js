@@ -38,7 +38,7 @@ describe("redux", ()=> {
       (cb)=> rest.actions.test(cb),
       rest.actions.test2
     ).then((d)=> {
-      expect(d.data).to.eql({ data: "/api/url2" });
+      expect(d.data).to.eql("/api/url2");
       expect(store.getState().test.data).to.eql({ data: "/api/url" });
       expect(store.getState().test2.data).to.eql({ data: "/api/url2" });
     });
@@ -53,9 +53,9 @@ describe("redux", ()=> {
     function testAction() {
       return (dispatch, getState)=> {
         async(dispatch, rest.actions.test).then((data)=> {
-          expect(getState().test).to.eql(data);
+          expect(getState().test.data).to.eql(data);
           done();
-        });
+        }).catch(done);
       };
     }
     store.dispatch(testAction());
