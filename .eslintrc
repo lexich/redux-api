@@ -46,6 +46,9 @@
     "guard-for-in": 0,
     "comma-dangle": 0,
     "space-before-function-paren": 0,
-    "arrow-spacing": [2, { "before": false, "after": true }]
+    "arrow-spacing": [2, { "before": false, "after": true }],
+    "prefer-template": 0,
+    "prefer-arrow-callback": 0,
+    "arrow-body-style": 0
   }
 }
