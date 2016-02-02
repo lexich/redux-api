@@ -500,8 +500,16 @@ const store = createStoreWithMiddleware(reducer);
 @connect((state)=> ({ entry: state.entry, regions: state.regions }))
 class Application {
   static propTypes = {
-    entry: PropTypes.object.isRequired,
-    regions: PropTypes.array.isRequired,
+    entry: PropTypes.shape({
+      loading: PropTypes.bool.isRequired,
+      data: PropTypes.shape({
+        text: PropTypes.string
+      }).isRequired
+    }).isRequired,
+    regions: PropTypes.shape({
+      loading: PropTypes.bool.isRequired,
+      data: PropTypes.array.isRequired
+    }).isRequired,
     dispatch: PropTypes.func.isRequired
   }
   componentDidMount() {
