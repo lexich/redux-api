@@ -482,7 +482,7 @@ export default reduxApi({
       }
     }
   }
-}).init(adapterFetch(fetch)); // it's nessasary to point using rest backend
+}).use("fetch", adapterFetch(fetch)); // it's nessasary to point using rest backend
 ```
 
 index.jsx
