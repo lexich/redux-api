@@ -31,6 +31,10 @@ And of course you have to setup adapter to your `redux-api` instance before usin
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is intended to be used with [Redux](https://github.com/gaearon/redux).
 
 =======
+## Documentation
+See [DOCS.md](DOCS.md) for API documentation.
+
+=======
 ## Install
 with npm
 ```sh
@@ -40,9 +44,6 @@ with bower
 ```sh
 bower install redux-api --save
 ```
-
-## Documentation
-See [DOCS.md](DOCS.md) for API documentation.
 
 =======
 ## Examples
