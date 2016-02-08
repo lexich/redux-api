@@ -6,7 +6,27 @@ Flux REST API for redux infrastructure
 [![Coverage Status](https://coveralls.io/repos/lexich/redux-api/badge.png?branch=master)](https://coveralls.io/r/lexich/redux-api?branch=master)
 
 ## Introduction :lipstick:
-Because of X `redux-api` tries to solve problem Y by doing Z. 
+`redux-api` generate [actions](http://rackt.org/redux/docs/basics/Actions.html) and [reducers](http://rackt.org/redux/docs/basics/Reducers.html) for making ajax call to API endpoints. You don't need to write a lot of [boilerplate code](http://rackt.org/redux/docs/advanced/ExampleRedditAPI.html) if use `redux` and wanted to exchange data with server. 
+
+`redux-api` doesn't bounded you in using tehnologies for ajax call. It use configurable `adapters`. It's a pretty simple function with receive 2 arguments: url of endpoint and options. And it return Promise as result. Default adapter has implemetation like this:
+```js
+function adapterFetch(url, options) {
+  return fetch(url, options);
+}
+
+// if you like jquery style
+function adapterJquery(url, options) {
+  return new Promise((success, error) {
+      $.ajax({ ...options, url, success, error });
+  });
+}
+```
+This implementation allow to make any requests and process any responses.
+
+And of course you have to setup adapter to your `redux-api` instance before using. 
+```
+  reduxApi(....).use("fetch", adapterFetch)
+```
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is intended to be used with [Redux](https://github.com/gaearon/redux).
 
@@ -28,7 +48,7 @@ See [DOCS.md](DOCS.md) for API documentation.
 ## Examples
 [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github api
 
-### Full example Example
+### Example
 rest.js
 ```js
 import "isomorphic-fetch";
@@ -64,7 +84,10 @@ const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 const reducer = combineReducers(rest.reducers);
 const store = createStoreWithMiddleware(reducer);
 
-@connect((state)=> ({ entry: state.entry, regions: state.regions }))
+function select(state) {
+  return { entry: state.entry, regions: state.regions };
+}
+
 class Application {
   static propTypes = {
     entry: PropTypes.shape({
@@ -78,7 +101,7 @@ class Application {
       data: PropTypes.array.isRequired
     }).isRequired,
     dispatch: PropTypes.func.isRequired
-  }
+  };
   componentDidMount() {
     const {dispatch} = this.props;
     // fetch `/api/v1/regions
@@ -100,34 +123,14 @@ class Application {
   }
 }
 
+const SmartComponent = connect(select)(Application);
+
 React.render(
   <Provider store={store}>
-    { ()=> <Application /> }
+    { ()=> <SmartComponent /> }
   </Provider>,
   document.getElementById("content")
 );
 ```
-
-### Store state schema
-```js
-const rest = reduxApi({
-  user: "/user/1"
-});
-```
-
-```js
-// initialState
-{
-  user: {
-    sync: false,    // State was update once
-    syncing: false, // State syncing is in progress
-    loading: false, // State updating is in progress
-    error: null,    // response error
-    data: []        // response data
-  }
-}
-```
-
-
 
 ### [Releases Changelog](https://github.com/lexich/redux-api/releases)

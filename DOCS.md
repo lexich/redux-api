@@ -437,3 +437,23 @@ async(dispatch,
   rest.actions.test2
 ).then((data)=> async(rest.actions.test3));
 ```
+
+### Store state schema
+```js
+const rest = reduxApi({
+  user: "/user/1"
+});
+```
+
+```js
+// initialState
+{
+  user: {
+    sync: false,    // State was update once
+    syncing: false, // State syncing is in progress
+    loading: false, // State updating is in progress
+    error: null,    // response error
+    data: []        // response data
+  }
+}
+```
