@@ -5,10 +5,10 @@ Flux REST API for redux infrastructure
 [![NPM version](https://badge.fury.io/js/redux-api.svg)](http://badge.fury.io/js/redux-api)
 [![Coverage Status](https://coveralls.io/repos/lexich/redux-api/badge.png?branch=master)](https://coveralls.io/r/lexich/redux-api?branch=master)
 
-## Introduction :lipstick:
-`redux-api` generate [actions](http://rackt.org/redux/docs/basics/Actions.html) and [reducers](http://rackt.org/redux/docs/basics/Reducers.html) for making ajax call to API endpoints. You don't need to write a lot of [boilerplate code](http://rackt.org/redux/docs/advanced/ExampleRedditAPI.html) if use `redux` and wanted to exchange data with server. 
+## Introduction
+`redux-api` solves problem of writing client for communicating with backend. It generates [actions](http://rackt.org/redux/docs/basics/Actions.html) and [reducers](http://rackt.org/redux/docs/basics/Reducers.html) for making ajax call to API endpoints. You don't need to write a lot of [boilerplate code](http://rackt.org/redux/docs/advanced/ExampleRedditAPI.html) if use `redux` and wanted to exchange data with server. 
 
-`redux-api` doesn't bounded you in using tehnologies for ajax call. It use configurable `adapters`. It's a pretty simple function with receive 2 arguments: url of endpoint and options. And it return Promise as result. Default adapter has implemetation like this:
+`redux-api` doesn't bound you in using tehnologies for make ajax calls. It use configurable `adapters` - a pretty simple function witch receive 2 arguments: url of endpoint and options - andreturn Promise as result. Default adapter has implemetation like this:
 ```js
 function adapterFetch(url, options) {
   return fetch(url, options);
