@@ -8,7 +8,7 @@ Flux REST API for redux infrastructure
 ## Introduction
 `redux-api` solves problem of writing client for communicating with backend. It generates [actions](http://rackt.org/redux/docs/basics/Actions.html) and [reducers](http://rackt.org/redux/docs/basics/Reducers.html) for making ajax call to API endpoints. You don't need to write a lot of [boilerplate code](http://rackt.org/redux/docs/advanced/ExampleRedditAPI.html) if use `redux` and wanted to exchange data with server. 
 
-`redux-api` doesn't bound you in using tehnologies for make ajax calls. It use configurable `adapters` - a pretty simple function witch receive 2 arguments: url of endpoint and options - andreturn Promise as result. Default adapter has implemetation like this:
+`redux-api` doesn't bound you in using tehnologies for make ajax calls. It use configurable `adapters` - a pretty simple function which receives 2 arguments: url of endpoint and options - and returns a Promise as result. Default adapter has implemetation like this:
 ```js
 function adapterFetch(url, options) {
   return fetch(url, options);
@@ -21,9 +21,9 @@ function adapterJquery(url, options) {
   });
 }
 ```
-This implementation allow to make any requests and process any responses.
+This implementation allows one to make any request and process any response.
 
-And of course you have to setup adapter to your `redux-api` instance before using. 
+And of course you have to set up adapter to your `redux-api` instance before using. 
 ```
   reduxApi(....).use("fetch", adapterFetch)
 ```
@@ -70,7 +70,7 @@ export default reduxApi({
       }
     }
   }
-}).use("fetch", adapterFetch(fetch)); // it's necessary to point using rest backend
+}).use("fetch", adapterFetch(fetch)); // it's necessary to point using REST backend
 ```
 
 index.jsx
