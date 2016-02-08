@@ -5,6 +5,7 @@ import { expect } from "chai";
 import reduxApi, { async } from "../src/index.js";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
+import after from "lodash/function/after";
 
 describe("redux", ()=> {
   it("check redux", ()=> {
@@ -59,5 +60,33 @@ describe("redux", ()=> {
       };
     }
     store.dispatch(testAction());
+  });
+
+  it("check double call", (done)=> {
+    const rest = reduxApi({
+      test: "/test"
+    }).use("fetch", (url)=> new Promise((resolve)=> {
+      setTimeout(()=> resolve({ url }), 100);
+    }));
+
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+
+    const next = after(function() {
+      store.dispatch(rest.actions.test.sync((err, data)=> {
+        expect(data).to.eql({ url: "/test" });
+        done();
+      }));
+    }, 2);
+
+    store.dispatch(rest.actions.test.sync((err, data)=> {
+      expect(data).to.eql({ url: "/test" });
+      next();
+    }));
+    store.dispatch(rest.actions.test.sync((err, data)=> {
+      expect(data).to.eql({ url: "/test" });
+      next();
+    }));
   });
 });

@@ -2836,7 +2836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var state = getState();
 	      var store = state[name];
 	      if (!isServer && store && store.sync) {
-	        callback(null, store);
+	        callback(null, store.data);
 	        return;
 	      }
 	      var modifyParams = _extends({}, params, { syncing: true });
