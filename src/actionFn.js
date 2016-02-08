@@ -143,7 +143,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const state = getState();
       const store = state[name];
       if (!isServer && store && store.sync) {
-        callback(null, store);
+        callback(null, store.data);
         return;
       }
       const modifyParams = { ...params, syncing: true };
