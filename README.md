@@ -8,26 +8,6 @@ Flux REST API for redux infrastructure
 ## Introduction
 `redux-api` solves problem of writing client for communicating with backend. It generates [actions](http://rackt.org/redux/docs/basics/Actions.html) and [reducers](http://rackt.org/redux/docs/basics/Reducers.html) for making ajax call to API endpoints. You don't need to write a lot of [boilerplate code](http://rackt.org/redux/docs/advanced/ExampleRedditAPI.html) if use `redux` and wanted to exchange data with server. 
 
-`redux-api` doesn't bound you in using tehnologies for make ajax calls. It use configurable `adapters` - a pretty simple function which receives 2 arguments: url of endpoint and options - and returns a Promise as result. Default adapter has implemetation like this:
-```js
-function adapterFetch(url, options) {
-  return fetch(url, options);
-}
-
-// if you like jquery style
-function adapterJquery(url, options) {
-  return new Promise((success, error) {
-      $.ajax({ ...options, url, success, error });
-  });
-}
-```
-This implementation allows one to make any request and process any response.
-
-And of course you have to set up adapter to your `redux-api` instance before using. 
-```
-  reduxApi(....).use("fetch", adapterFetch)
-```
-
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is intended to be used with [Redux](https://github.com/gaearon/redux).
 
 =======
@@ -43,6 +23,29 @@ npm install redux-api --save
 with bower
 ```sh
 bower install redux-api --save
+```
+
+=======
+## Remote calls
+
+`redux-api` doesn't bound you in using tehnologies for make ajax calls. It use configurable `adapters` - a pretty simple function which receives 2 arguments: url of endpoint and options - and returns a Promise as result. Default adapter has implemetation like this:
+```js
+function adapterFetch(url, options) {
+  return fetch(url, options);
+}
+
+// if you like jquery
+function adapterJquery(url, options) {
+  return new Promise((success, error)=> {
+    $.ajax({ ...options, url, success, error });
+  });
+}
+```
+This implementation allows one to make any request and process any response.
+
+And of course you have to set up adapter to your `redux-api` instance before using. 
+```
+  reduxApi(....).use("fetch", adapterFetch)
 ```
 
 =======
