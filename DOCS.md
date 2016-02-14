@@ -98,6 +98,7 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 ####broadcast
+- @deprecated
 - @description: list of actions which would emit after data fetching.
 - @type: Array
 - @default: null
@@ -127,6 +128,26 @@ function (state, action) {
 - @description: if virtual is `true` this endpoint doesn't create reducer and doesn't emit redux-api actions. All data broadcasting by actions from `broadcast` list.
 - @type: Array
 - @default: false
+- @example
+It usefull, for example, when you need to manipulate list of items. But you don't want to persist infomation about each manipulation, you want to save it in list.
+```js
+const rest = reduxApi({
+  items: "/api/items",
+  item: {
+    url: "/api/item/:id",
+    virtual: true, //reducer in this case doesn't generate
+    postfetch: [
+      function({ dispatch, actions }) {
+        dispatch(actions.items()); // update list of items after modify any item
+      }
+    ]
+  }
+});
+```
+In this case you global state is look like this:
+```js
+{ items: [ ... ] }
+```
 
 ####prefetch
 - @description: you can organize chain of calling events before the current endpoint will be executed
@@ -419,6 +440,34 @@ rest.actions.user({id: 1}) // /api/v1/user/1
 /api/v1/user/(:id)
 ```js
 rest.actions.user({id: 1, test: 2}) // /api/v1/user/1?test=2
+```
+
+###Events
+Each endpoint in redux-api infranstucrute has own collection of methods.
+- actionFetch   - emits when endpoint's call is started
+- actionSuccess - emits when endpoint's call finishs with success result
+- actionFail    - emits when endpoint's call finishs with error result
+- actionReset   - emits when reset action was called
+
+you can get access for anyone using next accessible properties
+```js
+rest.events.user.actionFetch // actionSuccess actionFail actionReset
+....
+```
+It's very useful when you need to update external reducer using information from redux-api.
+
+```js
+const initialState = { access: false };
+function accessReducer(state=initialState, action) {
+  switch (action.type) {
+    case UPDATE_ACCESS:  // manual update
+      return { ...state, access: action.access };
+    case rest.events.user.actionSuccess: // user has own information about access
+      return { ...state, access: action.data.access };
+    default:
+      state;
+  }
+}
 ```
 
 ###Tools

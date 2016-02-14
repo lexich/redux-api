@@ -90,6 +90,12 @@ export default function reduxApi(config) {
       { ...defaultEndpointConfig, reducerName: key, ...value } :
       { ...defaultEndpointConfig, reducerName: key, url: value };
 
+    if (opts.broadcast !== (void 0)) {
+      /* eslint no-console: 0 */
+      console.warn("Deprecated `broadcast` option. you shoud use `events`" +
+      "to catch redux-api events (see https://github.com/lexich/redux-api/blob/master/DOCS.md#Events)");
+    }
+
     const {
       url, options, transformer, broadcast,
       reducerName, prefetch, postfetch, validation, helpers
