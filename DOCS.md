@@ -388,8 +388,8 @@ function onEnter(state, replaceState, callback) {
 - @example:
 ```js
 import {actions} from "./rest";
-function onLeave(state, replaceState, callback) {
-  dispatch(rest.actions.entries.sync(callback));  
+function onLeave(state, replaceState, cb) {
+  dispatch(rest.actions.entries.reset(cb));  
 }
 
 ```
