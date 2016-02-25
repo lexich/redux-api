@@ -131,7 +131,7 @@ const SmartComponent = connect(select)(Application);
 
 React.render(
   <Provider store={store}>
-    { ()=> <SmartComponent /> }
+    <SmartComponent />
   </Provider>,
   document.getElementById("content")
 );
