@@ -19,7 +19,7 @@ export default function async(dispatch, ...args) {
       } else {
         dispatch(fn((err, data)=> {
           err ? reject(err) : resolve(data);
-        }));
+        }) || {});
       }
     })
   .then((data)=> {

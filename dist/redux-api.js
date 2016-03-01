@@ -2934,7 +2934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      dispatch(fn(function (err, data) {
 	        err ? reject(err) : resolve(data);
-	      }));
+	      }) || {});
 	    }
 	  }).then(function (data) {
 	    if (nextArgs.length) {
