@@ -526,6 +526,178 @@ describe("actionFn", function() {
         expect(errorMsg).to.eql("Error");
       });
   });
+
+  it("check crud option",  function() {
+    const meta = {
+      transformer, crud: true,
+      fetch(url, opts) {
+        return new Promise((resolve)=> resolve({ url, opts }));
+      }
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    const expectedEvent = [{
+      type: "actionFetch",
+      syncing: false,
+      request: {
+        pathvars: { id: 1 },
+        params: { method: "get" }
+      }
+    }, {
+      type: "actionFetch",
+      syncing: false,
+      request: {
+        pathvars: { id: 2 },
+        params: { body: "Hello", method: "post" }
+      }
+    }, {
+      type: "actionFetch",
+      syncing: false,
+      request: {
+        pathvars: { id: 3 },
+        params: { body: "World", method: "put" }
+      }
+    }, {
+      type: "actionFetch",
+      syncing: false,
+      request: {
+        pathvars: { id: 4 },
+        params: { method: "delete" }
+      }
+    }, {
+      type: "actionFetch",
+      syncing: false,
+      request: {
+        pathvars: { id: 5 },
+        params: { body: "World", method: "patch" }
+      }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: { url: "/test/1", opts: { method: "get" } },
+      request: {
+        pathvars: { id: 1 },
+        params: { method: "get" }
+      }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: {
+        url: "/test/2",
+        opts: { body: "Hello", method: "post" }
+      },
+      request: {
+        pathvars: { id: 2 },
+        params: { body: "Hello", method: "post" }
+      }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: {
+        url: "/test/3",
+        opts: { body: "World", method: "put" }
+      },
+      request: {
+        pathvars: { id: 3 },
+        params: { body: "World", method: "put" }
+      }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: {
+        url: "/test/4",
+        opts: { method: "delete" }
+      },
+      request: {
+        pathvars: { id: 4 },
+        params: { method: "delete" }
+      }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: {
+        url: "/test/5",
+        opts: { body: "World", method: "patch" }
+      },
+      request: {
+        pathvars: { id: 5 },
+        params: { body: "World", method: "patch" }
+      }
+    }];
+
+    const getQuery = new Promise((resolve)=> {
+      api.get({ id: 1 }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    });
+
+    const postQuery = new Promise((resolve)=> {
+      api.post({ id: 2 }, { body: "Hello" }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    });
+    const putQuery = new Promise((resolve)=> {
+      api.put({ id: 3 }, { body: "World" }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    });
+    const deleteQuery = new Promise((resolve)=> {
+      api.delete({ id: 4 }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    });
+    const patchQuery = new Promise((resolve)=> {
+      api.patch({ id: 5 }, { body: "World" }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    });
+
+    return Promise.all([getQuery, postQuery, putQuery, deleteQuery, patchQuery])
+      .then(()=> expect(expectedEvent).to.have.length(0));
+  });
+
+  it("check crud option with overwrite",  function() {
+    const meta = {
+      transformer, crud: true,
+      fetch(url, opts) {
+        return new Promise((resolve)=> resolve({ url, opts }));
+      },
+      helpers: {
+        get() {
+          return [{ id: "overwrite" }];
+        }
+      }
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+    const expectedEvent = [{
+      type: "actionFetch",
+      syncing: false,
+      request: { pathvars: { id: "overwrite" }, params: {} }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: { url: "/test/overwrite", opts: {} },
+      request: { pathvars: { id: "overwrite" }, params: {} }
+    }];
+
+    return new Promise((resolve)=> {
+      api.get({ id: 1 }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> expect(expectedEvent).to.have.length(0));
+  });
+
   it("check merge params", function() {
     let params;
     const meta = {
