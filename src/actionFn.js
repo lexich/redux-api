@@ -27,6 +27,19 @@ function extractArgs(args) {
   return [pathvars, params, callback];
 }
 
+function helperCrudFunction(name) {
+  return (...args)=> {
+    const [pathvars, params, cb] = extractArgs(args);
+    return [pathvars, { ...params, method: name }, cb];
+  };
+}
+
+export const CRUD = reduce(["get", "post", "put", "delete", "patch"],
+  (memo, name)=> {
+    memo[name] = helperCrudFunction(name);
+    return memo;
+  }, {});
+
 /**
  * Constructor for create action
  * @param  {String} url          endpoint's url
@@ -151,7 +164,12 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     };
   };
 
-  return reduce(meta.helpers, (memo, func, helpername)=> {
+  let helpers = meta.helpers || [];
+  if (meta.crud) {
+    helpers = { ...CRUD, ...helpers };
+  }
+
+  return reduce(helpers, (memo, func, helpername)=> {
     if (memo[helpername]) {
       throw new Error(
         `Helper name: "${helpername}" for endpoint "${name}" has been already reserved`

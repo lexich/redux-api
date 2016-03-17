@@ -295,6 +295,28 @@ rest.actions.test.post(1, "admin", {msg: "Hello"}, (err)=> {
 rest.actions.test.async();
 ```
 
+####crud
+- @description: autogenerate `helpers` ("get", "post", "put", "delete", "patch") for selected endpoint. Also you can overwrite autogenerate action with `helpers` definitions.
+- @type: Boolean
+- @default: false
+- @example:
+```js
+{
+  test: {
+    url: "/test/:id",
+    crud: true
+  }
+}
+
+//using
+rest.action.test.get({ id: 1})
+rest.action.test.post({ id: 1}, { body: "data" }, (err, data)=> {
+  //code
+});
+rest.action.test.put({ id: 1}, { body: "data" })
+rest.action.test.delete({ id: 1 });
+```
+
 ### reduxApi object
 
 ####use(key, value)

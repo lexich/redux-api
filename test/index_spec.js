@@ -1,5 +1,5 @@
 "use strict";
-/* global describe, it */
+/* global describe, it, xit */
 
 import { expect } from "chai";
 import reduxApi from "../src/index.js";
@@ -192,7 +192,7 @@ describe("index", function() {
     expect(res.reducers.foo).to.exist;
   });
 
-  it("check virtual option with broadcast", function() {
+  xit("check virtual option with broadcast", function() {
     const BROADCAST_ACTION = "BROADCAST_ACTION";
     const res = reduxApi({
       test: {
@@ -351,5 +351,17 @@ describe("index", function() {
         "X-Header": 1
       }
     });
+  });
+
+  it("check crud option", ()=> {
+    const rest = reduxApi({
+      test: { url: "/test", crud: true }
+    });
+    expect(rest.actions.test).to.include.keys(
+      "get", "post", "delete", "put", "patch"
+    );
+    expect(rest.actions.test).to.include.keys(
+      "request", "reset", "sync"
+    );
   });
 });

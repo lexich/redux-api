@@ -189,6 +189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var options = opts.options;
 	    var transformer = opts.transformer;
 	    var broadcast = opts.broadcast;
+	    var crud = opts.crud;
 	    var reducerName = opts.reducerName;
 	    var prefetch = opts.prefetch;
 	    var postfetch = opts.postfetch;
@@ -212,7 +213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      virtual: !!opts.virtual,
 	      actions: memo.actions,
 	      prefetch: prefetch, postfetch: postfetch, validation: validation,
-	      helpers: helpers, transformer: transformer
+	      helpers: helpers, transformer: transformer, crud: crud
 	    };
 	
 	    memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
@@ -2631,6 +2632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.CRUD = undefined;
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
@@ -2695,6 +2697,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return [pathvars, params, callback];
 	}
 	
+	function helperCrudFunction(name) {
+	  return function () {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+	
+	    var _extractArgs = extractArgs(args);
+	
+	    var _extractArgs2 = _slicedToArray(_extractArgs, 3);
+	
+	    var pathvars = _extractArgs2[0];
+	    var params = _extractArgs2[1];
+	    var cb = _extractArgs2[2];
+	
+	    return [pathvars, _extends({}, params, { method: name }), cb];
+	  };
+	}
+	
+	var CRUD = exports.CRUD = (0, _reduce2.default)(["get", "post", "put", "delete", "patch"], function (memo, name) {
+	  memo[name] = helperCrudFunction(name);
+	  return memo;
+	}, {});
+	
 	/**
 	 * Constructor for create action
 	 * @param  {String} url          endpoint's url
@@ -2753,17 +2778,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param  {Function} callback)   callback execute after end request
 	   */
 	  var fn = function fn() {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
+	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	      args[_key2] = arguments[_key2];
 	    }
 	
-	    var _extractArgs = extractArgs(args);
+	    var _extractArgs3 = extractArgs(args);
 	
-	    var _extractArgs2 = _slicedToArray(_extractArgs, 3);
+	    var _extractArgs4 = _slicedToArray(_extractArgs3, 3);
 	
-	    var pathvars = _extractArgs2[0];
-	    var params = _extractArgs2[1];
-	    var callback = _extractArgs2[2];
+	    var pathvars = _extractArgs4[0];
+	    var params = _extractArgs4[1];
+	    var callback = _extractArgs4[2];
 	
 	    var syncing = params ? !!params.syncing : false;
 	    params && delete params.syncing;
@@ -2827,17 +2852,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param  {Function} callback) callback execute after end request
 	   */
 	  fn.sync = function () {
-	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	      args[_key2] = arguments[_key2];
+	    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	      args[_key3] = arguments[_key3];
 	    }
 	
-	    var _extractArgs3 = extractArgs(args);
+	    var _extractArgs5 = extractArgs(args);
 	
-	    var _extractArgs4 = _slicedToArray(_extractArgs3, 3);
+	    var _extractArgs6 = _slicedToArray(_extractArgs5, 3);
 	
-	    var pathvars = _extractArgs4[0];
-	    var params = _extractArgs4[1];
-	    var callback = _extractArgs4[2];
+	    var pathvars = _extractArgs6[0];
+	    var params = _extractArgs6[1];
+	    var callback = _extractArgs6[2];
 	
 	    var isServer = meta.holder ? meta.holder.server : false;
 	    return function (dispatch, getState) {
@@ -2852,7 +2877,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 	
-	  return (0, _reduce2.default)(meta.helpers, function (memo, func, helpername) {
+	  var helpers = meta.helpers || [];
+	  if (meta.crud) {
+	    helpers = _extends({}, CRUD, helpers);
+	  }
+	
+	  return (0, _reduce2.default)(helpers, function (memo, func, helpername) {
 	    if (memo[helpername]) {
 	      throw new Error("Helper name: \"" + helpername + "\" for endpoint \"" + name + "\" has been already reserved");
 	    }
@@ -2863,8 +2893,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var call = _ref.call;
 	
 	    memo[helpername] = function () {
-	      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	        args[_key3] = arguments[_key3];
+	      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	        args[_key4] = arguments[_key4];
 	      }
 	
 	      return function (dispatch, getState) {
@@ -2892,7 +2922,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return memo;
 	  }, fn);
 	}
-	module.exports = exports['default'];
 
 /***/ },
 /* 36 */
