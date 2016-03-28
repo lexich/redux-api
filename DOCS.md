@@ -190,7 +190,7 @@ In this case you global state is look like this:
   logout: {
     url: "/user/logout",
     postfetch: [
-      function({data, actions, dispatch, getState}) {
+      function({data, actions, dispatch, getState, request}) {
         dispatch(actions.user.reset());
       }      
     ]    

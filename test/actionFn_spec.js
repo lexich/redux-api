@@ -417,10 +417,11 @@ describe("actionFn", function() {
       api(resolve)(dispatch, getState);
     }).then(()=> {
       expect(expectedOpts).to.exist;
-      expect(expectedOpts).to.include.keys("data", "getState", "dispatch", "actions");
+      expect(expectedOpts).to.include.keys("data", "getState", "dispatch", "actions", "request");
       expect(expectedOpts.getState).to.eql(getState);
       expect(expectedOpts.dispatch).to.eql(dispatch);
       expect(expectedOpts.actions).to.eql({ hello: "a" });
+      expect(expectedOpts.request).to.eql({ params: {}, pathvars: (void 0) });
     });
   });
   it("check prefetch option", function() {

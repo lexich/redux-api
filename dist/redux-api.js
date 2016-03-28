@@ -2820,7 +2820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          });
 	          (0, _each2.default)(meta.postfetch, function (postfetch) {
 	            (0, _isFunction2.default)(postfetch) && postfetch({
-	              data: data, getState: getState, dispatch: dispatch, actions: meta.actions
+	              data: data, getState: getState, dispatch: dispatch, actions: meta.actions, request: requestOptions
 	            });
 	          });
 	          pubsub.resolve(data);

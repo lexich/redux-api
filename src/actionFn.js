@@ -121,7 +121,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             each(meta.postfetch,
               (postfetch)=> {
                 isFunction(postfetch) && postfetch({
-                  data, getState, dispatch, actions: meta.actions
+                  data, getState, dispatch, actions: meta.actions, request: requestOptions
                 });
               });
             pubsub.resolve(data);
