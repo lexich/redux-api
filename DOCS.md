@@ -426,7 +426,7 @@ function onEnter(state, replaceState, callback) {
 ```
 
 #### reset()
-- @description: Reset state of current reducer
+- @description: Reset state of current reducer and application's abort request if it processed.
 - @type: Function
 - @example:
 ```js

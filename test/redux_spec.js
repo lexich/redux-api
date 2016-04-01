@@ -89,4 +89,44 @@ describe("redux", ()=> {
       next();
     }));
   });
+
+  it("check abort request", (done)=> {
+    let store;
+    const rest = reduxApi({
+      test: "/test"
+    }).use("fetch", (url)=> new Promise((resolve)=> {
+      setTimeout(()=> {
+        resolve({ url });
+        expect(store.getState().test).to.eql({
+          sync: false, syncing: false, loading: false, data: {},
+          error: new Error("Error: Application abort request")
+        });
+        done();
+      }, 100);
+    }));
+
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    store = createStoreWithMiddleware(reducer);
+
+    expect(store.getState().test).to.eql(
+      { sync: false, syncing: false, loading: false, data: {} }
+    );
+
+    store.dispatch(rest.actions.test((err)=> {
+      expect(err).to.eql(new Error("Error: Application abort request"));
+      expect(store.getState().test).to.eql(
+        { sync: false, syncing: false, loading: true, data: {} }
+      );
+    }));
+
+    expect(store.getState().test).to.eql(
+      { sync: false, syncing: false, loading: true, data: {}, error: null }
+    );
+    store.dispatch(rest.actions.test.reset());
+
+    expect(store.getState().test).to.eql(
+      { sync: false, syncing: false, loading: false, data: {} }
+    );
+  });
 });

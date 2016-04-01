@@ -7,6 +7,7 @@ import reduce from "lodash/collection/reduce";
 import merge from "lodash/object/merge";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
+import createHolder from "./createHolder";
 import fastApply from "fast-apply";
 import libUrl from "url";
 
@@ -52,7 +53,7 @@ export const CRUD = reduce(["get", "post", "put", "delete", "patch"],
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
   const pubsub = new PubSub();
-
+  const requestHolder = createHolder();
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -107,28 +108,37 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         prefetch: meta.prefetch
       };
 
-      fetchResolver(0, fetchResolverOpts,
-        (err)=> err ? pubsub.reject(err) : request(pathvars, params, getState)
-          .then((d)=> {
-            const gState = getState();
-            const prevData = gState && gState[name] && gState[name].data;
-            const data = meta.transformer(d, prevData, {
-              type: actionSuccess, request: requestOptions
-            });
-            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
-            each(meta.broadcast,
-              (btype)=> dispatch({ type: btype, data, request: requestOptions }));
-            each(meta.postfetch,
-              (postfetch)=> {
-                isFunction(postfetch) && postfetch({
-                  data, getState, dispatch, actions: meta.actions, request: requestOptions
-                });
+      fetchResolver(0, fetchResolverOpts, (err)=> {
+        if (err) {
+          return pubsub.reject(err);
+        }
+        new Promise((resolve, reject)=> {
+          requestHolder.set({
+            resolve, reject,
+            promise: request(pathvars, params, getState).then(resolve, reject)
+          });
+        }).then((d)=> {
+          requestHolder.pop();
+          const gState = getState();
+          const prevData = gState && gState[name] && gState[name].data;
+          const data = meta.transformer(d, prevData, {
+            type: actionSuccess, request: requestOptions
+          });
+          dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
+          each(meta.broadcast,
+            (btype)=> dispatch({ type: btype, data, request: requestOptions }));
+          each(meta.postfetch,
+            (postfetch)=> {
+              isFunction(postfetch) && postfetch({
+                data, getState, dispatch, actions: meta.actions, request: requestOptions
               });
-            pubsub.resolve(data);
-          }, (error)=> {
-            dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
-            pubsub.reject(error);
-          }));
+            });
+          pubsub.resolve(data);
+        }, (error)=> {
+          dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
+          pubsub.reject(error);
+        });
+      });
     };
   };
 
@@ -140,7 +150,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   /**
    * Reset store to initial state
    */
-  fn.reset = ()=> ({ type: actionReset });
+  fn.reset = ()=> {
+    const defer = requestHolder.pop();
+    defer && defer.reject(new Error("Application abort request"));
+    return { type: actionReset };
+  };
 
   /**
    * Sync store with server. In server mode works as usual method.
