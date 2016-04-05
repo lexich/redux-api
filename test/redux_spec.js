@@ -129,4 +129,60 @@ describe("redux", ()=> {
       { sync: false, syncing: false, loading: false, data: {} }
     );
   });
+
+  it("check reducer option", ()=> {
+    let context;
+    const rest = reduxApi({
+      external: "/external",
+      test: {
+        url: "/test",
+        reducer(state, action) {
+          context = this;
+          if (action.type === this.events.external.actionSuccess) {
+            return { ...state, data: action.data };
+          } else {
+            return state;
+          }
+        }
+      }
+    }).use("fetch", (url)=> {
+      return new Promise((resolve)=> {
+        resolve({ url });
+      });
+    });
+
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+    expect(store.getState()).to.eql({
+      external: { sync: false, syncing: false, loading: false, data: {} },
+      test: { sync: false, syncing: false, loading: false, data: {} }
+    });
+
+    return new Promise((done)=> {
+      store.dispatch(rest.actions.external(done));
+    }).then((err)=> {
+      expect(err).to.not.exist;
+      expect(context).to.include.keys(
+        "actions",
+        "reducers",
+        "events"
+      );
+      expect(store.getState()).to.eql({
+        external: {
+          sync: true,
+          syncing: false,
+          loading: false,
+          data: { url: "/external" },
+          error: null
+        },
+        test: {
+          sync: false,
+          syncing: false,
+          loading: false,
+          data: { url: "/external" }
+        }
+      });
+    });
+  });
 });

@@ -129,7 +129,8 @@ export default function reduxApi(config) {
         loading: false,
         data: transformer()
       };
-      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS);
+      const reducer = opts.reducer ? opts.reducer.bind(memo) : null;
+      memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, reducer);
     }
     memo.events[reducerName] = ACTIONS;
     return memo;

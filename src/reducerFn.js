@@ -5,9 +5,10 @@
  * @param  {Object}   initialState default initial state
  * @param  {Object}   actions      actions map
  * @param  {Function} transformer  transformer function
+ * @param  {Function} reducer      custom reducer function
  * @return {Function}              reducer function
  */
-export default function reducerFn(initialState, actions={}) {
+export default function reducerFn(initialState, actions={}, reducer) {
   const { actionFetch, actionSuccess, actionFail, actionReset } = actions;
   return (state=initialState, action)=> {
     switch (action.type) {
@@ -37,7 +38,7 @@ export default function reducerFn(initialState, actions={}) {
       case actionReset:
         return { ...initialState };
       default:
-        return state;
+        return reducer ? reducer(state, action) : state;
     }
   };
 }
