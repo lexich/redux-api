@@ -42,4 +42,26 @@ describe("reducerFn", function() {
     const res5 = fn(undefined, { type: "fake" });
     expect(res5 === initialState).to.be.true;
   });
+
+  it("check injected reducer", function() {
+    const initialState = { loading: false, data: { msg: "Hello" } };
+    const actions = {
+      actionFetch: "actionFetch",
+      actionSuccess: "actionSuccess",
+      actionFail: "actionFail",
+      actionReset: "actionReset"
+    };
+    const fn = reducerFn(initialState, actions, (state, action)=> {
+      if (action.type === "CUSTOM") {
+        return { ...state, data: "custom" };
+      } else {
+        return state;
+      }
+    });
+    const res0 = fn(initialState, { type: "NO_WAY" });
+    expect(res0 === initialState).to.be.true;
+
+    const res1 = fn(initialState, { type: "CUSTOM" });
+    expect(res1).to.eql({ loading: false, data: "custom" });
+  });
 });

@@ -6,12 +6,12 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 #### reduxApi(options)
-- @description create endpoint  
-- @param **options** - configuration of rest-api endpoints  
-  - @type: Object  
-  - @default: {}  
-  - @example:  
-  Simple endpoint definition `GET /api/v1/entry` where response is Object  
+- @description create endpoint
+- @param **options** - configuration of rest-api endpoints
+  - @type: Object
+  - @default: {}
+  - @example:
+  Simple endpoint definition `GET /api/v1/entry` where response is Object
 ```js
     {
       entry: "/api/v1/entry",
@@ -37,7 +37,7 @@ import reduxApi, {transformers} from "redux-api";
         transformer: transformers.object, //it's default value
         options: function(url, params) {  //it's default value
           return {};
-        }                       
+        }
       }
     }
 ```
@@ -46,7 +46,7 @@ import reduxApi, {transformers} from "redux-api";
 #### url
 - @description: url endpoint
 - @type: String
-- @example: 
+- @example:
 ```js
 {
   entry: {
@@ -57,10 +57,10 @@ import reduxApi, {transformers} from "redux-api";
 
 #### transformer
 - @description: function for rest response transformation
-- @type: Function  
-- @default: transformers.object  
-- @example: It's a good idea to write custom transformer  
-    for example you have response  
+- @type: Function
+- @default: transformers.object
+- @example: It's a good idea to write custom transformer
+    for example you have response
 ```json
   { "title": "Hello", "message": "World" }
 ```
@@ -74,9 +74,9 @@ import reduxApi, {transformers} from "redux-api";
 
 #### options
 - @description: options for rest-api backend. `function(url, options)`
-- @type: Object | Funtions 
-- @default: null  
-- @example: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend  
+- @type: Object | Funtions
+- @default: null
+- @example: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend
 ```js
       options: {
         method: "post",
@@ -122,6 +122,26 @@ function (state, action) {
     return state;
   }
 }
+```
+
+####reducer
+```js
+const rest = reduxApi({
+  hello: "/api/hello",
+  item: {
+    url: "/api/item",
+    reducer(state, action) {
+      // context has instance
+      if (action.type === "MY_CUSTOM_EVENT") {
+        return { ...state, value: action.value };
+      } else if (action.type === this.events.hello.actionSuccess) {
+        return { ...state, value: action.value };
+      } else {
+        return state;
+      }
+    }
+  }
+});
 ```
 
 ####virtual
@@ -171,7 +191,7 @@ In this case you global state is look like this:
         uuid ? cb() : dispatch(actions.profile({name}, cb));
       }
     ],
-    options: function(url, params, getState) {      
+    options: function(url, params, getState) {
       const {user: {data: {uuid}}} = getState();
       return { ...params, body: { ...params.body, uuid }};
     }
@@ -192,8 +212,8 @@ In this case you global state is look like this:
     postfetch: [
       function({data, actions, dispatch, getState, request}) {
         dispatch(actions.user.reset());
-      }      
-    ]    
+      }
+    ]
   }
 }
 ```
@@ -259,7 +279,7 @@ For example used es7 javascript
 - @type: Object
 - @example:
 ```js
-{  
+{
   logger: "/api/logger",
   test: {
     url: "/api/test/:name/:id",
@@ -325,8 +345,8 @@ rest.action.test.delete({ id: 1 });
 - @param **value** - value of property
 
 ####list of properties
-####fetch 
-- @description backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
+####fetch
+- @description backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
 - @example
 ```js
 import adapterFetch from "redux-api/adapters/fetch";
@@ -335,11 +355,11 @@ rest.use("fetch", adapterFetch(fetch));
 ```
 
 ####server
-- @description - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for clien-size mode. If `server===true` redux-api works in server-size mode. 
+- @description - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for clien-size mode. If `server===true` redux-api works in server-size mode.
 - @default false
 ```js
 const rest = reduxApi({...});
-rest.use("server", true); 
+rest.use("server", true);
 ```
 
 ####rootUrl
@@ -354,8 +374,8 @@ rest.use("rootUrl", "http://localhost:3000");
 - @deprecated
 - @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
 - @type: Function
-- @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)  
-- @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode. 
+- @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.
 - @param **rootUrl** - root url for every endpoint. very usefull for isomorphic(universal) app. For clientsize use default rootUrl, and for backend use http://localhost:80 for example. For cliendsize for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`.
 - @example:
 
@@ -403,7 +423,7 @@ dispatch(rest.actions.entries()); // GET "/api/v1/entry"
 dispatch(rest.actions.entry({id: 1}, {
   body: JSON.stringify({ name: "Hubot", login: "hubot"
 }}));  // POST "/api/v1/entry/1" with body
-dispatch(rest.actions.entries.reset()); 
+dispatch(rest.actions.entries.reset());
 dispatch(rest.actions.entries.sync());
 ```
 
@@ -420,7 +440,7 @@ dispatch(rest.actions.entries.sync());
 ```js
 import {actions} from "./rest";
 function onEnter(state, replaceState, callback) {
-  dispatch(rest.actions.entries.sync(callback));  
+  dispatch(rest.actions.entries.sync(callback));
 }
 
 ```
@@ -432,7 +452,7 @@ function onEnter(state, replaceState, callback) {
 ```js
 import {actions} from "./rest";
 function onLeave(state, replaceState, cb) {
-  dispatch(rest.actions.entries.reset(cb));  
+  dispatch(rest.actions.entries.reset(cb));
 }
 
 ```
@@ -503,7 +523,7 @@ const rest = reduxApi({
   test2: "/api/test2",
   test3: "/api/test3"
 });
-async(dispatch, 
+async(dispatch,
   (cb)=> rest.actions.test(cb),
   rest.actions.test2
 ).then((data)=> async(rest.actions.test3));

@@ -14,7 +14,9 @@ import libUrl from "url";
 function none() {}
 
 function extractArgs(args) {
-  let pathvars, params={}, callback;
+  let pathvars;
+  let params={};
+  let callback;
   if (isFunction(args[0])) {
     callback = args[0];
   } else if (isFunction(args[1])) {
