@@ -206,7 +206,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var meta = {
 	      fetch: opts.fetch ? opts.fetch : function () {
-	        return fetchHolder.fetch.apply(this, arguments);
+	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	          args[_key] = arguments[_key];
+	        }
+	
+	        return fetchHolder.fetch.apply(this, args);
 	      },
 	      holder: fetchHolder,
 	      broadcast: broadcast,
@@ -225,7 +229,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        loading: false,
 	        data: transformer()
 	      };
-	      memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS);
+	      var reducer = opts.reducer ? opts.reducer.bind(memo) : null;
+	      memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, reducer);
 	    }
 	    memo.events[reducerName] = ACTIONS;
 	    return memo;
@@ -2685,9 +2690,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function none() {}
 	
 	function extractArgs(args) {
-	  var pathvars = undefined,
-	      params = {},
-	      callback = undefined;
+	  var pathvars = void 0;
+	  var params = {};
+	  var callback = void 0;
 	  if ((0, _isFunction2.default)(args[0])) {
 	    callback = args[0];
 	  } else if ((0, _isFunction2.default)(args[1])) {
@@ -3004,7 +3009,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	
 	exports.default = function () {
-	  var data = undefined;
+	  var data = void 0;
 	  var hasData = false;
 	  return {
 	    set: function set(val) {
@@ -3075,6 +3080,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param  {Object}   initialState default initial state
 	 * @param  {Object}   actions      actions map
 	 * @param  {Function} transformer  transformer function
+	 * @param  {Function} reducer      custom reducer function
 	 * @return {Function}              reducer function
 	 */
 	
@@ -3087,6 +3093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = reducerFn;
 	function reducerFn(initialState) {
 	  var actions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	  var reducer = arguments[2];
 	  var actionFetch = actions.actionFetch;
 	  var actionSuccess = actions.actionSuccess;
 	  var actionFail = actions.actionFail;
@@ -3120,7 +3127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case actionReset:
 	        return _extends({}, initialState);
 	      default:
-	        return state;
+	        return reducer ? reducer(state, action) : state;
 	    }
 	  };
 	}

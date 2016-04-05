@@ -109,8 +109,8 @@ export default function reduxApi(config) {
     };
 
     const meta = {
-      fetch: opts.fetch ? opts.fetch : function() {
-        return fetchHolder.fetch.apply(this, arguments);
+      fetch: opts.fetch ? opts.fetch : function(...args) {
+        return fetchHolder.fetch.apply(this, args);
       },
       holder: fetchHolder,
       broadcast,

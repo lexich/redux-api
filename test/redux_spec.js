@@ -91,6 +91,7 @@ describe("redux", ()=> {
   });
 
   it("check abort request", (done)=> {
+    /* eslint prefer-const: 0 */
     let store;
     const rest = reduxApi({
       test: "/test"

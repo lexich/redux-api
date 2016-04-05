@@ -276,9 +276,9 @@ describe("index", function() {
     const a3 = new Promise((resolve)=> {
       const mockSync = res.actions.hello.sync;
       let counter = 0;
-      res.actions.hello.sync = function() {
+      res.actions.hello.sync = function(...args) {
         counter++;
-        return mockSync.apply(this, arguments);
+        return mockSync.apply(this, args);
       };
       res.actions.hello.testSync(1, resolve)(dispatch, getState);
       expect(counter).to.eql(1);

@@ -85,7 +85,8 @@ describe("actionFn", function() {
 
   it("check request method", function() {
     let executeCounter = 0;
-    let urlFetch, paramsFetch;
+    let urlFetch;
+    let paramsFetch;
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
       transformer,
       fetch: (url, params)=> {
@@ -289,7 +290,8 @@ describe("actionFn", function() {
     });
   });
   it("check validation with request method", function() {
-    let expData, counter = 0;
+    let expData;
+    let counter = 0;
     const meta = {
       transformer,
       fetch: fetchSuccess,
@@ -307,7 +309,8 @@ describe("actionFn", function() {
     });
   });
   it("check success validation", function() {
-    let expData, counter = 0;
+    let expData;
+    let counter = 0;
     const meta = {
       transformer,
       fetch: fetchSuccess,
@@ -342,7 +345,8 @@ describe("actionFn", function() {
     });
   });
   it("check unsuccess validation", function() {
-    let expData, counter = 0;
+    let expData;
+    let counter = 0;
     const meta = {
       transformer,
       fetch: fetchSuccess,
@@ -476,14 +480,14 @@ describe("actionFn", function() {
           reset() {}
         }
       })
-    ).to.throw(Error, `Helper name: "reset" for endpoint "test" has been already reserved`);
+    ).to.throw(Error, "Helper name: \"reset\" for endpoint \"test\" has been already reserved");
     expect(
       ()=> actionFn("/test/:id", "test", null, ACTIONS, {
         helpers: {
           sync() {}
         }
       })
-    ).to.throw(Error, `Helper name: "sync" for endpoint "test" has been already reserved`);
+    ).to.throw(Error, "Helper name: \"sync\" for endpoint \"test\" has been already reserved");
   });
   it("check helpers with async functionality", function() {
     const meta = {
