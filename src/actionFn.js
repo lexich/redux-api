@@ -1,10 +1,7 @@
 "use strict";
 
 import urlTransform from "./urlTransform";
-import isFunction from "lodash/lang/isFunction";
-import each from "lodash/collection/each";
-import reduce from "lodash/collection/reduce";
-import merge from "lodash/object/merge";
+import merge from "./utils/merge";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
@@ -17,9 +14,9 @@ function extractArgs(args) {
   let pathvars;
   let params={};
   let callback;
-  if (isFunction(args[0])) {
+  if (args[0] instanceof Function) {
     callback = args[0];
-  } else if (isFunction(args[1])) {
+  } else if (args[1] instanceof Function) {
     pathvars = args[0];
     callback = args[1];
   } else {
@@ -37,7 +34,7 @@ function helperCrudFunction(name) {
   };
 }
 
-export const CRUD = reduce(["get", "post", "put", "delete", "patch"],
+export const CRUD = ["get", "post", "put", "delete", "patch"].reduce(
   (memo, name)=> {
     memo[name] = helperCrudFunction(name);
     return memo;
@@ -74,9 +71,12 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         urlT = `${rootUrl.protocol}//${rootUrl.host}${urlPath}`;
       }
     }
-    const globalOptions = !meta.holder ? {} : isFunction(meta.holder.options) ?
-      meta.holder.options(urlT, params, getState) : (meta.holder.options);
-    const baseOptions = isFunction(options) ? options(urlT, params, getState) : options;
+    const globalOptions = !meta.holder ? {} :
+      (meta.holder.options instanceof Function) ?
+        meta.holder.options(urlT, params, getState) : (meta.holder.options);
+    const baseOptions = (options instanceof Function) ?
+      options(urlT, params, getState) :
+      options;
     const opts = merge({}, globalOptions, baseOptions, params);
     const response = meta.fetch(urlT, opts);
     return !meta.validation ? response : response.then(
@@ -127,14 +127,19 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             type: actionSuccess, request: requestOptions
           });
           dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
-          each(meta.broadcast,
-            (btype)=> dispatch({ type: btype, data, request: requestOptions }));
-          each(meta.postfetch,
-            (postfetch)=> {
-              isFunction(postfetch) && postfetch({
+          if (meta.broadcast) {
+            for (const key in meta.broadcast) {
+              dispatch({ type: meta.broadcast[key], data, request: requestOptions });
+            }
+          }
+          if (meta.postfetch) {
+            for (const key in meta.postfetch) {
+              const postfetch = meta.postfetch[key];
+              (postfetch instanceof Function) && postfetch({
                 data, getState, dispatch, actions: meta.actions, request: requestOptions
               });
-            });
+            }
+          }
           pubsub.resolve(data);
         }, (error)=> {
           dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
@@ -180,25 +185,24 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     };
   };
 
-  let helpers = meta.helpers || [];
+  let helpers = meta.helpers || {};
   if (meta.crud) {
     helpers = { ...CRUD, ...helpers };
   }
-
-  return reduce(helpers, (memo, func, helpername)=> {
+  const fnHelperCallback = (memo, func, helpername)=> {
     if (memo[helpername]) {
       throw new Error(
         `Helper name: "${helpername}" for endpoint "${name}" has been already reserved`
       );
     }
-    const { sync, call } = isFunction(func) ? { call: func } : func;
+    const { sync, call } = (func instanceof Function) ? { call: func } : func;
     memo[helpername] = (...args)=> (dispatch, getState)=> {
       const index = args.length - 1;
-      const callback = isFunction(args[index]) ? args[index] : none;
+      const callback = (args[index] instanceof Function) ? args[index] : none;
       const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
 
       // If helper alias using async functionality
-      if (isFunction(helpersResult)) {
+      if (helpersResult instanceof Function) {
         helpersResult((error, newArgs=[])=> {
           if (error) {
             callback(error);
@@ -216,5 +220,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       }
     };
     return memo;
-  }, fn);
+  };
+
+  return Object.keys(helpers).reduce(
+    (memo, key)=> fnHelperCallback(memo, helpers[key], key, helpers), fn);
 }

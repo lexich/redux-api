@@ -4,8 +4,8 @@
 import { expect } from "chai";
 import reduxApi from "../src/index.js";
 import transformers from "../src/transformers.js";
-import isFunction from "lodash/lang/isFunction";
-import size from "lodash/collection/size";
+import isFunction from "lodash/isFunction";
+import size from "lodash/size";
 
 function getState() {
   return { test: { loading: false, data: {} } };

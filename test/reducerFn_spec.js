@@ -3,7 +3,7 @@
 
 import { expect } from "chai";
 import reducerFn from "../src/reducerFn";
-import isFunction from "lodash/lang/isFunction";
+import isFunction from "lodash/isFunction";
 
 describe("reducerFn", function() {
   it("check null params", function() {

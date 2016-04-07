@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "fast-apply": "0.0.3",
-    "lodash": "3.10.1",
     "qs": "5.2.0"
   },
   "devDependencies": {
@@ -42,9 +41,10 @@
     "coveralls": "2.11.9",
     "eslint": "2.7.0",
     "eslint-config-airbnb": "6.2.0",
-    "eslint-plugin-react": "4.2.3",
+    "eslint-plugin-react": "4.3.0",
     "husky": "0.11.4",
     "isparta": "4.0.0",
+    "lodash": "4.8.2",
     "mocha": "2.4.5",
     "mocha-lcov-reporter": "1.2.0",
     "redux": "3.3.1",

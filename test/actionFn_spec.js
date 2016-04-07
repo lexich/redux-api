@@ -3,8 +3,8 @@
 
 import { expect } from "chai";
 import actionFn from "../src/actionFn";
-import isFunction from "lodash/lang/isFunction";
-import after from "lodash/function/after";
+import isFunction from "lodash/isFunction";
+import after from "lodash/after";
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
