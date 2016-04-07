@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-var webpack = require('webpack');
+var webpack = require("webpack");
 
 var plugins = [
   new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV)
   }),
   new webpack.optimize.OccurenceOrderPlugin()
 ];
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   plugins.push(
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
@@ -23,17 +23,19 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
   module: {
     loaders: [
-      { test: /\.js$/, loaders: ['babel-loader'], exclude: /node_modules/ },
-			{ test: /qs\/lib\/.+\.js$/, loaders: ['babel-loader'] }
+      {
+        test: /\.js$/,
+        loaders: ["babel-loader"]
+      }
     ]
   },
   output: {
-    library: 'redux-api',
-    libraryTarget: 'umd'
+    library: "redux-api",
+    libraryTarget: "umd"
   },
   devtool: "eval-source-map",
   plugins: plugins,
   resolve: {
-    extensions: ['', '.js']
+    extensions: ["", ".js"]
   }
 };

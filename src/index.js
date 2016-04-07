@@ -1,7 +1,6 @@
 "use strict";
 
 import libUrl from "url";
-import reduce from "lodash/collection/reduce";
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
 import transformers from "./transformers";
@@ -55,6 +54,7 @@ const PREFIX = "@@redux-api";
  */
 
 export default function reduxApi(config) {
+  config || (config = {});
   const fetchHolder = {
     fetch: null,
     server: false,
@@ -84,8 +84,7 @@ export default function reduxApi(config) {
     reducers: {},
     events: {}
   };
-
-  const reduxApiObject = reduce(config, (memo, value, key)=> {
+  const fnConfigCallback = (memo, value, key)=> {
     const opts = typeof value === "object" ?
       { ...defaultEndpointConfig, reducerName: key, ...value } :
       { ...defaultEndpointConfig, reducerName: key, url: value };
@@ -134,9 +133,10 @@ export default function reduxApi(config) {
     }
     memo.events[reducerName] = ACTIONS;
     return memo;
-  }, cfg);
+  };
 
-  return reduxApiObject;
+  return Object.keys(config).reduce(
+    (memo, key)=> fnConfigCallback(memo, config[key], key, config), cfg);
 }
 
 reduxApi.transformers = transformers;

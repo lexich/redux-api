@@ -3,7 +3,7 @@
 
 import { expect } from "chai";
 import fetchResolver from "../src/fetchResolver";
-import isFunction from "lodash/lang/isFunction";
+import isFunction from "lodash/isFunction";
 
 describe("fetchResolver", function() {
   it("check import", function() {
