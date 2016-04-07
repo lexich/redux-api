@@ -1,6 +1,12 @@
-/src
+/coverage
 /dist
 /examples
-/coverage
 /node_modules
+/src
+/test
+/.babelrc
+/.editorconfig
+/.eslintrc
+/.gitignore
+/.travis.yml
 /webpack.config.js
