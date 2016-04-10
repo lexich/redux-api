@@ -35,5 +35,5 @@ render(
   <Provider store={store}>
     <Router key="ta-app" history={history} children={childRoutes}/>
   </Provider>,
-  document.getElementById("react-main-mount")
+  el
 );
