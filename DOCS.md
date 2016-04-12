@@ -349,7 +349,7 @@ rest.action.test.delete({ id: 1 });
 - @description backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
 - @example
 ```js
-import adapterFetch from "redux-api/adapters/fetch";
+import adapterFetch from "redux-api/lib/adapters/fetch";
 const rest = reduxApi({...});
 rest.use("fetch", adapterFetch(fetch));
 ```
@@ -382,7 +382,7 @@ rest.use("rootUrl", "http://localhost:3000");
 ```js
 import "isomorphic-fetch";
 import reduxApi from "redux-api";
-import adapterFetch from "redux-api/adapters/fetch";
+import adapterFetch from "redux-api/lib/adapters/fetch";
 const rest = reduxApi({
   ... //config
 });
