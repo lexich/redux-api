@@ -14,7 +14,7 @@ import { Provider } from "react-redux";
 
 // Redux-api
 import reduxApi from "./utils/rest";
-import adapterFetch from "../../../src/adapters/fetch";
+import adapterFetch from "redux-api/lib/adapters/fetch";
 import "isomorphic-fetch";
 
 // Initialize react-api
@@ -37,3 +37,4 @@ render(
   </Provider>,
   el
 );
+
