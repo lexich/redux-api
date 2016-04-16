@@ -6,3 +6,6 @@ Run server
 npm install
 npm start
 ```
+
+Point your browser to http://localhost:4444/
+
