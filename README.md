@@ -57,7 +57,7 @@ rest.js
 ```js
 import "isomorphic-fetch";
 import reduxApi, {transformers} from "redux-api";
-import adapterFetch from "redux-api/adapters/fetch";
+import adapterFetch from "redux-api/lib/adapters/fetch";
 export default reduxApi({
   // simple edpoint description
   entry: `/api/v1/entry/:id`,

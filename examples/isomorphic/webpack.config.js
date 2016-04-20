@@ -1,6 +1,7 @@
 "use strict";
 
 var webpack = require("webpack");
+var path = require("path");
 
 var plugins = [
   new webpack.DefinePlugin({
@@ -37,6 +38,15 @@ module.exports = {
   devtool: "eval-source-map",
   plugins: plugins,
   resolve: {
+    // Alias redux-api for using version from source instead of npm
+    alias: {
+      "redux-api/lib": path.resolve(
+        path.join(__dirname, "..", "..", "src")
+      ),
+      "redux-api": path.resolve(
+        path.join(__dirname, "..", "..", "src")
+      )
+    },
     extensions: ["", ".js", ".jsx"]
   }
 };

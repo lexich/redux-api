@@ -1,5 +1,5 @@
-import reduxApi from "../../../../src/index"; // redux-api
-import map from "lodash/collection/map";
+import reduxApi from "redux-api";
+import map from "lodash/map";
 
 const headers = {
   "User-Agent": "redux-api"
