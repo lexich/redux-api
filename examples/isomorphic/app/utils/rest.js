@@ -1,4 +1,4 @@
-import reduxApi from "redux-api/lib/index"; // redux-api
+import reduxApi from "redux-api";
 import map from "lodash/map";
 
 const headers = {
