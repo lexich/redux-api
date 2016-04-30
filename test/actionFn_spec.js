@@ -135,6 +135,18 @@ describe("actionFn", function() {
     });
   });
 
+  it("check reset helper with mutation", function() {
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
+      fetch: fetchSuccess
+    });
+    expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
+    expect(api.reset("sync")).to.eql({
+      type: ACTIONS.actionReset, mutation: "sync"
+    });
+    expect(api.reset("other")).to.eql({ type: ACTIONS.actionReset });
+  });
+
   it("check fail fetch", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {
       transformer,

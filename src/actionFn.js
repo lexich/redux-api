@@ -157,10 +157,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   /**
    * Reset store to initial state
    */
-  fn.reset = ()=> {
+  fn.reset = (mutation)=> {
     const defer = requestHolder.pop();
     defer && defer.reject(new Error("Application abort request"));
-    return { type: actionReset };
+    return mutation === "sync" ? { type: actionReset, mutation } : { type: actionReset };
   };
 
   /**

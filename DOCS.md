@@ -445,9 +445,10 @@ function onEnter(state, replaceState, callback) {
 
 ```
 
-#### reset()
+#### reset(mutation)
 - @description: Reset state of current reducer and application's abort request if it processed.
 - @type: Function
+- @param mutation: if `mutation` equal `sync`, it reset only `sync` flag in store.
 - @example:
 ```js
 import {actions} from "./rest";

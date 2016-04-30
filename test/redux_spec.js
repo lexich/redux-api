@@ -186,4 +186,33 @@ describe("redux", ()=> {
       });
     });
   });
+  it("check reset 'sync'", ()=> {
+    const rest = reduxApi({
+      test: "/api/url",
+    }).use("fetch", (url)=> {
+      return new Promise((resolve)=> resolve(url));
+    });
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+    return new Promise((resolve)=> {
+      store.dispatch(rest.actions.test(resolve));
+    }).then(()=> {
+      expect(store.getState().test).to.eql({
+        sync: true,
+        syncing: false,
+        loading: false,
+        data: { data: "/api/url" },
+        error: null
+      });
+      store.dispatch(rest.actions.test.reset("sync"));
+      expect(store.getState().test).to.eql({
+        sync: false,
+        syncing: false,
+        loading: false,
+        data: { data: "/api/url" },
+        error: null
+      });
+    });
+  });
 });

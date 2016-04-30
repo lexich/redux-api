@@ -1,5 +1,5 @@
 "use strict";
-
+/* eslint no-case-declarations: 0 */
 /**
  * Reducer contructor
  * @param  {Object}   initialState default initial state
@@ -36,7 +36,10 @@ export default function reducerFn(initialState, actions={}, reducer) {
           syncing: false
         };
       case actionReset:
-        return { ...initialState };
+        const { mutation } = action;
+        return (mutation === "sync") ?
+          { ...state, sync: false } :
+          { ...initialState };
       default:
         return reducer ? reducer(state, action) : state;
     }
