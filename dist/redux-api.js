@@ -2302,7 +2302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  return PubSub;
 	}();
-
+	
 	exports.default = PubSub;
 	module.exports = exports['default'];
 
@@ -2484,41 +2484,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	        actions: meta.actions,
 	        prefetch: meta.prefetch
 	      };
-	
-	      (0, _fetchResolver2.default)(0, fetchResolverOpts, function (err) {
-	        if (err) {
-	          return pubsub.reject(err);
-	        }
-	        new Promise(function (resolve, reject) {
-	          requestHolder.set({
-	            resolve: resolve, reject: reject,
-	            promise: request(pathvars, params, getState).then(resolve, reject)
-	          });
-	        }).then(function (d) {
-	          requestHolder.pop();
-	          var gState = getState();
-	          var prevData = gState && gState[name] && gState[name].data;
-	          var data = meta.transformer(d, prevData, {
-	            type: actionSuccess, request: requestOptions
-	          });
-	          dispatch({ type: actionSuccess, syncing: false, data: data, request: requestOptions });
-	          if (meta.broadcast) {
-	            for (var key in meta.broadcast) {
-	              dispatch({ type: meta.broadcast[key], data: data, request: requestOptions });
-	            }
+	      return new Promise(function (done, fail) {
+	        (0, _fetchResolver2.default)(0, fetchResolverOpts, function (err) {
+	          if (err) {
+	            pubsub.reject(err);
+	            return fail(err);
 	          }
-	          if (meta.postfetch) {
-	            for (var _key3 in meta.postfetch) {
-	              var postfetch = meta.postfetch[_key3];
-	              postfetch instanceof Function && postfetch({
-	                data: data, getState: getState, dispatch: dispatch, actions: meta.actions, request: requestOptions
+	          new Promise(function (resolve, reject) {
+	            requestHolder.set({
+	              resolve: resolve, reject: reject,
+	              promise: request(pathvars, params, getState).then(resolve, reject)
+	            });
+	          }).then(function (d) {
+	            requestHolder.pop();
+	            var gState = getState();
+	            var prevData = gState && gState[name] && gState[name].data;
+	            var data = meta.transformer(d, prevData, {
+	              type: actionSuccess, request: requestOptions
+	            });
+	            dispatch({ type: actionSuccess, syncing: false, data: data, request: requestOptions });
+	            if (meta.broadcast) {
+	              meta.broadcast.forEach(function (type) {
+	                dispatch({ type: type, data: data, request: requestOptions });
 	              });
 	            }
-	          }
-	          pubsub.resolve(data);
-	        }, function (error) {
-	          dispatch({ type: actionFail, syncing: false, error: error, request: requestOptions });
-	          pubsub.reject(error);
+	            if (meta.postfetch) {
+	              meta.postfetch.forEach(function (postfetch) {
+	                postfetch instanceof Function && postfetch({
+	                  data: data, getState: getState, dispatch: dispatch, actions: meta.actions, request: requestOptions
+	                });
+	              });
+	            }
+	            pubsub.resolve(data);
+	            done(data);
+	          }, function (error) {
+	            dispatch({ type: actionFail, syncing: false, error: error, request: requestOptions });
+	            pubsub.reject(error);
+	            fail(error);
+	          });
 	        });
 	      });
 	    };
@@ -2532,10 +2535,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * Reset store to initial state
 	   */
-	  fn.reset = function () {
+	  fn.reset = function (mutation) {
 	    var defer = requestHolder.pop();
 	    defer && defer.reject(new Error("Application abort request"));
-	    return { type: actionReset };
+	    return mutation === "sync" ? { type: actionReset, mutation: mutation } : { type: actionReset };
 	  };
 	
 	  /**
@@ -2546,8 +2549,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param  {Function} callback) callback execute after end request
 	   */
 	  fn.sync = function () {
-	    for (var _len3 = arguments.length, args = Array(_len3), _key4 = 0; _key4 < _len3; _key4++) {
-	      args[_key4] = arguments[_key4];
+	    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	      args[_key3] = arguments[_key3];
 	    }
 	
 	    var _extractArgs5 = extractArgs(args);
@@ -2586,8 +2589,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var call = _ref.call;
 	
 	    memo[helpername] = function () {
-	      for (var _len4 = arguments.length, args = Array(_len4), _key5 = 0; _key5 < _len4; _key5++) {
-	        args[_key5] = arguments[_key5];
+	      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	        args[_key4] = arguments[_key4];
 	      }
 	
 	      return function (dispatch, getState) {
@@ -2751,7 +2754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
-	
+	/* eslint no-case-declarations: 0 */
 	/**
 	 * Reducer contructor
 	 * @param  {Object}   initialState default initial state
@@ -2802,7 +2805,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          syncing: false
 	        });
 	      case actionReset:
-	        return _extends({}, initialState);
+	        var mutation = action.mutation;
+	
+	        return mutation === "sync" ? _extends({}, state, { sync: false }) : _extends({}, initialState);
 	      default:
 	        return reducer ? reducer(state, action) : state;
 	    }
