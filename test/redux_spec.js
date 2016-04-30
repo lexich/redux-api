@@ -215,4 +215,19 @@ describe("redux", ()=> {
       });
     });
   });
+  it("check result of dispatch", function() {
+    const rest = reduxApi({
+      test: "/api/url",
+    }).use("fetch", (url)=> {
+      return new Promise((resolve)=> resolve(url));
+    });
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+    const result = store.dispatch(rest.actions.test());
+    expect(result instanceof Promise).to.be.true;
+    return result.then((data)=> {
+      expect(data).to.eql({ data: "/api/url" });
+    });
+  });
 });

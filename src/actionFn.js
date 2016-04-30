@@ -109,40 +109,44 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         actions: meta.actions,
         prefetch: meta.prefetch
       };
-
-      fetchResolver(0, fetchResolverOpts, (err)=> {
-        if (err) {
-          return pubsub.reject(err);
-        }
-        new Promise((resolve, reject)=> {
-          requestHolder.set({
-            resolve, reject,
-            promise: request(pathvars, params, getState).then(resolve, reject)
-          });
-        }).then((d)=> {
-          requestHolder.pop();
-          const gState = getState();
-          const prevData = gState && gState[name] && gState[name].data;
-          const data = meta.transformer(d, prevData, {
-            type: actionSuccess, request: requestOptions
-          });
-          dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
-          if (meta.broadcast) {
-            meta.broadcast.forEach((type)=> {
-              dispatch({ type, data, request: requestOptions });
-            });
+      return new Promise((done, fail)=> {
+        fetchResolver(0, fetchResolverOpts, (err)=> {
+          if (err) {
+            pubsub.reject(err);
+            return fail(err);
           }
-          if (meta.postfetch) {
-            meta.postfetch.forEach((postfetch)=> {
-              (postfetch instanceof Function) && postfetch({
-                data, getState, dispatch, actions: meta.actions, request: requestOptions
+          new Promise((resolve, reject)=> {
+            requestHolder.set({
+              resolve, reject,
+              promise: request(pathvars, params, getState).then(resolve, reject)
+            });
+          }).then((d)=> {
+            requestHolder.pop();
+            const gState = getState();
+            const prevData = gState && gState[name] && gState[name].data;
+            const data = meta.transformer(d, prevData, {
+              type: actionSuccess, request: requestOptions
+            });
+            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
+            if (meta.broadcast) {
+              meta.broadcast.forEach((type)=> {
+                dispatch({ type, data, request: requestOptions });
               });
-            });
-          }
-          pubsub.resolve(data);
-        }, (error)=> {
-          dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
-          pubsub.reject(error);
+            }
+            if (meta.postfetch) {
+              meta.postfetch.forEach((postfetch)=> {
+                (postfetch instanceof Function) && postfetch({
+                  data, getState, dispatch, actions: meta.actions, request: requestOptions
+                });
+              });
+            }
+            pubsub.resolve(data);
+            done(data);
+          }, (error)=> {
+            dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
+            pubsub.reject(error);
+            fail(error);
+          });
         });
       });
     };
