@@ -128,17 +128,16 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           });
           dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
           if (meta.broadcast) {
-            for (const key in meta.broadcast) {
-              dispatch({ type: meta.broadcast[key], data, request: requestOptions });
-            }
+            meta.broadcast.forEach((type)=> {
+              dispatch({ type, data, request: requestOptions });
+            });
           }
           if (meta.postfetch) {
-            for (const key in meta.postfetch) {
-              const postfetch = meta.postfetch[key];
+            meta.postfetch.forEach((postfetch)=> {
               (postfetch instanceof Function) && postfetch({
                 data, getState, dispatch, actions: meta.actions, request: requestOptions
               });
-            }
+            });
           }
           pubsub.resolve(data);
         }, (error)=> {
