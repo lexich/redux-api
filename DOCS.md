@@ -370,6 +370,20 @@ const rest = reduxApi({...});
 rest.use("rootUrl", "http://localhost:3000");
 ```
 
+####options
+- @description - Apply add options for each rest call.
+- @example
+```js
+const rest = reduxApi({...});
+rest.use("options", function() {
+  const headers = {
+    'User-Agent': 'foodsoft-shop', // @todo add version
+    'Accept': 'application/json'
+  };
+  return { headers: headers };
+});
+```
+
 ####init(adapter, isServer, rootUrl)
 - @deprecated
 - @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
