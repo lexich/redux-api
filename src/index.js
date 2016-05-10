@@ -114,6 +114,7 @@ export default function reduxApi(config) {
       holder: fetchHolder,
       broadcast,
       virtual: !!opts.virtual,
+      reducerName,
       actions: memo.actions,
       prefetch, postfetch, validation,
       helpers, transformer, crud

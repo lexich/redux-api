@@ -123,7 +123,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           }).then((d)=> {
             requestHolder.pop();
             const gState = getState();
-            const prevData = gState && gState[name] && gState[name].data;
+            const { reducerName } = meta;
+            const prevData = gState && gState[reducerName] && gState[reducerName].data;
             const data = meta.transformer(d, prevData, {
               type: actionSuccess, request: requestOptions
             });

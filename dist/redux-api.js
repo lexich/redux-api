@@ -211,6 +211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      holder: fetchHolder,
 	      broadcast: broadcast,
 	      virtual: !!opts.virtual,
+	      reducerName: reducerName,
 	      actions: memo.actions,
 	      prefetch: prefetch, postfetch: postfetch, validation: validation,
 	      helpers: helpers, transformer: transformer, crud: crud
@@ -2498,7 +2499,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }).then(function (d) {
 	            requestHolder.pop();
 	            var gState = getState();
-	            var prevData = gState && gState[name] && gState[name].data;
+	            var reducerName = meta.reducerName;
+	
+	            var prevData = gState && gState[reducerName] && gState[reducerName].data;
 	            var data = meta.transformer(d, prevData, {
 	              type: actionSuccess, request: requestOptions
 	            });

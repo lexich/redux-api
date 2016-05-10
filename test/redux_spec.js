@@ -230,4 +230,42 @@ describe("redux", ()=> {
       expect(data).to.eql({ data: "/api/url" });
     });
   });
+  it("check all arguments for transformer", function() {
+    const expectedArgs = [
+      [(void 0), (void 0), (void 0)],
+      ["/api/test1", (void 0), {
+        type: "@@redux-api@test1_success",
+        request: { pathvars: (void 0), params: (void 0)
+      } }],
+      ["/api/test2", "/api/test1", {
+        type: "@@redux-api@test1_success",
+        request: { pathvars: (void 0), params: (void 0)
+      } }],
+      "none"
+    ];
+    const rest = reduxApi({
+      test1: {
+        url: "/api/test1",
+        transformer(data, prevData, opts) {
+          expect([data, prevData, opts]).to.eql(expectedArgs.shift());
+          return data;
+        }
+      },
+      test2: {
+        url: "/api/test2",
+        reducerName: "test1",
+        transformer(data, prevData, opts) {
+          expect([data, prevData, opts]).to.eql(expectedArgs.shift());
+          return data;
+        }
+      }
+    }).use("fetch", (url)=> new Promise((resolve)=> resolve(url)));
+
+    const reducer = combineReducers(rest.reducers);
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+    return store.dispatch(rest.actions.test1())
+      .then(()=> store.dispatch(rest.actions.test2()))
+      .then(()=> expect(expectedArgs).to.eql(["none"]));
+  });
 });

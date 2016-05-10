@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -41,8 +41,9 @@
     "coveralls": "2.11.9",
     "eslint": "2.9.0",
     "eslint-config-airbnb": "8.0.0",
+    "eslint-plugin-import": "1.7.0",
+    "eslint-plugin-jsx-a11y": "1.0.2",
     "eslint-plugin-react": "5.0.1",
-    "eslint-plugin-jsx-a11y": "^1.0.2",
     "husky": "0.11.4",
     "isparta": "4.0.0",
     "lodash": "4.11.1",
