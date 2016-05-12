@@ -30,7 +30,7 @@ function extractArgs(args) {
 function helperCrudFunction(name) {
   return (...args)=> {
     const [pathvars, params, cb] = extractArgs(args);
-    return [pathvars, { ...params, method: name }, cb];
+    return [pathvars, { ...params, method: name.toUpperCase() }, cb];
   };
 }
 

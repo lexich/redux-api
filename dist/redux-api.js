@@ -2390,7 +2390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var params = _extractArgs2[1];
 	    var cb = _extractArgs2[2];
 	
-	    return [pathvars, _extends({}, params, { method: name }), cb];
+	    return [pathvars, _extends({}, params, { method: name.toUpperCase() }), cb];
 	  };
 	}
 	

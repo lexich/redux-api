@@ -557,87 +557,87 @@ describe("actionFn", function() {
       syncing: false,
       request: {
         pathvars: { id: 1 },
-        params: { method: "get" }
+        params: { method: "GET" }
       }
     }, {
       type: "actionFetch",
       syncing: false,
       request: {
         pathvars: { id: 2 },
-        params: { body: "Hello", method: "post" }
+        params: { body: "Hello", method: "POST" }
       }
     }, {
       type: "actionFetch",
       syncing: false,
       request: {
         pathvars: { id: 3 },
-        params: { body: "World", method: "put" }
+        params: { body: "World", method: "PUT" }
       }
     }, {
       type: "actionFetch",
       syncing: false,
       request: {
         pathvars: { id: 4 },
-        params: { method: "delete" }
+        params: { method: "DELETE" }
       }
     }, {
       type: "actionFetch",
       syncing: false,
       request: {
         pathvars: { id: 5 },
-        params: { body: "World", method: "patch" }
+        params: { body: "World", method: "PATCH" }
       }
     }, {
       type: "actionSuccess",
       syncing: false,
-      data: { url: "/test/1", opts: { method: "get" } },
+      data: { url: "/test/1", opts: { method: "GET" } },
       request: {
         pathvars: { id: 1 },
-        params: { method: "get" }
+        params: { method: "GET" }
       }
     }, {
       type: "actionSuccess",
       syncing: false,
       data: {
         url: "/test/2",
-        opts: { body: "Hello", method: "post" }
+        opts: { body: "Hello", method: "POST" }
       },
       request: {
         pathvars: { id: 2 },
-        params: { body: "Hello", method: "post" }
+        params: { body: "Hello", method: "POST" }
       }
     }, {
       type: "actionSuccess",
       syncing: false,
       data: {
         url: "/test/3",
-        opts: { body: "World", method: "put" }
+        opts: { body: "World", method: "PUT" }
       },
       request: {
         pathvars: { id: 3 },
-        params: { body: "World", method: "put" }
+        params: { body: "World", method: "PUT" }
       }
     }, {
       type: "actionSuccess",
       syncing: false,
       data: {
         url: "/test/4",
-        opts: { method: "delete" }
+        opts: { method: "DELETE" }
       },
       request: {
         pathvars: { id: 4 },
-        params: { method: "delete" }
+        params: { method: "DELETE" }
       }
     }, {
       type: "actionSuccess",
       syncing: false,
       data: {
         url: "/test/5",
-        opts: { body: "World", method: "patch" }
+        opts: { body: "World", method: "PATCH" }
       },
       request: {
         pathvars: { id: 5 },
-        params: { body: "World", method: "patch" }
+        params: { body: "World", method: "PATCH" }
       }
     }];
 
