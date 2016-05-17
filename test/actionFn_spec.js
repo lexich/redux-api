@@ -4,7 +4,6 @@
 import { expect } from "chai";
 import actionFn from "../src/actionFn";
 import isFunction from "lodash/isFunction";
-import after from "lodash/after";
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
@@ -66,6 +65,7 @@ describe("actionFn", function() {
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }];
@@ -118,6 +118,7 @@ describe("actionFn", function() {
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }];
@@ -174,39 +175,6 @@ describe("actionFn", function() {
     });
   });
 
-  it("check double request", function(_done) {
-    const api = actionFn("/test/:id", "test", null, ACTIONS, {
-      transformer,
-      fetch: fetchSuccess
-    });
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: { id: 1 }, params: {} }
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: { id: 1 }, params: {} }
-    }];
-    let modify = 0;
-    let loading = false;
-    function dispatch(msg) {
-      modify++;
-      expect(expectedEvent).to.have.length.above(0);
-      const exp = expectedEvent.shift();
-      expect(msg).to.eql(exp);
-    }
-    function getState() {
-      loading = !loading;
-      return { test: { loading, data: {} } };
-    }
-    const done = after(2, _done);
-    api({ id: 1 }, done)(dispatch, getState);
-    expect(modify).to.eql(0);
-    api({ id: 1 }, done)(dispatch, getState);
-  });
-
   it("check options param", function() {
     let callOptions = 0;
     let checkOptions = null;
@@ -254,6 +222,7 @@ describe("actionFn", function() {
         type: "actionSuccess",
         syncing: false,
         data: { msg: "hello" },
+        origData: { msg: "hello" },
         request: { pathvars: undefined, params: {} }
       }
     ];
@@ -277,11 +246,13 @@ describe("actionFn", function() {
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }, {
       type: BROADCAST_ACTION,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       request: { pathvars: undefined, params: {} }
     }];
     const meta = {
@@ -339,6 +310,7 @@ describe("actionFn", function() {
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }];
@@ -415,6 +387,7 @@ describe("actionFn", function() {
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }, {
@@ -464,6 +437,7 @@ describe("actionFn", function() {
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }];
@@ -521,6 +495,7 @@ describe("actionFn", function() {
       type: ACTIONS.actionSuccess,
       syncing: false,
       data: { url: "/test/1", opts: { async: true } },
+      origData: { url: "/test/1", opts: { async: true } },
       request: { pathvars: { id: 1 }, params: { async: true } }
     }];
     const wait1 = new Promise((resolve)=> {
@@ -591,6 +566,7 @@ describe("actionFn", function() {
       type: "actionSuccess",
       syncing: false,
       data: { url: "/test/1", opts: { method: "GET" } },
+      origData: { url: "/test/1", opts: { method: "GET" } },
       request: {
         pathvars: { id: 1 },
         params: { method: "GET" }
@@ -599,6 +575,10 @@ describe("actionFn", function() {
       type: "actionSuccess",
       syncing: false,
       data: {
+        url: "/test/2",
+        opts: { body: "Hello", method: "POST" }
+      },
+      origData: {
         url: "/test/2",
         opts: { body: "Hello", method: "POST" }
       },
@@ -613,6 +593,10 @@ describe("actionFn", function() {
         url: "/test/3",
         opts: { body: "World", method: "PUT" }
       },
+      origData: {
+        url: "/test/3",
+        opts: { body: "World", method: "PUT" }
+      },
       request: {
         pathvars: { id: 3 },
         params: { body: "World", method: "PUT" }
@@ -624,6 +608,10 @@ describe("actionFn", function() {
         url: "/test/4",
         opts: { method: "DELETE" }
       },
+      origData: {
+        url: "/test/4",
+        opts: { method: "DELETE" }
+      },
       request: {
         pathvars: { id: 4 },
         params: { method: "DELETE" }
@@ -632,6 +620,10 @@ describe("actionFn", function() {
       type: "actionSuccess",
       syncing: false,
       data: {
+        url: "/test/5",
+        opts: { body: "World", method: "PATCH" }
+      },
+      origData: {
         url: "/test/5",
         opts: { body: "World", method: "PATCH" }
       },
@@ -703,6 +695,7 @@ describe("actionFn", function() {
       type: "actionSuccess",
       syncing: false,
       data: { url: "/test/overwrite", opts: {} },
+      origData: { url: "/test/overwrite", opts: {} },
       request: { pathvars: { id: "overwrite" }, params: {} }
     }];
 

@@ -97,12 +97,14 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     params && delete params.syncing;
     pubsub.push(callback);
     return (dispatch, getState)=> {
+      const { reducerName } = meta;
       const state = getState();
-      const store = state[name];
+      const store = state[reducerName];
       const requestOptions = { pathvars, params };
       if (store && store.loading) {
         return;
       }
+      const prevData = state && state[reducerName] && state[reducerName].data;
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch, getState,
@@ -122,16 +124,18 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             });
           }).then((d)=> {
             requestHolder.pop();
-            const gState = getState();
-            const { reducerName } = meta;
-            const prevData = gState && gState[reducerName] && gState[reducerName].data;
             const data = meta.transformer(d, prevData, {
               type: actionSuccess, request: requestOptions
             });
-            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
+            dispatch({
+              data, origData: d,
+              type: actionSuccess,
+              syncing: false,
+              request: requestOptions
+            });
             if (meta.broadcast) {
               meta.broadcast.forEach((type)=> {
-                dispatch({ type, data, request: requestOptions });
+                dispatch({ type, data, origData: d, request: requestOptions });
               });
             }
             if (meta.postfetch) {
