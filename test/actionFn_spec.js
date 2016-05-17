@@ -475,6 +475,17 @@ describe("actionFn", function() {
       })
     ).to.throw(Error, "Helper name: \"sync\" for endpoint \"test\" has been already reserved");
   });
+  it("check that helpers returns Promise", function() {
+    const api = actionFn("/test/:id", "test", null, ACTIONS, {
+      transformer,
+      fetch: fetchSuccess,
+      helpers: {
+        test: ()=> (cb)=> cb(null, [{ id: 1 }, { async: true }])
+      }
+    });
+    const result = api.test()(()=> {}, getState);
+    expect(result).to.be.an.instanceof(Promise);
+  });
   it("check helpers with async functionality", function() {
     const meta = {
       transformer,

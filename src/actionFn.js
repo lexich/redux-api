@@ -206,26 +206,31 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const { sync, call } = (func instanceof Function) ? { call: func } : func;
     memo[helpername] = (...args)=> (dispatch, getState)=> {
       const index = args.length - 1;
-      const callback = (args[index] instanceof Function) ? args[index] : none;
+      const callbackFn = (args[index] instanceof Function) ? args[index] : none;
       const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
-
-      // If helper alias using async functionality
-      if (helpersResult instanceof Function) {
-        helpersResult((error, newArgs=[])=> {
-          if (error) {
-            callback(error);
-          } else {
-            fastApply(
-              sync ? fn.sync : fn, null, newArgs.concat(callback)
-            )(dispatch, getState);
-          }
-        });
-      } else {
-        // if helper alias is synchronous
-        fastApply(
-          sync ? fn.sync : fn, null, helpersResult.concat(callback)
-        )(dispatch, getState);
-      }
+      return new Promise((resolve, reject)=> {
+        const callback = (err, data)=> {
+          err ? reject(err) : resolve(data);
+          callbackFn(err, data);
+        };
+        // If helper alias using async functionality
+        if (helpersResult instanceof Function) {
+          helpersResult((error, newArgs=[])=> {
+            if (error) {
+              callback(error);
+            } else {
+              fastApply(
+                sync ? fn.sync : fn, null, newArgs.concat(callback)
+              )(dispatch, getState);
+            }
+          });
+        } else {
+          // if helper alias is synchronous
+          fastApply(
+            sync ? fn.sync : fn, null, helpersResult.concat(callback)
+          )(dispatch, getState);
+        }
+      });
     };
     return memo;
   };
