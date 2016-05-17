@@ -97,12 +97,14 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     params && delete params.syncing;
     pubsub.push(callback);
     return (dispatch, getState)=> {
+      const { reducerName } = meta;
       const state = getState();
-      const store = state[name];
+      const store = state[reducerName];
       const requestOptions = { pathvars, params };
       if (store && store.loading) {
         return;
       }
+      const prevData = state && state[reducerName] && state[reducerName].data;
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch, getState,
@@ -122,16 +124,18 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             });
           }).then((d)=> {
             requestHolder.pop();
-            const gState = getState();
-            const { reducerName } = meta;
-            const prevData = gState && gState[reducerName] && gState[reducerName].data;
             const data = meta.transformer(d, prevData, {
               type: actionSuccess, request: requestOptions
             });
-            dispatch({ type: actionSuccess, syncing: false, data, request: requestOptions });
+            dispatch({
+              data, origData: d,
+              type: actionSuccess,
+              syncing: false,
+              request: requestOptions
+            });
             if (meta.broadcast) {
               meta.broadcast.forEach((type)=> {
-                dispatch({ type, data, request: requestOptions });
+                dispatch({ type, data, origData: d, request: requestOptions });
               });
             }
             if (meta.postfetch) {
@@ -202,26 +206,31 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const { sync, call } = (func instanceof Function) ? { call: func } : func;
     memo[helpername] = (...args)=> (dispatch, getState)=> {
       const index = args.length - 1;
-      const callback = (args[index] instanceof Function) ? args[index] : none;
+      const callbackFn = (args[index] instanceof Function) ? args[index] : none;
       const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
-
-      // If helper alias using async functionality
-      if (helpersResult instanceof Function) {
-        helpersResult((error, newArgs=[])=> {
-          if (error) {
-            callback(error);
-          } else {
-            fastApply(
-              sync ? fn.sync : fn, null, newArgs.concat(callback)
-            )(dispatch, getState);
-          }
-        });
-      } else {
-        // if helper alias is synchronous
-        fastApply(
-          sync ? fn.sync : fn, null, helpersResult.concat(callback)
-        )(dispatch, getState);
-      }
+      return new Promise((resolve, reject)=> {
+        const callback = (err, data)=> {
+          err ? reject(err) : resolve(data);
+          callbackFn(err, data);
+        };
+        // If helper alias using async functionality
+        if (helpersResult instanceof Function) {
+          helpersResult((error, newArgs=[])=> {
+            if (error) {
+              callback(error);
+            } else {
+              fastApply(
+                sync ? fn.sync : fn, null, newArgs.concat(callback)
+              )(dispatch, getState);
+            }
+          });
+        } else {
+          // if helper alias is synchronous
+          fastApply(
+            sync ? fn.sync : fn, null, helpersResult.concat(callback)
+          )(dispatch, getState);
+        }
+      });
     };
     return memo;
   };

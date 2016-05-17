@@ -112,6 +112,7 @@ describe("index", function() {
       }, {
         type: "@@redux-api@test_success",
         data: { msg: "hello" },
+        origData: { msg: "hello" },
         syncing: false,
         request: { pathvars: undefined, params: {} }
       }
@@ -160,6 +161,7 @@ describe("index", function() {
     }, {
       type: "@@redux-api@test_success",
       data: { msg: "hello" },
+      origData: { msg: "hello" },
       syncing: false,
       request: { pathvars: { id: 1 }, params: {} }
     }];

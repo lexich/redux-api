@@ -2473,12 +2473,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    params && delete params.syncing;
 	    pubsub.push(callback);
 	    return function (dispatch, getState) {
+	      var reducerName = meta.reducerName;
+	
 	      var state = getState();
-	      var store = state[name];
+	      var store = state[reducerName];
 	      var requestOptions = { pathvars: pathvars, params: params };
 	      if (store && store.loading) {
 	        return;
 	      }
+	      var prevData = state && state[reducerName] && state[reducerName].data;
 	      dispatch({ type: actionFetch, syncing: syncing, request: requestOptions });
 	      var fetchResolverOpts = {
 	        dispatch: dispatch, getState: getState,
@@ -2498,17 +2501,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	          }).then(function (d) {
 	            requestHolder.pop();
-	            var gState = getState();
-	            var reducerName = meta.reducerName;
-	
-	            var prevData = gState && gState[reducerName] && gState[reducerName].data;
 	            var data = meta.transformer(d, prevData, {
 	              type: actionSuccess, request: requestOptions
 	            });
-	            dispatch({ type: actionSuccess, syncing: false, data: data, request: requestOptions });
+	            dispatch({
+	              data: data, origData: d,
+	              type: actionSuccess,
+	              syncing: false,
+	              request: requestOptions
+	            });
 	            if (meta.broadcast) {
 	              meta.broadcast.forEach(function (type) {
-	                dispatch({ type: type, data: data, request: requestOptions });
+	                dispatch({ type: type, data: data, origData: d, request: requestOptions });
 	              });
 	            }
 	            if (meta.postfetch) {
@@ -2598,24 +2602,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      return function (dispatch, getState) {
 	        var index = args.length - 1;
-	        var callback = args[index] instanceof Function ? args[index] : none;
+	        var callbackFn = args[index] instanceof Function ? args[index] : none;
 	        var helpersResult = (0, _fastApply2.default)(call, { getState: getState, dispatch: dispatch, actions: meta.actions }, args);
+	        return new Promise(function (resolve, reject) {
+	          var callback = function callback(err, data) {
+	            err ? reject(err) : resolve(data);
+	            callbackFn(err, data);
+	          };
+	          // If helper alias using async functionality
+	          if (helpersResult instanceof Function) {
+	            helpersResult(function (error) {
+	              var newArgs = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
 	
-	        // If helper alias using async functionality
-	        if (helpersResult instanceof Function) {
-	          helpersResult(function (error) {
-	            var newArgs = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-	
-	            if (error) {
-	              callback(error);
-	            } else {
-	              (0, _fastApply2.default)(sync ? fn.sync : fn, null, newArgs.concat(callback))(dispatch, getState);
-	            }
-	          });
-	        } else {
-	          // if helper alias is synchronous
-	          (0, _fastApply2.default)(sync ? fn.sync : fn, null, helpersResult.concat(callback))(dispatch, getState);
-	        }
+	              if (error) {
+	                callback(error);
+	              } else {
+	                (0, _fastApply2.default)(sync ? fn.sync : fn, null, newArgs.concat(callback))(dispatch, getState);
+	              }
+	            });
+	          } else {
+	            // if helper alias is synchronous
+	            (0, _fastApply2.default)(sync ? fn.sync : fn, null, helpersResult.concat(callback))(dispatch, getState);
+	          }
+	        });
 	      };
 	    };
 	    return memo;

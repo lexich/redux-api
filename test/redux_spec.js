@@ -69,13 +69,37 @@ describe("redux", ()=> {
       setTimeout(()=> resolve({ url }), 100);
     }));
 
-    const reducer = combineReducers(rest.reducers);
+    const expectedAction = [
+      {
+        type: "@@redux-api@test",
+        syncing: true,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        data: { url: "/test" },
+        origData: { url: "/test" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
+    const reducer = combineReducers({
+      ...rest.reducers,
+      debug(state={}, action) {
+        if (!/^@@redux\//.test(action.type)) {
+          const exp = expectedAction.shift();
+          expect(action).to.eql(exp);
+        }
+        return state;
+      }
+    });
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
     const store = createStoreWithMiddleware(reducer);
 
     const next = after(2, function() {
       store.dispatch(rest.actions.test.sync((err, data)=> {
         expect(data).to.eql({ url: "/test" });
+        expect(expectedAction).to.have.length(0);
         done();
       }));
     });
@@ -186,7 +210,7 @@ describe("redux", ()=> {
       });
     });
   });
-  it("check reset 'sync'", ()=> {
+  it("check reset \"sync\"", ()=> {
     const rest = reduxApi({
       test: "/api/url",
     }).use("fetch", (url)=> {
