@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <title>React Isomorphic Server Side Rendering Example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link href="/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="react-main-mount"><%- html %></div>
+    <script>window.$REDUX_STATE = <%- json %></script>
+    <script src="/main.js"></script>
+  </body>
+</html>
