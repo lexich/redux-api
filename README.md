@@ -68,7 +68,7 @@ export default reduxApi({
     transformer: transformers.array,
     // base endpoint options `fetch(url, options)`
     options: {
-      header: {
+      headers: {
         "Accept": "application/json"
       }
     }
