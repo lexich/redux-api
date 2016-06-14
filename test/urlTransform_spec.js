@@ -41,4 +41,13 @@ describe("urlTransform", function() {
     expect(urlTransform("/test/:id/")).to.eql("/test//");
     expect(urlTransform("/test/(:id)")).to.eql("/test/");
   });
+
+  it("accepts qsParseOptions", function() {
+    expect(urlTransform("/test?id=1&id=2", { id: [1, 2] }, { qsParseOptions: { arrayFormat: "repeat" } })).to.eql("/test?id%5B0%5D=1&id%5B1%5D=2");
+  });
+
+  it("accepts qsStringifyOptions", function() {
+    expect(urlTransform("/test", { id: [1, 2] })).to.eql("/test?id%5B0%5D=1&id%5B1%5D=2");
+    expect(urlTransform("/test", { id: [1, 2] }, { qsStringifyOptions: { arrayFormat: "repeat" } })).to.eql("/test?id=1&id=2");
+  });
 });

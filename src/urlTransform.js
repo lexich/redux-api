@@ -7,13 +7,18 @@ const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 
 /**
  * Url modification
- * @param  {String} url    url template
- * @param  {Object} params params for url template
- * @return {String}        result url
+ * @param  {String} url     url template
+ * @param  {Object} params  params for url template
+ * @param  {Object} options transformation options,
+ *                          accepts +qsStringifyOptions+ and +qsParseOptions+
+ * @return {String}         result url
  */
-export default function urlTransform(url, params) {
+export default function urlTransform(url, params, options) {
   if (!url) { return ""; }
   params || (params = {});
+  options || (options = {});
+  const qsParseOptions = options.qsParseOptions || {};
+  const qsStringifyOptions = options.qsStringifyOptions || {};
   const usedKeys = {};
 
   const urlWithParams = Object.keys(params).reduce((url, key)=> {
@@ -35,10 +40,10 @@ export default function urlTransform(url, params) {
   if (usedKeysArray.length !== Object.keys(params).length) {
     const urlObject = cleanURL.split("?");
     const mergeParams = {
-      ...(urlObject[1] && qs.parse(urlObject[1])),
+      ...(urlObject[1] && qs.parse(urlObject[1], qsParseOptions)),
       ...omit(params, usedKeysArray)
     };
-    return `${urlObject[0]}?${qs.stringify(mergeParams)}`;
+    return `${urlObject[0]}?${qs.stringify(mergeParams, qsStringifyOptions)}`;
   }
   return cleanURL;
 }

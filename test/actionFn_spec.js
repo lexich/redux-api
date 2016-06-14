@@ -739,4 +739,21 @@ describe("actionFn", function() {
       });
     });
   });
+
+  it("check qsStringifyOptions option", function() {
+    let urlFetch;
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
+      fetch: (url)=> {
+        urlFetch = url;
+        return fetchSuccess();
+      }
+    });
+    const opts = { qsStringifyOptions: { arrayFormat: "repeat" } };
+    const async = api.request({ id: [1, 2] }, opts);
+    expect(async).to.be.an.instanceof(Promise);
+    return async.then(()=> {
+      expect(urlFetch).to.eql("/test?id=1&id=2");
+    });
+  });
 });
