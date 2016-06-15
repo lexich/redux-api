@@ -25,6 +25,17 @@ with bower
 bower install redux-api --save
 ```
 
+If you don't use tools like webpack, browserify, etc and loading redux-api manually - the best way add redux api to you project is:
+```js
+<script src="(...)/redux-api.min.js"></script>
+<script>
+  window.ReduxApi = window["redux-api"]; 
+  // or
+  var ReduxApi = window["redux-api"];
+  // initialization code
+</script>
+```
+
 =======
 ## Remote calls
 
