@@ -12,7 +12,9 @@ Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is intended to
 
 =======
 ## Documentation
-See [DOCS.md](DOCS.md) for API documentation.
+See [DOCS.md](docs/DOCS.md) for API documentation.
+## Use cases
+[AuthorizationJWT.md](docs/AuthorizationJWT.md) - example of JWT Authorization
 
 =======
 ## Install
@@ -29,7 +31,7 @@ If you don't use tools like webpack, browserify, etc and loading redux-api manua
 ```js
 <script src="(...)/redux-api.min.js"></script>
 <script>
-  window.ReduxApi = window["redux-api"]; 
+  window.ReduxApi = window["redux-api"];
   // or
   var ReduxApi = window["redux-api"];
   // initialization code
