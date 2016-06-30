@@ -329,12 +329,12 @@ rest.actions.test.async();
 }
 
 //using
-rest.action.test.get({ id: 1})
-rest.action.test.post({ id: 1}, { body: "data" }, (err, data)=> {
+rest.actions.test.get({ id: 1})
+rest.actions.test.post({ id: 1}, { body: "data" }, (err, data)=> {
   //code
 });
-rest.action.test.put({ id: 1}, { body: "data" })
-rest.action.test.delete({ id: 1 });
+rest.actions.test.put({ id: 1}, { body: "data" })
+rest.actions.test.delete({ id: 1 });
 ```
 
 ### reduxApi object
