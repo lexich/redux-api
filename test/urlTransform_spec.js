@@ -43,16 +43,19 @@ describe("urlTransform", function() {
   });
 
   it("accepts url transform options", function() {
-    expect(urlTransform("/test", { id: [1, 2] }, { arrayFormat: "repeat", delimiter: ";" })).to.eql("/test?id=1;id=2");
-    expect(urlTransform("/test?id=1;id=2", null, { arrayFormat: "repeat", delimiter: ";" })).to.eql("/test?id=1;id=2");
+    const urlOptions = { arrayFormat: "repeat", delimiter: ";" };
+    expect(urlTransform("/test", { id: [1, 2] }, urlOptions)).to.eql("/test?id=1;id=2");
+    expect(urlTransform("/test?id=1;id=2", null, urlOptions)).to.eql("/test?id=1;id=2");
   });
 
   it("accepts qsParseOptions", function() {
-    expect(urlTransform("/test?id=1&id=2", { id: [1, 2] }, { arrayFormat: "indices", qsParseOptions: { arrayFormat: "repeat" } })).to.eql("/test?id%5B0%5D=1&id%5B1%5D=2");
+    const urlOptions = { arrayFormat: "repeat", qsParseOptions: { arrayFormat: "indices" } };
+    expect(urlTransform("/t?id[0]=1&id[1]=2", { a: 0 }, urlOptions)).to.eql("/t?id=1&id=2&a=0");
   });
 
   it("accepts qsStringifyOptions", function() {
-    expect(urlTransform("/test", { id: [1, 2] })).to.eql("/test?id%5B0%5D=1&id%5B1%5D=2");
-    expect(urlTransform("/test", { id: [1, 2] }, { arrayFormat: "brackets", qsStringifyOptions: { arrayFormat: "repeat" } })).to.eql("/test?id=1&id=2");
+    const urlOptions = { arrayFormat: "brackets", qsStringifyOptions: { arrayFormat: "repeat" } };
+    expect(urlTransform("/test", { id: [1, 2] }, {})).to.eql("/test?id%5B0%5D=1&id%5B1%5D=2");
+    expect(urlTransform("/test", { id: [1, 2] }, urlOptions)).to.eql("/test?id=1&id=2");
   });
 });
