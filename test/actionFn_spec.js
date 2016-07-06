@@ -740,20 +740,23 @@ describe("actionFn", function() {
     });
   });
 
-  it("check qsStringifyOptions option", function() {
+  it("check urlOptions", function() {
     let urlFetch;
     const api = actionFn("/test", "test", null, ACTIONS, {
       transformer,
       fetch: (url)=> {
         urlFetch = url;
         return fetchSuccess();
+      },
+      urlOptions: {
+        delimiter: ",",
+        arrayFormat: "repeat"
       }
     });
-    const opts = { qsStringifyOptions: { arrayFormat: "repeat" } };
-    const async = api.request({ id: [1, 2] }, opts);
+    const async = api.request({ id: [1, 2] });
     expect(async).to.be.an.instanceof(Promise);
     return async.then(()=> {
-      expect(urlFetch).to.eql("/test?id=1&id=2");
+      expect(urlFetch).to.eql("/test?id=1,id=2");
     });
   });
 });

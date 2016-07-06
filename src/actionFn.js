@@ -60,7 +60,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Function} getState    helper meta function
   */
   const request = (pathvars, params, getState=none)=> {
-    const resultUrlT = urlTransform(url, pathvars, params);
+    const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
     const rootUrl = meta.holder ? meta.holder.rootUrl : null;
     let urlT = resultUrlT;
     if (rootUrl) {

@@ -9,16 +9,17 @@ const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
  * Url modification
  * @param  {String} url     url template
  * @param  {Object} params  params for url template
- * @param  {Object} options transformation options,
- *                          accepts +qsStringifyOptions+ and +qsParseOptions+
+ * @param  {Object} options transformation options, accepts +delimiter+, +arrayFormat+,
+ *                          +qsStringifyOptions+ and +qsParseOptions+
  * @return {String}         result url
  */
 export default function urlTransform(url, params, options) {
   if (!url) { return ""; }
   params || (params = {});
   options || (options = {});
-  const qsParseOptions = options.qsParseOptions || {};
-  const qsStringifyOptions = options.qsStringifyOptions || {};
+  const qsCommonOptions = { arrayFormat: options.arrayFormat, delimiter: options.delimiter };
+  const qsParseOptions = { ...qsCommonOptions, ...options.qsParseOptions };
+  const qsStringifyOptions = { ...qsCommonOptions, ...options.qsStringifyOptions };
   const usedKeys = {};
 
   const urlWithParams = Object.keys(params).reduce((url, key)=> {
