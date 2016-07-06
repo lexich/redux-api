@@ -96,7 +96,7 @@ export default function reduxApi(config) {
     }
 
     const {
-      url, options, transformer, broadcast, crud,
+      url, urlOptions, options, transformer, broadcast, crud,
       reducerName, prefetch, postfetch, validation, helpers,
     } = opts;
 
@@ -108,6 +108,7 @@ export default function reduxApi(config) {
     };
 
     const meta = {
+      urlOptions,
       fetch: opts.fetch ? opts.fetch : function(...args) {
         return fetchHolder.fetch.apply(this, args);
       },
