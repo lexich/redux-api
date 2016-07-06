@@ -55,6 +55,42 @@ import reduxApi, {transformers} from "redux-api";
 }
 ```
 
+#### urlOptions
+- @description: options for transforming urls
+- @type: Object
+- @example: Keys `delimiter` and `arrayFormat` are passed on to
+  [qs#parse](https://github.com/ljharb/qs#parsing-objects) and
+  [qs#stringify](https://github.com/ljharb/qs#stringifying):
+```js
+{
+  entry: {
+    url: "/api/v1/entry",
+    urlOptions: {
+      delimiter: ";",
+      arrayFormat: "brackets"
+    }
+  }
+}
+```
+  To pass different options to `#parse` and `#stringify`, use the `qsParseOptions` and `qsStringifyOptions` keys:
+```js
+{
+  entry: {
+    url: "/api/v1/entry?a[]=5,a[]=6",
+    urlOptions: {
+      arrayFormat: "brackets",
+      qsParseOptions: {
+        delimiter: /[,;]/
+      },
+      qsStringifyOptions: {
+        delimiter: ";"
+      }
+    }
+  }
+}
+```
+  This would re-encode the url to `/api/v1/entry?a[]=5;a[]=6`.
+
 #### transformer
 - @description: function for rest response transformation
 - @type: Function
@@ -185,7 +221,7 @@ In this case you global state is look like this:
       function({actions, dispatch, getState}, cb) {
         const {user: {data: {name}}} = getState();
         name ? cb() : dispatch(actions.user(cb));
-      }, 
+      },
       function({actions, dispatch, getState}, cb) {
         const {user: {data: {name}}, profile: {data: {uuid}}} = getState();
         uuid ? cb() : dispatch(actions.profile({name}, cb));
