@@ -1,5 +1,6 @@
 "use strict";
 import omit from "./utils/omit";
+import merge from "./utils/merge";
 import qs from "qs";
 import { parse } from "url";
 
@@ -16,10 +17,6 @@ const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 export default function urlTransform(url, params, options) {
   if (!url) { return ""; }
   params || (params = {});
-  options || (options = {});
-  const qsCommonOptions = { arrayFormat: options.arrayFormat, delimiter: options.delimiter };
-  const qsParseOptions = { ...qsCommonOptions, ...options.qsParseOptions };
-  const qsStringifyOptions = { ...qsCommonOptions, ...options.qsStringifyOptions };
   const usedKeys = {};
 
   const urlWithParams = Object.keys(params).reduce((url, key)=> {
@@ -40,11 +37,24 @@ export default function urlTransform(url, params, options) {
   const usedKeysArray = Object.keys(usedKeys);
   if (usedKeysArray.length !== Object.keys(params).length) {
     const urlObject = cleanURL.split("?");
-    const mergeParams = {
-      ...(urlObject[1] && qs.parse(urlObject[1], qsParseOptions)),
-      ...omit(params, usedKeysArray)
+    options || (options = {});
+    const { arrayFormat, delimiter } = options;
+    const qsParseOptions = {
+      arrayFormat,
+      delimiter,
+      ...options.qsParseOptions
     };
-    return `${urlObject[0]}?${qs.stringify(mergeParams, qsStringifyOptions)}`;
+    const mergeParams = merge(
+      (urlObject[1] && qs.parse(urlObject[1], qsParseOptions)),
+      omit(params, usedKeysArray)
+    );
+    const qsStringifyOptions = {
+      arrayFormat,
+      delimiter,
+      ...options.qsStringifyOptions
+    };
+    const urlStringParams = qs.stringify(mergeParams, qsStringifyOptions);
+    return `${urlObject[0]}?${urlStringParams}`;
   }
   return cleanURL;
 }
