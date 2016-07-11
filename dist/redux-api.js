@@ -73,19 +73,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _url2 = _interopRequireDefault(_url);
 	
-	var _reducerFn = __webpack_require__(/*! ./reducerFn */ 18);
+	var _reducerFn = __webpack_require__(/*! ./reducerFn */ 19);
 	
 	var _reducerFn2 = _interopRequireDefault(_reducerFn);
 	
-	var _actionFn = __webpack_require__(/*! ./actionFn */ 14);
+	var _actionFn = __webpack_require__(/*! ./actionFn */ 15);
 	
 	var _actionFn2 = _interopRequireDefault(_actionFn);
 	
-	var _transformers = __webpack_require__(/*! ./transformers */ 19);
+	var _transformers = __webpack_require__(/*! ./transformers */ 20);
 	
 	var _transformers2 = _interopRequireDefault(_transformers);
 	
-	var _async = __webpack_require__(/*! ./async */ 15);
+	var _async = __webpack_require__(/*! ./async */ 16);
 	
 	var _async2 = _interopRequireDefault(_async);
 	
@@ -182,6 +182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    var url = opts.url;
+	    var urlOptions = opts.urlOptions;
 	    var options = opts.options;
 	    var transformer = opts.transformer;
 	    var broadcast = opts.broadcast;
@@ -201,6 +202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    var meta = {
+	      urlOptions: urlOptions,
 	      fetch: opts.fetch ? opts.fetch : function () {
 	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	          args[_key] = arguments[_key];
@@ -240,7 +242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	reduxApi.transformers = _transformers2.default;
 	reduxApi.async = _async2.default;
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
 /* 1 */
@@ -274,7 +276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var punycode = __webpack_require__(/*! punycode */ 9);
+	var punycode = __webpack_require__(/*! punycode */ 10);
 	
 	exports.parse = urlParse;
 	exports.resolve = urlResolve;
@@ -353,7 +355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'gopher:': true,
 	  'file:': true
 	},
-	    querystring = __webpack_require__(/*! querystring */ 12);
+	    querystring = __webpack_require__(/*! querystring */ 13);
 	
 	function urlParse(url, parseQueryString, slashesDenoteHost) {
 	  if (url && isObject(url) && url instanceof Url) return url;
@@ -787,37 +789,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    srcPath = relPath;
 	    // fall through to the dot-handling below.
 	  } else if (relPath.length) {
-	      // it's relative
-	      // throw away the existing file, and take the new path instead.
-	      if (!srcPath) srcPath = [];
-	      srcPath.pop();
-	      srcPath = srcPath.concat(relPath);
-	      result.search = relative.search;
-	      result.query = relative.query;
-	    } else if (!isNullOrUndefined(relative.search)) {
-	      // just pull out the search.
-	      // like href='?foo'.
-	      // Put this after the other two cases because it simplifies the booleans
-	      if (psychotic) {
-	        result.hostname = result.host = srcPath.shift();
-	        //occationaly the auth can get stuck only in host
-	        //this especialy happens in cases like
-	        //url.resolveObject('mailto:local1@domain1', 'local2@domain2')
-	        var authInHost = result.host && result.host.indexOf('@') > 0 ? result.host.split('@') : false;
-	        if (authInHost) {
-	          result.auth = authInHost.shift();
-	          result.host = result.hostname = authInHost.shift();
-	        }
+	    // it's relative
+	    // throw away the existing file, and take the new path instead.
+	    if (!srcPath) srcPath = [];
+	    srcPath.pop();
+	    srcPath = srcPath.concat(relPath);
+	    result.search = relative.search;
+	    result.query = relative.query;
+	  } else if (!isNullOrUndefined(relative.search)) {
+	    // just pull out the search.
+	    // like href='?foo'.
+	    // Put this after the other two cases because it simplifies the booleans
+	    if (psychotic) {
+	      result.hostname = result.host = srcPath.shift();
+	      //occationaly the auth can get stuck only in host
+	      //this especialy happens in cases like
+	      //url.resolveObject('mailto:local1@domain1', 'local2@domain2')
+	      var authInHost = result.host && result.host.indexOf('@') > 0 ? result.host.split('@') : false;
+	      if (authInHost) {
+	        result.auth = authInHost.shift();
+	        result.host = result.hostname = authInHost.shift();
 	      }
-	      result.search = relative.search;
-	      result.query = relative.query;
-	      //to support http.request
-	      if (!isNull(result.pathname) || !isNull(result.search)) {
-	        result.path = (result.pathname ? result.pathname : '') + (result.search ? result.search : '');
-	      }
-	      result.href = result.format();
-	      return result;
 	    }
+	    result.search = relative.search;
+	    result.query = relative.query;
+	    //to support http.request
+	    if (!isNull(result.pathname) || !isNull(result.search)) {
+	      result.path = (result.pathname ? result.pathname : '') + (result.search ? result.search : '');
+	    }
+	    result.href = result.format();
+	    return result;
+	  }
 	
 	  if (!srcPath.length) {
 	    // no path at all.  easy.
@@ -1127,6 +1129,57 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 3 */
+/*!****************************!*\
+  !*** ./src/utils/merge.js ***!
+  \****************************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.mergePair = mergePair;
+	
+	exports.default = function () {
+	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	    args[_key] = arguments[_key];
+	  }
+	
+	  return args.length ? args.reduce(mergePair) : null;
+	};
+	
+	var toString = Object.prototype.toString;
+	var OBJECT = "[object Object]";
+	var ARRAY = "[object Array]";
+	
+	function mergePair(a, b) {
+	  if (a === void 0) {
+	    return b;
+	  }
+	  if (b === void 0) {
+	    return a;
+	  }
+	
+	  var aType = toString.call(a);
+	  var bType = toString.call(b);
+	  if (aType === ARRAY) {
+	    return a.concat(b);
+	  }
+	  if (bType === ARRAY) {
+	    return [a].concat(b);
+	  }
+	  if (aType !== OBJECT || bType !== OBJECT) {
+	    return b;
+	  }
+	  return Object.keys(b).reduce(function (memo, key) {
+	    memo[key] = mergePair(a[key], b[key]);
+	    return memo;
+	  }, a);
+	}
+
+/***/ },
+/* 4 */
 /*!****************************************!*\
   !*** (webpack)/buildin/amd-options.js ***!
   \****************************************/
@@ -1137,7 +1190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 4 */
+/* 5 */
 /*!*******************************!*\
   !*** ./~/fast-apply/index.js ***!
   \*******************************/
@@ -1168,7 +1221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 5 */
+/* 6 */
 /*!***************************!*\
   !*** ./~/qs/lib/index.js ***!
   \***************************/
@@ -1178,8 +1231,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// Load modules
 	
-	var Stringify = __webpack_require__(/*! ./stringify */ 7);
-	var Parse = __webpack_require__(/*! ./parse */ 6);
+	var Stringify = __webpack_require__(/*! ./stringify */ 8);
+	var Parse = __webpack_require__(/*! ./parse */ 7);
 	
 	// Declare internals
 	
@@ -1191,7 +1244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 6 */
+/* 7 */
 /*!***************************!*\
   !*** ./~/qs/lib/parse.js ***!
   \***************************/
@@ -1370,7 +1423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 7 */
+/* 8 */
 /*!*******************************!*\
   !*** ./~/qs/lib/stringify.js ***!
   \*******************************/
@@ -1521,7 +1574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 8 */
+/* 9 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -1541,7 +1594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
+/* 10 */
 /*!******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/punycode/punycode.js ***!
   \******************************************************************/
@@ -2057,7 +2110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		/** Expose `punycode` */
 		// Some AMD build optimizers, like r.js, check for specific condition patterns
 		// like the following:
-		if ("function" == 'function' && _typeof(__webpack_require__(/*! !webpack amd options */ 3)) == 'object' && __webpack_require__(/*! !webpack amd options */ 3)) {
+		if ("function" == 'function' && _typeof(__webpack_require__(/*! !webpack amd options */ 4)) == 'object' && __webpack_require__(/*! !webpack amd options */ 4)) {
 			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return punycode;
 			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -2076,10 +2129,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			root.punycode = punycode;
 		}
 	})(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../../../buildin/module.js */ 8)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../../../buildin/module.js */ 9)(module), (function() { return this; }())))
 
 /***/ },
-/* 10 */
+/* 11 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/querystring/decode.js ***!
   \*******************************************************************/
@@ -2171,7 +2224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 11 */
+/* 12 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/querystring/encode.js ***!
   \*******************************************************************/
@@ -2243,7 +2296,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 12 */
+/* 13 */
 /*!******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/url/~/querystring/index.js ***!
   \******************************************************************/
@@ -2251,11 +2304,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 10);
-	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 11);
+	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 11);
+	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 12);
 
 /***/ },
-/* 13 */
+/* 14 */
 /*!***********************!*\
   !*** ./src/PubSub.js ***!
   \***********************/
@@ -2305,10 +2358,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	
 	exports.default = PubSub;
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
-/* 14 */
+/* 15 */
 /*!*************************!*\
   !*** ./src/actionFn.js ***!
   \*************************/
@@ -2327,27 +2380,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = actionFn;
 	
-	var _urlTransform = __webpack_require__(/*! ./urlTransform */ 20);
+	var _urlTransform = __webpack_require__(/*! ./urlTransform */ 21);
 	
 	var _urlTransform2 = _interopRequireDefault(_urlTransform);
 	
-	var _merge = __webpack_require__(/*! ./utils/merge */ 21);
+	var _merge = __webpack_require__(/*! ./utils/merge */ 3);
 	
 	var _merge2 = _interopRequireDefault(_merge);
 	
-	var _fetchResolver = __webpack_require__(/*! ./fetchResolver */ 17);
+	var _fetchResolver = __webpack_require__(/*! ./fetchResolver */ 18);
 	
 	var _fetchResolver2 = _interopRequireDefault(_fetchResolver);
 	
-	var _PubSub = __webpack_require__(/*! ./PubSub */ 13);
+	var _PubSub = __webpack_require__(/*! ./PubSub */ 14);
 	
 	var _PubSub2 = _interopRequireDefault(_PubSub);
 	
-	var _createHolder = __webpack_require__(/*! ./createHolder */ 16);
+	var _createHolder = __webpack_require__(/*! ./createHolder */ 17);
 	
 	var _createHolder2 = _interopRequireDefault(_createHolder);
 	
-	var _fastApply = __webpack_require__(/*! fast-apply */ 4);
+	var _fastApply = __webpack_require__(/*! fast-apply */ 5);
 	
 	var _fastApply2 = _interopRequireDefault(_fastApply);
 	
@@ -2427,7 +2480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var request = function request(pathvars, params) {
 	    var getState = arguments.length <= 2 || arguments[2] === undefined ? none : arguments[2];
 	
-	    var resultUrlT = (0, _urlTransform2.default)(url, pathvars);
+	    var resultUrlT = (0, _urlTransform2.default)(url, pathvars, meta.urlOptions);
 	    var rootUrl = meta.holder ? meta.holder.rootUrl : null;
 	    var urlT = resultUrlT;
 	    if (rootUrl) {
@@ -2636,7 +2689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 15 */
+/* 16 */
 /*!**********************!*\
   !*** ./src/async.js ***!
   \**********************/
@@ -2685,10 +2738,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	}
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
-/* 16 */
+/* 17 */
 /*!*****************************!*\
   !*** ./src/createHolder.js ***!
   \*****************************/
@@ -2726,10 +2779,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 	
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 18 */
 /*!******************************!*\
   !*** ./src/fetchResolver.js ***!
   \******************************/
@@ -2756,10 +2809,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	}
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
-/* 18 */
+/* 19 */
 /*!**************************!*\
   !*** ./src/reducerFn.js ***!
   \**************************/
@@ -2825,10 +2878,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	}
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
-/* 19 */
+/* 20 */
 /*!*****************************!*\
   !*** ./src/transformers.js ***!
   \*****************************/
@@ -2856,10 +2909,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return toString.call(data) === OBJECT ? data : { data: data };
 	  }
 	};
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
-/* 20 */
+/* 21 */
 /*!*****************************!*\
   !*** ./src/urlTransform.js ***!
   \*****************************/
@@ -2879,7 +2932,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _omit2 = _interopRequireDefault(_omit);
 	
-	var _qs = __webpack_require__(/*! qs */ 5);
+	var _merge = __webpack_require__(/*! ./utils/merge */ 3);
+	
+	var _merge2 = _interopRequireDefault(_merge);
+	
+	var _qs = __webpack_require__(/*! qs */ 6);
 	
 	var _qs2 = _interopRequireDefault(_qs);
 	
@@ -2891,11 +2948,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Url modification
-	 * @param  {String} url    url template
-	 * @param  {Object} params params for url template
-	 * @return {String}        result url
+	 * @param  {String} url     url template
+	 * @param  {Object} params  params for url template
+	 * @param  {Object} options transformation options, accepts +delimiter+, +arrayFormat+,
+	 *                          +qsStringifyOptions+ and +qsParseOptions+
+	 * @return {String}         result url
 	 */
-	function urlTransform(url, params) {
+	function urlTransform(url, params, options) {
 	  if (!url) {
 	    return "";
 	  }
@@ -2925,53 +2984,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var usedKeysArray = Object.keys(usedKeys);
 	  if (usedKeysArray.length !== Object.keys(params).length) {
 	    var urlObject = cleanURL.split("?");
-	    var mergeParams = _extends({}, urlObject[1] && _qs2.default.parse(urlObject[1]), (0, _omit2.default)(params, usedKeysArray));
-	    return urlObject[0] + "?" + _qs2.default.stringify(mergeParams);
+	    options || (options = {});
+	    var _options = options;
+	    var arrayFormat = _options.arrayFormat;
+	    var delimiter = _options.delimiter;
+	
+	    var qsParseOptions = _extends({
+	      arrayFormat: arrayFormat,
+	      delimiter: delimiter
+	    }, options.qsParseOptions);
+	    var mergeParams = (0, _merge2.default)(urlObject[1] && _qs2.default.parse(urlObject[1], qsParseOptions), (0, _omit2.default)(params, usedKeysArray));
+	    var qsStringifyOptions = _extends({
+	      arrayFormat: arrayFormat,
+	      delimiter: delimiter
+	    }, options.qsStringifyOptions);
+	    var urlStringParams = _qs2.default.stringify(mergeParams, qsStringifyOptions);
+	    return urlObject[0] + "?" + urlStringParams;
 	  }
 	  return cleanURL;
 	}
-	module.exports = exports['default'];
-
-/***/ },
-/* 21 */
-/*!****************************!*\
-  !*** ./src/utils/merge.js ***!
-  \****************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.mergePair = mergePair;
-	
-	exports.default = function () {
-	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	    args[_key] = arguments[_key];
-	  }
-	
-	  return args.length ? args.reduce(mergePair) : null;
-	};
-	
-	var toString = Object.prototype.toString;
-	var OBJECT = "[object Object]";
-	
-	function mergePair(a, b) {
-	  if (a === void 0) {
-	    return b;
-	  }
-	  if (b === void 0) {
-	    return a;
-	  }
-	  if (toString.call(a) !== OBJECT || toString.call(b) !== OBJECT) {
-	    return b;
-	  }
-	  return Object.keys(b).reduce(function (memo, key) {
-	    memo[key] = mergePair(a[key], b[key]);
-	    return memo;
-	  }, a);
-	}
+	module.exports = exports["default"];
 
 /***/ },
 /* 22 */
@@ -3001,7 +3033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {});
 	};
 	
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ }
 /******/ ])
