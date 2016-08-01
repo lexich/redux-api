@@ -110,7 +110,7 @@ import reduxApi, {transformers} from "redux-api";
 
 #### options
 - @description: options for rest-api backend. `function(url, options)`
-- @type: Object | Funtions
+- @type: Object | Functions
 - @default: null
 - @example: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend
 ```js
@@ -185,7 +185,7 @@ const rest = reduxApi({
 - @type: Array
 - @default: false
 - @example
-It usefull, for example, when you need to manipulate list of items. But you don't want to persist infomation about each manipulation, you want to save it in list.
+It usefull, for example, when you need to manipulate list of items. But you don't want to persist information about each manipulation, you want to save it in list.
 ```js
 const rest = reduxApi({
   items: "/api/items",
@@ -382,7 +382,7 @@ rest.actions.test.delete({ id: 1 });
 
 ####list of properties
 ####fetch
-- @description backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- @description backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
 - @example
 ```js
 import adapterFetch from "redux-api/lib/adapters/fetch";
@@ -391,7 +391,7 @@ rest.use("fetch", adapterFetch(fetch));
 ```
 
 ####server
-- @description - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for clien-size mode. If `server===true` redux-api works in server-size mode.
+- @description - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for client-size mode. If `server===true` redux-api works in server-size mode.
 - @default false
 ```js
 const rest = reduxApi({...});
@@ -399,7 +399,7 @@ rest.use("server", true);
 ```
 
 ####rootUrl
-- @description - root url for every endpoint. very usefull for isomorphic(universal) app. For clientsize use default rootUrl, and for backend use http://localhost:80 for example. For cliendsize for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`
+- @description - root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`
 - @example
 ```js
 const rest = reduxApi({...});
@@ -420,13 +420,32 @@ rest.use("options", function() {
 });
 ```
 
+####middlewareParser
+- @description - if you use middleware different from [redux-thunk](https://github.com/gaearon/redux-thunk) you can realize custom behaviour for argument parser.
+- @example
+```js
+// Custom middleware
+const cutsomThunkMiddleware = ({ dispatch, getState }) => next => action => {
+  if (typeof action === 'function') {
+    return action({ dispatch, getState });
+  }
+  return next(action);
+};
+
+// middlewareParser
+reduxApi({ ... }).use("middlewareParser", 
+  ({ dispatch, getState })=> {
+    return { getState, dispatch };
+  });
+```
+
 ####init(adapter, isServer, rootUrl)
 - @deprecated
-- @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initilize it.
+- @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initialize it.
 - @type: Function
-- @param **adapter** - backend adapter. In curent example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
-- @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for clien-size mode. If `isServer===true` redux-api works in server-size mode.
-- @param **rootUrl** - root url for every endpoint. very usefull for isomorphic(universal) app. For clientsize use default rootUrl, and for backend use http://localhost:80 for example. For cliendsize for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`.
+- @param **adapter** - backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for client-size mode. If `isServer===true` redux-api works in server-size mode.
+- @param **rootUrl** - root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`.
 - @example:
 
 ```js
@@ -440,7 +459,7 @@ rest.init(adapterFetch(fetch), false, "http://localhost:3000");
 ```
 
 #### actions
-- @descritpion: list of redux actions for rest manipulations
+- @description: list of redux actions for rest manipulations
 - @type: Object
 - @example:
 ```js
@@ -480,7 +499,7 @@ dispatch(rest.actions.entries.sync());
 ###Actions sub methods
 
 #### sync(urlparams, params, callback)
-- @description: this method save you from twice requests flag `sync`. if `sync===true` requst wouldn't execute. In server-side mode calls twice
+- @description: this method save you from twice requests flag `sync`. if `sync===true` request wouldn't execute. In server-side mode calls twice
 - @param **urlparams**  - update url according Url schema
 - @param **params**     - add additional params to rest request
 - @param **callback**   - callback function when action ends
@@ -536,10 +555,10 @@ rest.actions.user({id: 1, test: 2}) // /api/v1/user/1?test=2
 ```
 
 ###Events
-Each endpoint in redux-api infranstucrute has own collection of methods.
+Each endpoint in redux-api infrastructure has own collection of methods.
 - actionFetch   - emits when endpoint's call is started
-- actionSuccess - emits when endpoint's call finishs with success result
-- actionFail    - emits when endpoint's call finishs with error result
+- actionSuccess - emits when endpoint's call finishes with success result
+- actionFail    - emits when endpoint's call finishes with error result
 - actionReset   - emits when reset action was called
 
 you can get access for anyone using next accessible properties

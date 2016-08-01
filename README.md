@@ -27,7 +27,7 @@ with bower
 bower install redux-api --save
 ```
 
-If you don't use tools like webpack, browserify, etc and loading redux-api manually - the best way add redux api to you project is:
+If you don't use tools like webpack, browserify, etc and loading redux-api manually - the best way add redux-api to you project is:
 ```js
 <script src="(...)/redux-api.min.js"></script>
 <script>
@@ -63,7 +63,7 @@ And of course you have to set up adapter to your `redux-api` instance before usi
 
 =======
 ## Examples
-[examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github api
+[examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) - React + Redux + React-Router + Redux-api with webpack and express + github API
 
 ### Example
 rest.js

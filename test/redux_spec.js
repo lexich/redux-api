@@ -62,6 +62,30 @@ describe("redux", ()=> {
     store.dispatch(testAction());
   });
 
+  it("check custom middlewareParser", ()=> {
+    const rest = reduxApi({
+      test: "/api/url"
+    }).use("fetch",
+      (url)=> new Promise((resolve)=> resolve(url)))
+    .use("middlewareParser",
+      ({ getState, dispatch })=> ({ getState, dispatch }));
+    const reducer = combineReducers(rest.reducers);
+
+    const cutsomThunkMiddleware = ({ dispatch, getState })=> (next)=> (action)=> {
+      if (typeof action === "function") {
+        return action({ dispatch, getState });
+      }
+      return next(action);
+    };
+    const createStoreWithMiddleware = applyMiddleware(cutsomThunkMiddleware)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+    return new Promise((resolve)=> {
+      store.dispatch(rest.actions.test(resolve));
+    }).then(()=> {
+      expect(store.getState().test.data).to.eql({ data: "/api/url" });
+    });
+  });
+
   it("check double call", (done)=> {
     const rest = reduxApi({
       test: "/test"

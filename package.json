@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "author": {
     "name": "Efremov Alex",
     "email": "lexich121@gmail.com",
@@ -11,7 +11,8 @@
   "description": "Flux REST API for redux infrastructure",
   "repository": "http://github.com/lexich/redux-api",
   "scripts": {
-    "test": "npm run eslint && npm run mocha",
+    "test": "npm run eslint && npm run mocha && npm run yaspeller",
+    "yaspeller": "node_modules/.bin/yaspeller .",
     "mocha": "node_modules/.bin/mocha --compilers js:babel-core/register test/*_spec.js",
     "build": "rm -rf dist lib && npm run browser-dev && npm run browser-min && npm run compile",
     "cover": "./node_modules/.bin/babel-node ./node_modules/.bin/isparta cover ./node_modules/.bin/_mocha test/*_spec.js",
@@ -51,7 +52,8 @@
     "mocha-lcov-reporter": "1.2.0",
     "redux": "3.5.2",
     "redux-thunk": "2.1.0",
-    "webpack": "1.13.1"
+    "webpack": "1.13.1",
+    "yaspeller": "^2.9.0"
   },
   "engines": {
     "node": ">=0.12.0"

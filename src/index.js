@@ -59,6 +59,7 @@ export default function reduxApi(config) {
     fetch: null,
     server: false,
     rootUrl: null,
+    middlewareParser: null,
     options: {}
   };
 

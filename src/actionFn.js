@@ -34,6 +34,10 @@ function helperCrudFunction(name) {
   };
 }
 
+function defaultMiddlewareArgsParser(dispatch, getState) {
+  return { dispatch, getState };
+}
+
 export const CRUD = ["get", "post", "put", "delete", "patch"].reduce(
   (memo, name)=> {
     memo[name] = helperCrudFunction(name);
@@ -96,7 +100,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
     pubsub.push(callback);
-    return (dispatch, getState)=> {
+    return (...middlewareArgs)=> {
+      const middlewareParser = (meta.holder && meta.holder.middlewareParser) ||
+        defaultMiddlewareArgsParser;
+      const { dispatch, getState } = middlewareParser(...middlewareArgs);
       const { reducerName } = meta;
       const state = getState();
       const store = state[reducerName];

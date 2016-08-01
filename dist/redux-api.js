@@ -144,6 +144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fetch: null,
 	    server: false,
 	    rootUrl: null,
+	    middlewareParser: null,
 	    options: {}
 	  };
 	
@@ -2447,6 +2448,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 	
+	function defaultMiddlewareArgsParser(dispatch, getState) {
+	  return { dispatch: dispatch, getState: getState };
+	}
+	
 	var CRUD = exports.CRUD = ["get", "post", "put", "delete", "patch"].reduce(function (memo, name) {
 	  memo[name] = helperCrudFunction(name);
 	  return memo;
@@ -2525,7 +2530,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var syncing = params ? !!params.syncing : false;
 	    params && delete params.syncing;
 	    pubsub.push(callback);
-	    return function (dispatch, getState) {
+	    return function () {
+	      var middlewareParser = meta.holder && meta.holder.middlewareParser || defaultMiddlewareArgsParser;
+	
+	      var _middlewareParser = middlewareParser.apply(undefined, arguments);
+	
+	      var dispatch = _middlewareParser.dispatch;
+	      var getState = _middlewareParser.getState;
 	      var reducerName = meta.reducerName;
 	
 	      var state = getState();
