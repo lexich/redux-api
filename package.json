@@ -20,7 +20,7 @@
     "eslint": "node_modules/.bin/eslint src test examples/isomorphic/app examples/isomorphic/server.js",
     "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
-    "browser-min": "NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
+    "browser-min": "cross-env NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
     "precommit": "npm test",
     "prepush": "npm test && npm run build",
     "postmerge": "npm install"
@@ -40,6 +40,7 @@
     "babel-preset-stage-0": "6.5.0",
     "chai": "3.5.0",
     "coveralls": "2.11.9",
+    "cross-env": "^2.0.0",
     "eslint": "2.10.2",
     "eslint-config-airbnb": "9.0.1",
     "eslint-plugin-import": "1.10.2",
