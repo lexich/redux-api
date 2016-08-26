@@ -4,3 +4,9 @@ coverage/
 bower_components
 /lib
 .DS_Store
+
+#Webstorm metadata
+.idea
+
+#VSCode metadata
+.vscode
