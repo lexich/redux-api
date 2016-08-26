@@ -2,15 +2,16 @@
 import reduxApi from "redux-api";
 import map from "lodash/map";
 
-const headers = {
-  "User-Agent": "redux-api"
+
+const globalOptions = {
+  headers: {
+    "User-Agent": "redux-api"
+  }
 };
-const URL = "https://api.github.com";
 
 export default reduxApi({
   userRepos: {
-    url: `${URL}/users/:user/repos`,
-    options: { headers },
+    url: "/users/:user/repos",
     transformer(data) {
       return map(data, (item)=> {
         return {
@@ -22,7 +23,8 @@ export default reduxApi({
     }
   },
   repo: {
-    url: `${URL}/repos/:user/:repo`,
-    options: { headers }
+    url: "/repos/:user/:repo"
   }
-});
+})
+.use("rootUrl", "https://api.github.com")
+.use("options", globalOptions);

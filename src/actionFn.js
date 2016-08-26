@@ -82,7 +82,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       options(urlT, params, getState) :
       options;
     const opts = merge({}, globalOptions, baseOptions, params);
-    const response = meta.fetch(urlT, opts);
+    const response = meta.fetch(urlT, opts, { pathvars, params });
     return !meta.validation ? response : response.then(
       (data)=> new Promise(
         (resolve, reject)=> meta.validation(data,
