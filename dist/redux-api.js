@@ -58,6 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	/* eslint no-void: 0 */
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -216,8 +217,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      virtual: !!opts.virtual,
 	      reducerName: reducerName,
 	      actions: memo.actions,
-	      prefetch: prefetch, postfetch: postfetch, validation: validation,
-	      helpers: helpers, transformer: transformer, crud: crud
+	      prefetch: prefetch,
+	      postfetch: postfetch,
+	      validation: validation,
+	      helpers: helpers,
+	      transformer: transformer,
+	      crud: crud
 	    };
 	
 	    memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
@@ -247,9 +252,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
-/*!**************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/url/url.js ***!
-  \**************************************************/
+/*!**********************!*\
+  !*** ./~/url/url.js ***!
+  \**********************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -277,7 +282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var punycode = __webpack_require__(/*! punycode */ 10);
+	var punycode = __webpack_require__(/*! punycode */ 12);
 	
 	exports.parse = urlParse;
 	exports.resolve = urlResolve;
@@ -356,7 +361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'gopher:': true,
 	  'file:': true
 	},
-	    querystring = __webpack_require__(/*! querystring */ 13);
+	    querystring = __webpack_require__(/*! querystring */ 11);
 	
 	function urlParse(url, parseQueryString, slashesDenoteHost) {
 	  if (url && isObject(url) && url instanceof Url) return url;
@@ -952,6 +957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// Load modules
 	
+	
 	// Declare internals
 	
 	var internals = {};
@@ -1150,6 +1156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return args.length ? args.reduce(mergePair) : null;
 	};
 	
+	/* eslint no-void: 0 */
 	var toString = Object.prototype.toString;
 	var OBJECT = "[object Object]";
 	var ARRAY = "[object Array]";
@@ -1576,29 +1583,185 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/*!***********************************!*\
-  !*** (webpack)/buildin/module.js ***!
-  \***********************************/
+/*!*********************************!*\
+  !*** ./~/querystring/decode.js ***!
+  \*********************************/
 /***/ function(module, exports) {
 
-	"use strict";
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	module.exports = function (module) {
-		if (!module.webpackPolyfill) {
-			module.deprecate = function () {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
+	'use strict';
+	
+	// If obj.hasOwnProperty has been overridden, then calling
+	// obj.hasOwnProperty(prop) will break.
+	// See: https://github.com/joyent/node/issues/1707
+	
+	function hasOwnProperty(obj, prop) {
+	  return Object.prototype.hasOwnProperty.call(obj, prop);
+	}
+	
+	module.exports = function (qs, sep, eq, options) {
+	  sep = sep || '&';
+	  eq = eq || '=';
+	  var obj = {};
+	
+	  if (typeof qs !== 'string' || qs.length === 0) {
+	    return obj;
+	  }
+	
+	  var regexp = /\+/g;
+	  qs = qs.split(sep);
+	
+	  var maxKeys = 1000;
+	  if (options && typeof options.maxKeys === 'number') {
+	    maxKeys = options.maxKeys;
+	  }
+	
+	  var len = qs.length;
+	  // maxKeys <= 0 means that we should not limit keys count
+	  if (maxKeys > 0 && len > maxKeys) {
+	    len = maxKeys;
+	  }
+	
+	  for (var i = 0; i < len; ++i) {
+	    var x = qs[i].replace(regexp, '%20'),
+	        idx = x.indexOf(eq),
+	        kstr,
+	        vstr,
+	        k,
+	        v;
+	
+	    if (idx >= 0) {
+	      kstr = x.substr(0, idx);
+	      vstr = x.substr(idx + 1);
+	    } else {
+	      kstr = x;
+	      vstr = '';
+	    }
+	
+	    k = decodeURIComponent(kstr);
+	    v = decodeURIComponent(vstr);
+	
+	    if (!hasOwnProperty(obj, k)) {
+	      obj[k] = v;
+	    } else if (Array.isArray(obj[k])) {
+	      obj[k].push(v);
+	    } else {
+	      obj[k] = [obj[k], v];
+	    }
+	  }
+	
+	  return obj;
 	};
 
 /***/ },
 /* 10 */
-/*!******************************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/url/~/punycode/punycode.js ***!
-  \******************************************************************/
+/*!*********************************!*\
+  !*** ./~/querystring/encode.js ***!
+  \*********************************/
+/***/ function(module, exports) {
+
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	
+	'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	var stringifyPrimitive = function stringifyPrimitive(v) {
+	  switch (typeof v === 'undefined' ? 'undefined' : _typeof(v)) {
+	    case 'string':
+	      return v;
+	
+	    case 'boolean':
+	      return v ? 'true' : 'false';
+	
+	    case 'number':
+	      return isFinite(v) ? v : '';
+	
+	    default:
+	      return '';
+	  }
+	};
+	
+	module.exports = function (obj, sep, eq, name) {
+	  sep = sep || '&';
+	  eq = eq || '=';
+	  if (obj === null) {
+	    obj = undefined;
+	  }
+	
+	  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+	    return Object.keys(obj).map(function (k) {
+	      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+	      if (Array.isArray(obj[k])) {
+	        return obj[k].map(function (v) {
+	          return ks + encodeURIComponent(stringifyPrimitive(v));
+	        }).join(sep);
+	      } else {
+	        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+	      }
+	    }).join(sep);
+	  }
+	
+	  if (!name) return '';
+	  return encodeURIComponent(stringifyPrimitive(name)) + eq + encodeURIComponent(stringifyPrimitive(obj));
+	};
+
+/***/ },
+/* 11 */
+/*!********************************!*\
+  !*** ./~/querystring/index.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 9);
+	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 10);
+
+/***/ },
+/* 12 */
+/*!**************************************!*\
+  !*** ./~/url/~/punycode/punycode.js ***!
+  \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {'use strict';
@@ -2130,183 +2293,27 @@ return /******/ (function(modules) { // webpackBootstrap
 			root.punycode = punycode;
 		}
 	})(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../../../buildin/module.js */ 9)(module), (function() { return this; }())))
-
-/***/ },
-/* 11 */
-/*!*******************************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/url/~/querystring/decode.js ***!
-  \*******************************************************************/
-/***/ function(module, exports) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
-	'use strict';
-	
-	// If obj.hasOwnProperty has been overridden, then calling
-	// obj.hasOwnProperty(prop) will break.
-	// See: https://github.com/joyent/node/issues/1707
-	
-	function hasOwnProperty(obj, prop) {
-	  return Object.prototype.hasOwnProperty.call(obj, prop);
-	}
-	
-	module.exports = function (qs, sep, eq, options) {
-	  sep = sep || '&';
-	  eq = eq || '=';
-	  var obj = {};
-	
-	  if (typeof qs !== 'string' || qs.length === 0) {
-	    return obj;
-	  }
-	
-	  var regexp = /\+/g;
-	  qs = qs.split(sep);
-	
-	  var maxKeys = 1000;
-	  if (options && typeof options.maxKeys === 'number') {
-	    maxKeys = options.maxKeys;
-	  }
-	
-	  var len = qs.length;
-	  // maxKeys <= 0 means that we should not limit keys count
-	  if (maxKeys > 0 && len > maxKeys) {
-	    len = maxKeys;
-	  }
-	
-	  for (var i = 0; i < len; ++i) {
-	    var x = qs[i].replace(regexp, '%20'),
-	        idx = x.indexOf(eq),
-	        kstr,
-	        vstr,
-	        k,
-	        v;
-	
-	    if (idx >= 0) {
-	      kstr = x.substr(0, idx);
-	      vstr = x.substr(idx + 1);
-	    } else {
-	      kstr = x;
-	      vstr = '';
-	    }
-	
-	    k = decodeURIComponent(kstr);
-	    v = decodeURIComponent(vstr);
-	
-	    if (!hasOwnProperty(obj, k)) {
-	      obj[k] = v;
-	    } else if (Array.isArray(obj[k])) {
-	      obj[k].push(v);
-	    } else {
-	      obj[k] = [obj[k], v];
-	    }
-	  }
-	
-	  return obj;
-	};
-
-/***/ },
-/* 12 */
-/*!*******************************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/url/~/querystring/encode.js ***!
-  \*******************************************************************/
-/***/ function(module, exports) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
-	'use strict';
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
-	var stringifyPrimitive = function stringifyPrimitive(v) {
-	  switch (typeof v === 'undefined' ? 'undefined' : _typeof(v)) {
-	    case 'string':
-	      return v;
-	
-	    case 'boolean':
-	      return v ? 'true' : 'false';
-	
-	    case 'number':
-	      return isFinite(v) ? v : '';
-	
-	    default:
-	      return '';
-	  }
-	};
-	
-	module.exports = function (obj, sep, eq, name) {
-	  sep = sep || '&';
-	  eq = eq || '=';
-	  if (obj === null) {
-	    obj = undefined;
-	  }
-	
-	  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-	    return Object.keys(obj).map(function (k) {
-	      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
-	      if (Array.isArray(obj[k])) {
-	        return obj[k].map(function (v) {
-	          return ks + encodeURIComponent(stringifyPrimitive(v));
-	        }).join(sep);
-	      } else {
-	        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
-	      }
-	    }).join(sep);
-	  }
-	
-	  if (!name) return '';
-	  return encodeURIComponent(stringifyPrimitive(name)) + eq + encodeURIComponent(stringifyPrimitive(obj));
-	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../webpack/buildin/module.js */ 13)(module), (function() { return this; }())))
 
 /***/ },
 /* 13 */
-/*!******************************************************************!*\
-  !*** (webpack)/~/node-libs-browser/~/url/~/querystring/index.js ***!
-  \******************************************************************/
-/***/ function(module, exports, __webpack_require__) {
+/*!***********************************!*\
+  !*** (webpack)/buildin/module.js ***!
+  \***********************************/
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
-	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 11);
-	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 12);
+	module.exports = function (module) {
+		if (!module.webpackPolyfill) {
+			module.deprecate = function () {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	};
 
 /***/ },
 /* 14 */
@@ -2381,6 +2388,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = actionFn;
 	
+	var _fastApply = __webpack_require__(/*! fast-apply */ 5);
+	
+	var _fastApply2 = _interopRequireDefault(_fastApply);
+	
+	var _url = __webpack_require__(/*! url */ 1);
+	
+	var _url2 = _interopRequireDefault(_url);
+	
 	var _urlTransform = __webpack_require__(/*! ./urlTransform */ 21);
 	
 	var _urlTransform2 = _interopRequireDefault(_urlTransform);
@@ -2400,14 +2415,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _createHolder = __webpack_require__(/*! ./createHolder */ 17);
 	
 	var _createHolder2 = _interopRequireDefault(_createHolder);
-	
-	var _fastApply = __webpack_require__(/*! fast-apply */ 5);
-	
-	var _fastApply2 = _interopRequireDefault(_fastApply);
-	
-	var _url = __webpack_require__(/*! url */ 1);
-	
-	var _url2 = _interopRequireDefault(_url);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2548,7 +2555,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var prevData = state && state[reducerName] && state[reducerName].data;
 	      dispatch({ type: actionFetch, syncing: syncing, request: requestOptions });
 	      var fetchResolverOpts = {
-	        dispatch: dispatch, getState: getState,
+	        dispatch: dispatch,
+	        getState: getState,
 	        actions: meta.actions,
 	        prefetch: meta.prefetch
 	      };
@@ -2560,7 +2568,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          new Promise(function (resolve, reject) {
 	            requestHolder.set({
-	              resolve: resolve, reject: reject,
+	              resolve: resolve,
+	              reject: reject,
 	              promise: request(pathvars, params, getState).then(resolve, reject)
 	            });
 	          }).then(function (d) {
@@ -2569,7 +2578,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	              type: actionSuccess, request: requestOptions
 	            });
 	            dispatch({
-	              data: data, origData: d,
+	              data: data,
+	              origData: d,
 	              type: actionSuccess,
 	              syncing: false,
 	              request: requestOptions
@@ -2939,6 +2949,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = urlTransform;
 	
+	var _qs = __webpack_require__(/*! qs */ 6);
+	
+	var _qs2 = _interopRequireDefault(_qs);
+	
+	var _url = __webpack_require__(/*! url */ 1);
+	
 	var _omit = __webpack_require__(/*! ./utils/omit */ 22);
 	
 	var _omit2 = _interopRequireDefault(_omit);
@@ -2946,12 +2962,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _merge = __webpack_require__(/*! ./utils/merge */ 3);
 	
 	var _merge2 = _interopRequireDefault(_merge);
-	
-	var _qs = __webpack_require__(/*! qs */ 6);
-	
-	var _qs2 = _interopRequireDefault(_qs);
-	
-	var _url = __webpack_require__(/*! url */ 1);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	

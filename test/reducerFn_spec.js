@@ -1,9 +1,9 @@
 "use strict";
 /* global describe, it */
-
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import { expect } from "chai";
-import reducerFn from "../src/reducerFn";
 import isFunction from "lodash/isFunction";
+import reducerFn from "../src/reducerFn";
 
 describe("reducerFn", function() {
   it("check null params", function() {

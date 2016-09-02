@@ -1,4 +1,5 @@
 "use strict";
+/* eslint no-void: 0 */
 
 import libUrl from "url";
 import reducerFn from "./reducerFn";
@@ -118,8 +119,12 @@ export default function reduxApi(config) {
       virtual: !!opts.virtual,
       reducerName,
       actions: memo.actions,
-      prefetch, postfetch, validation,
-      helpers, transformer, crud
+      prefetch,
+      postfetch,
+      validation,
+      helpers,
+      transformer,
+      crud
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);

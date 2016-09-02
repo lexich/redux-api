@@ -1,11 +1,11 @@
 "use strict";
 /* global describe, it, xit */
-
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import { expect } from "chai";
-import reduxApi from "../src/index.js";
-import transformers from "../src/transformers.js";
 import isFunction from "lodash/isFunction";
 import size from "lodash/size";
+import reduxApi from "../src/index.js";
+import transformers from "../src/transformers.js";
 
 function getState() {
   return { test: { loading: false, data: {} } };

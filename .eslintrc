@@ -50,6 +50,7 @@
     "prefer-template": 0,
     "prefer-arrow-callback": 0,
     "arrow-body-style": 0,
-    "no-confusing-arrow": 0
+    "no-confusing-arrow": 0,
+    "react/require-extension": 0
   }
 }

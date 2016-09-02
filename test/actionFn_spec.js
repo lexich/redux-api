@@ -1,9 +1,9 @@
 "use strict";
 /* global describe, it */
-
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 import { expect } from "chai";
-import actionFn from "../src/actionFn";
 import isFunction from "lodash/isFunction";
+import actionFn from "../src/actionFn";
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
@@ -84,13 +84,11 @@ describe("actionFn", function() {
   });
 
   it("check request method", function() {
-    let executeCounter = 0;
     let urlFetch;
     let paramsFetch;
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
       transformer,
       fetch: (url, params)=> {
-        executeCounter++;
         urlFetch = url;
         paramsFetch = params;
         return fetchSuccess();
@@ -532,7 +530,8 @@ describe("actionFn", function() {
 
   it("check crud option",  function() {
     const meta = {
-      transformer, crud: true,
+      transformer,
+      crud: true,
       fetch(url, opts) {
         return new Promise((resolve)=> resolve({ url, opts }));
       }
@@ -687,7 +686,8 @@ describe("actionFn", function() {
 
   it("check crud option with overwrite",  function() {
     const meta = {
-      transformer, crud: true,
+      transformer,
+      crud: true,
       fetch(url, opts) {
         return new Promise((resolve)=> resolve({ url, opts }));
       },

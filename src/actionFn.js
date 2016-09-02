@@ -1,12 +1,12 @@
 "use strict";
 
+import fastApply from "fast-apply";
+import libUrl from "url";
 import urlTransform from "./urlTransform";
 import merge from "./utils/merge";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
-import fastApply from "fast-apply";
-import libUrl from "url";
 
 function none() {}
 
@@ -114,7 +114,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const prevData = state && state[reducerName] && state[reducerName].data;
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
-        dispatch, getState,
+        dispatch,
+        getState,
         actions: meta.actions,
         prefetch: meta.prefetch
       };
@@ -126,7 +127,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           }
           new Promise((resolve, reject)=> {
             requestHolder.set({
-              resolve, reject,
+              resolve,
+              reject,
               promise: request(pathvars, params, getState).then(resolve, reject)
             });
           }).then((d)=> {
@@ -135,7 +137,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
               type: actionSuccess, request: requestOptions
             });
             dispatch({
-              data, origData: d,
+              data,
+              origData: d,
               type: actionSuccess,
               syncing: false,
               request: requestOptions

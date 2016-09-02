@@ -1,11 +1,11 @@
 "use strict";
 /* global describe, it */
-
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 import { expect } from "chai";
-import reduxApi, { async } from "../src/index.js";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import after from "lodash/after";
+import reduxApi, { async } from "../src/index.js";
 
 describe("redux", ()=> {
   it("check redux", ()=> {
@@ -147,7 +147,10 @@ describe("redux", ()=> {
       setTimeout(()=> {
         resolve({ url });
         expect(store.getState().test).to.eql({
-          sync: false, syncing: false, loading: false, data: {},
+          sync: false,
+          syncing: false,
+          loading: false,
+          data: {},
           error: new Error("Error: Application abort request")
         });
         done();
