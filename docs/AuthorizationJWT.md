@@ -15,7 +15,7 @@ reduxApi({
   information: {
     url: "/api/information",
 
-    // Prevent Anauthorized request
+    // Prevent Unauthorized request
     prefetch: [
       // Step1
       function ({actions, dispatch}, cb) {
@@ -27,7 +27,7 @@ reduxApi({
         // If Step1 finished successuly check auth state
         const { user: { data: { auth }}} = getState();
         // if user authorized allow this query
-        auth ? cb() : cb(new Error("Anauthorized"));
+        auth ? cb() : cb(new Error("Unauthorized"));
       }
     ]
   }
