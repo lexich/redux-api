@@ -442,7 +442,6 @@ reduxApi({ ... }).use("middlewareParser",
 ####responseHandler
 - @description - catch all http response from each redux-api endpoint. First argument is Error is response fail, second argument data from success response.
 - @example
--
 ```js
 reduxApi({ ... }).use("responseHandler",
   (err, data)=>
