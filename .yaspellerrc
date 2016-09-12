@@ -58,6 +58,7 @@
     "usefull",
     "v1",
     "xhr",
-    "javascript"
+    "javascript",
+    "responseHandler"
   ]
 }

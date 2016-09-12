@@ -1,8 +1,8 @@
 "use strict";
-import omit from "./utils/omit";
-import merge from "./utils/merge";
 import qs from "qs";
 import { parse } from "url";
+import omit from "./utils/omit";
+import merge from "./utils/merge";
 
 const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 

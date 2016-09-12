@@ -1,9 +1,9 @@
 "use strict";
 /* global describe, it */
-
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 import { expect } from "chai";
-import actionFn from "../src/actionFn";
 import isFunction from "lodash/isFunction";
+import actionFn from "../src/actionFn";
 
 function fetchSuccess() {
   return new Promise(function(resolve) {
@@ -17,9 +17,11 @@ function getState() {
   };
 }
 
+const ERROR = new Error("Error");
+
 function fetchFail() {
   return new Promise(function(resolve, reject) {
-    reject("Error");
+    reject(ERROR);
   });
 }
 
@@ -84,13 +86,11 @@ describe("actionFn", function() {
   });
 
   it("check request method", function() {
-    let executeCounter = 0;
     let urlFetch;
     let paramsFetch;
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
       transformer,
       fetch: (url, params)=> {
-        executeCounter++;
         urlFetch = url;
         paramsFetch = params;
         return fetchSuccess();
@@ -159,7 +159,7 @@ describe("actionFn", function() {
       request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionFail,
-      error: "Error",
+      error: ERROR,
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }];
@@ -532,7 +532,8 @@ describe("actionFn", function() {
 
   it("check crud option",  function() {
     const meta = {
-      transformer, crud: true,
+      transformer,
+      crud: true,
       fetch(url, opts) {
         return new Promise((resolve)=> resolve({ url, opts }));
       }
@@ -687,7 +688,8 @@ describe("actionFn", function() {
 
   it("check crud option with overwrite",  function() {
     const meta = {
-      transformer, crud: true,
+      transformer,
+      crud: true,
       fetch(url, opts) {
         return new Promise((resolve)=> resolve({ url, opts }));
       },
@@ -757,6 +759,46 @@ describe("actionFn", function() {
     expect(async).to.be.an.instanceof(Promise);
     return async.then(()=> {
       expect(urlFetch).to.eql("/test?id=1,id=2");
+    });
+  });
+
+  it("check responseHandler success", function() {
+    const resp = [];
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
+      fetch() {
+        return fetchSuccess();
+      },
+      holder: {
+        responseHandler(err, data) {
+          resp.push({ err, data });
+        }
+      }
+    });
+    return api.request().then(()=> {
+      expect(resp).to.eql([
+        { err: null, data: { msg: "hello" } }
+      ]);
+    });
+  });
+
+  it("check responseHandler error", function() {
+    const resp = [];
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
+      fetch() {
+        return fetchFail();
+      },
+      holder: {
+        responseHandler(err, data) {
+          resp.push({ err, data });
+        }
+      }
+    });
+    return api.request().then(null, ()=> {
+      expect(resp).to.have.length(1);
+      expect(resp[0].data).to.not.exist;
+      expect(resp[0].err).to.be.an.instanceof(Error);
     });
   });
 });

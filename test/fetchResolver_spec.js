@@ -1,9 +1,9 @@
 "use strict";
 /* global describe, it */
-
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import { expect } from "chai";
-import fetchResolver from "../src/fetchResolver";
 import isFunction from "lodash/isFunction";
+import fetchResolver from "../src/fetchResolver";
 
 describe("fetchResolver", function() {
   it("check import", function() {

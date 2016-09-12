@@ -1,3 +1,4 @@
+/* eslint no-void: 0 */
 const toString = Object.prototype.toString;
 const OBJECT = "[object Object]";
 const ARRAY = "[object Array]";

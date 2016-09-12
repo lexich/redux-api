@@ -1,12 +1,12 @@
 "use strict";
 
+import fastApply from "fast-apply";
+import libUrl from "url";
 import urlTransform from "./urlTransform";
 import merge from "./utils/merge";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
-import fastApply from "fast-apply";
-import libUrl from "url";
 
 function none() {}
 
@@ -57,6 +57,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
+  const responseHandler = meta && meta.holder && meta.holder.responseHandler;
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -83,10 +84,22 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       options;
     const opts = merge({}, globalOptions, baseOptions, params);
     const response = meta.fetch(urlT, opts);
-    return !meta.validation ? response : response.then(
+    const result = !meta.validation ? response : response.then(
       (data)=> new Promise(
         (resolve, reject)=> meta.validation(data,
           (err)=> err ? reject(err) : resolve(data))));
+    if (responseHandler) {
+      if (result && result.then) {
+        result.then(
+          (data)=> responseHandler(null, data),
+          (err)=> responseHandler(err)
+        );
+      } else {
+        responseHandler(result);
+      }
+    }
+    result && result.catch && result.catch(none);
+    return result;
   };
 
   /**
@@ -95,7 +108,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object}   params      fetch params
    * @param  {Function} callback)   callback execute after end request
    */
-  const fn = (...args)=> {
+  function fn(...args) {
     const [pathvars, params, callback] = extractArgs(args);
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
@@ -114,11 +127,12 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const prevData = state && state[reducerName] && state[reducerName].data;
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
-        dispatch, getState,
+        dispatch,
+        getState,
         actions: meta.actions,
         prefetch: meta.prefetch
       };
-      return new Promise((done, fail)=> {
+      const result = new Promise((done, fail)=> {
         fetchResolver(0, fetchResolverOpts, (err)=> {
           if (err) {
             pubsub.reject(err);
@@ -126,7 +140,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           }
           new Promise((resolve, reject)=> {
             requestHolder.set({
-              resolve, reject,
+              resolve,
+              reject,
               promise: request(pathvars, params, getState).then(resolve, reject)
             });
           }).then((d)=> {
@@ -135,7 +150,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
               type: actionSuccess, request: requestOptions
             });
             dispatch({
-              data, origData: d,
+              data,
+              origData: d,
               type: actionSuccess,
               syncing: false,
               request: requestOptions
@@ -161,8 +177,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           });
         });
       });
+      result.catch(none);
+      return result;
     };
-  };
+  }
 
   /*
     Pure rest request
@@ -215,7 +233,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const index = args.length - 1;
       const callbackFn = (args[index] instanceof Function) ? args[index] : none;
       const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
-      return new Promise((resolve, reject)=> {
+      const result = new Promise((resolve, reject)=> {
         const callback = (err, data)=> {
           err ? reject(err) : resolve(data);
           callbackFn(err, data);
@@ -238,6 +256,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           )(dispatch, getState);
         }
       });
+      result.catch(none);
+      return result;
     };
     return memo;
   };

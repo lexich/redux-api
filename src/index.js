@@ -1,4 +1,5 @@
 "use strict";
+/* eslint no-void: 0 */
 
 import libUrl from "url";
 import reducerFn from "./reducerFn";
@@ -60,7 +61,8 @@ export default function reduxApi(config) {
     server: false,
     rootUrl: null,
     middlewareParser: null,
-    options: {}
+    options: {},
+    responseHandler: null
   };
 
   const cfg = {
@@ -85,7 +87,7 @@ export default function reduxApi(config) {
     reducers: {},
     events: {}
   };
-  const fnConfigCallback = (memo, value, key)=> {
+  function fnConfigCallback(memo, value, key) {
     const opts = typeof value === "object" ?
       { ...defaultEndpointConfig, reducerName: key, ...value } :
       { ...defaultEndpointConfig, reducerName: key, url: value };
@@ -118,8 +120,12 @@ export default function reduxApi(config) {
       virtual: !!opts.virtual,
       reducerName,
       actions: memo.actions,
-      prefetch, postfetch, validation,
-      helpers, transformer, crud
+      prefetch,
+      postfetch,
+      validation,
+      helpers,
+      transformer,
+      crud
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
@@ -136,7 +142,7 @@ export default function reduxApi(config) {
     }
     memo.events[reducerName] = ACTIONS;
     return memo;
-  };
+  }
 
   return Object.keys(config).reduce(
     (memo, key)=> fnConfigCallback(memo, config[key], key, config), cfg);
