@@ -57,6 +57,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
+  const responseHandler = meta && meta.holder && meta.holder.responseHandler;
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -87,6 +88,16 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       (data)=> new Promise(
         (resolve, reject)=> meta.validation(data,
           (err)=> err ? reject(err) : resolve(data))));
+    if (responseHandler) {
+      if (result && result.then) {
+        result.then(
+          (data)=> responseHandler(null, data),
+          (err)=> responseHandler(err)
+        );
+      } else {
+        responseHandler(result);
+      }
+    }
     result && result.catch && result.catch(none);
     return result;
   };

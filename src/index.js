@@ -61,7 +61,8 @@ export default function reduxApi(config) {
     server: false,
     rootUrl: null,
     middlewareParser: null,
-    options: {}
+    options: {},
+    responseHandler: null
   };
 
   const cfg = {

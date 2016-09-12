@@ -17,9 +17,11 @@ function getState() {
   };
 }
 
+const ERROR = new Error("Error");
+
 function fetchFail() {
   return new Promise(function(resolve, reject) {
-    reject("Error");
+    reject(ERROR);
   });
 }
 
@@ -157,7 +159,7 @@ describe("actionFn", function() {
       request: { pathvars: undefined, params: {} }
     }, {
       type: ACTIONS.actionFail,
-      error: "Error",
+      error: ERROR,
       syncing: false,
       request: { pathvars: undefined, params: {} }
     }];
@@ -757,6 +759,46 @@ describe("actionFn", function() {
     expect(async).to.be.an.instanceof(Promise);
     return async.then(()=> {
       expect(urlFetch).to.eql("/test?id=1,id=2");
+    });
+  });
+
+  it("check responseHandler success", function() {
+    const resp = [];
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
+      fetch() {
+        return fetchSuccess();
+      },
+      holder: {
+        responseHandler(err, data) {
+          resp.push({ err, data });
+        }
+      }
+    });
+    return api.request().then(()=> {
+      expect(resp).to.eql([
+        { err: null, data: { msg: "hello" } }
+      ]);
+    });
+  });
+
+  it("check responseHandler error", function() {
+    const resp = [];
+    const api = actionFn("/test", "test", null, ACTIONS, {
+      transformer,
+      fetch() {
+        return fetchFail();
+      },
+      holder: {
+        responseHandler(err, data) {
+          resp.push({ err, data });
+        }
+      }
+    });
+    return api.request().then(null, ()=> {
+      expect(resp).to.have.length(1);
+      expect(resp[0].data).to.not.exist;
+      expect(resp[0].err).to.be.an.instanceof(Error);
     });
   });
 });
