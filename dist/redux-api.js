@@ -146,7 +146,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    server: false,
 	    rootUrl: null,
 	    middlewareParser: null,
-	    options: {}
+	    options: {},
+	    responseHandler: null
 	  };
 	
 	  var cfg = {
@@ -175,7 +176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    reducers: {},
 	    events: {}
 	  };
-	  var fnConfigCallback = function fnConfigCallback(memo, value, key) {
+	  function fnConfigCallback(memo, value, key) {
 	    var opts = (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object" ? _extends({}, defaultEndpointConfig, { reducerName: key }, value) : _extends({}, defaultEndpointConfig, { reducerName: key, url: value });
 	
 	    if (opts.broadcast !== void 0) {
@@ -239,7 +240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    memo.events[reducerName] = ACTIONS;
 	    return memo;
-	  };
+	  }
 	
 	  return Object.keys(config).reduce(function (memo, key) {
 	    return fnConfigCallback(memo, config[key], key, config);
@@ -2483,6 +2484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var pubsub = new _PubSub2.default();
 	  var requestHolder = (0, _createHolder2.default)();
+	  var responseHandler = meta && meta.holder && meta.holder.responseHandler;
 	  /**
 	   * Fetch data from server
 	   * @param  {Object}   pathvars    path vars for url
@@ -2506,13 +2508,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var baseOptions = options instanceof Function ? options(urlT, params, getState) : options;
 	    var opts = (0, _merge2.default)({}, globalOptions, baseOptions, params);
 	    var response = meta.fetch(urlT, opts);
-	    return !meta.validation ? response : response.then(function (data) {
+	    var result = !meta.validation ? response : response.then(function (data) {
 	      return new Promise(function (resolve, reject) {
 	        return meta.validation(data, function (err) {
 	          return err ? reject(err) : resolve(data);
 	        });
 	      });
 	    });
+	    if (responseHandler) {
+	      if (result && result.then) {
+	        result.then(function (data) {
+	          return responseHandler(null, data);
+	        }, function (err) {
+	          return responseHandler(err);
+	        });
+	      } else {
+	        responseHandler(result);
+	      }
+	    }
+	    result && result.catch && result.catch(none);
+	    return result;
 	  };
 	
 	  /**
@@ -2521,7 +2536,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param  {Object}   params      fetch params
 	   * @param  {Function} callback)   callback execute after end request
 	   */
-	  var fn = function fn() {
+	  function fn() {
 	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
 	      args[_key2] = arguments[_key2];
 	    }
@@ -2560,7 +2575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        actions: meta.actions,
 	        prefetch: meta.prefetch
 	      };
-	      return new Promise(function (done, fail) {
+	      var result = new Promise(function (done, fail) {
 	        (0, _fetchResolver2.default)(0, fetchResolverOpts, function (err) {
 	          if (err) {
 	            pubsub.reject(err);
@@ -2605,8 +2620,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          });
 	        });
 	      });
+	      result.catch(none);
+	      return result;
 	    };
-	  };
+	  }
 	
 	  /*
 	    Pure rest request
@@ -2678,7 +2695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var index = args.length - 1;
 	        var callbackFn = args[index] instanceof Function ? args[index] : none;
 	        var helpersResult = (0, _fastApply2.default)(call, { getState: getState, dispatch: dispatch, actions: meta.actions }, args);
-	        return new Promise(function (resolve, reject) {
+	        var result = new Promise(function (resolve, reject) {
 	          var callback = function callback(err, data) {
 	            err ? reject(err) : resolve(data);
 	            callbackFn(err, data);
@@ -2699,6 +2716,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (0, _fastApply2.default)(sync ? fn.sync : fn, null, helpersResult.concat(callback))(dispatch, getState);
 	          }
 	        });
+	        result.catch(none);
+	        return result;
 	      };
 	    };
 	    return memo;
