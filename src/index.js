@@ -86,7 +86,7 @@ export default function reduxApi(config) {
     reducers: {},
     events: {}
   };
-  const fnConfigCallback = (memo, value, key)=> {
+  function fnConfigCallback(memo, value, key) {
     const opts = typeof value === "object" ?
       { ...defaultEndpointConfig, reducerName: key, ...value } :
       { ...defaultEndpointConfig, reducerName: key, url: value };
@@ -141,7 +141,7 @@ export default function reduxApi(config) {
     }
     memo.events[reducerName] = ACTIONS;
     return memo;
-  };
+  }
 
   return Object.keys(config).reduce(
     (memo, key)=> fnConfigCallback(memo, config[key], key, config), cfg);

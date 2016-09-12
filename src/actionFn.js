@@ -83,10 +83,12 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       options;
     const opts = merge({}, globalOptions, baseOptions, params);
     const response = meta.fetch(urlT, opts);
-    return !meta.validation ? response : response.then(
+    const result = !meta.validation ? response : response.then(
       (data)=> new Promise(
         (resolve, reject)=> meta.validation(data,
           (err)=> err ? reject(err) : resolve(data))));
+    result && result.catch && result.catch(none);
+    return result;
   };
 
   /**
@@ -95,7 +97,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object}   params      fetch params
    * @param  {Function} callback)   callback execute after end request
    */
-  const fn = (...args)=> {
+  function fn(...args) {
     const [pathvars, params, callback] = extractArgs(args);
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
@@ -119,7 +121,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         actions: meta.actions,
         prefetch: meta.prefetch
       };
-      return new Promise((done, fail)=> {
+      const result = new Promise((done, fail)=> {
         fetchResolver(0, fetchResolverOpts, (err)=> {
           if (err) {
             pubsub.reject(err);
@@ -164,8 +166,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           });
         });
       });
+      result.catch(none);
+      return result;
     };
-  };
+  }
 
   /*
     Pure rest request
@@ -218,7 +222,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const index = args.length - 1;
       const callbackFn = (args[index] instanceof Function) ? args[index] : none;
       const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
-      return new Promise((resolve, reject)=> {
+      const result = new Promise((resolve, reject)=> {
         const callback = (err, data)=> {
           err ? reject(err) : resolve(data);
           callbackFn(err, data);
@@ -241,6 +245,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           )(dispatch, getState);
         }
       });
+      result.catch(none);
+      return result;
     };
     return memo;
   };
