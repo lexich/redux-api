@@ -161,12 +161,20 @@ function (state, action) {
 ```
 
 ####reducer
+- @decription: Define your custom reducer to catch other events and modify state of current entry
+ATTENTION: custom reducer can't catch default events for current entry.
+- @type: Function
+- @default: null
+- @example:
 ```js
 const rest = reduxApi({
   hello: "/api/hello",
   item: {
     url: "/api/item",
     reducer(state, action) {
+      /*
+      ATTENTION: this.events.item.actionSuccess and other default redux-api events never catch there
+      */
       // context has instance
       if (action.type === "MY_CUSTOM_EVENT") {
         return { ...state, value: action.value };
