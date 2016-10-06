@@ -161,7 +161,7 @@ function (state, action) {
 ```
 
 ####reducer
-- @decription: Define your custom reducer to catch other events and modify state of current entry
+- @description: Define your custom reducer to catch other events and modify state of current entry
 ATTENTION: custom reducer can't catch default events for current entry.
 - @type: Function
 - @default: null
