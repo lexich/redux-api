@@ -1,11 +1,12 @@
 "use strict";
+
 /* global describe, it, xit */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import { expect } from "chai";
 import isFunction from "lodash/isFunction";
 import size from "lodash/size";
-import reduxApi from "../src/index.js";
-import transformers from "../src/transformers.js";
+import reduxApi from "../src/index";
+import transformers from "../src/transformers";
 
 function getState() {
   return { test: { loading: false, data: {} } };
@@ -34,7 +35,7 @@ describe("index", function() {
     const urls = [];
     function fetchUrl(url) {
       urls.push(url);
-      return new Promise((resolve)=> resolve({ msg: "hello" }));
+      return new Promise(resolve=> resolve({ msg: "hello" }));
     }
     const res = reduxApi({
       test1: "/url1/",
@@ -211,7 +212,7 @@ describe("index", function() {
     const expectUrls = [];
     function fetchSuccess(url) {
       expectUrls.push(url);
-      return new Promise((resolve)=> resolve({ url }));
+      return new Promise(resolve=> resolve({ url }));
     }
     const res = reduxApi({
       test: "/test",
@@ -267,7 +268,7 @@ describe("index", function() {
     }).use("fetch", function(url, opts) {
       result.push({ url, opts });
       return new Promise(
-        (resolve)=> resolve({ hello: "world" }));
+        resolve=> resolve({ hello: "world" }));
     });
     const a1 = new Promise((resolve)=> {
       res.actions.hello.test1(2, "lexich", resolve)(dispatch, getState);
@@ -279,7 +280,7 @@ describe("index", function() {
       const mockSync = res.actions.hello.sync;
       let counter = 0;
       res.actions.hello.sync = function(...args) {
-        counter++;
+        counter += 1;
         return mockSync.apply(this, args);
       };
       res.actions.hello.testSync(1, resolve)(dispatch, getState);

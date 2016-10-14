@@ -1,4 +1,5 @@
 "use strict";
+
 /* global describe, it */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 import { expect } from "chai";

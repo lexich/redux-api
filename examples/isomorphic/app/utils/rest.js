@@ -1,4 +1,5 @@
 /* eslint import/no-unresolved: 0 */
+/* eslint import/extensions: 0 */
 import reduxApi from "redux-api";
 import map from "lodash/map";
 

@@ -7,6 +7,6 @@ export default function fetchResolver(index=0, opts={}, cb=none) {
     cb();
   } else {
     opts.prefetch[index](opts,
-      (err)=> err ? cb(err) : fetchResolver(index + 1, opts, cb));
+      err=> err ? cb(err) : fetchResolver(index + 1, opts, cb));
   }
 }

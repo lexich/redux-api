@@ -5,7 +5,7 @@
  * @return {[type]}             [description]
  * @example
  * async(dispatch,
- *   (cb)=> actions.test(1, cb),
+ *   cb=> actions.test(1, cb),
  *   actions.test2
  * ).then(()=> async(dispatch, actions.test3))
  */

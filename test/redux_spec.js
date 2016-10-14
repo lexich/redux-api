@@ -1,18 +1,19 @@
 "use strict";
+
 /* global describe, it */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 import { expect } from "chai";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import after from "lodash/after";
-import reduxApi, { async } from "../src/index.js";
+import reduxApi, { async } from "../src/index";
 
 describe("redux", ()=> {
   it("check redux", ()=> {
     const rest = reduxApi({
       test: "/api/url",
     }).use("fetch", (url)=> {
-      return new Promise((resolve)=> resolve(url));
+      return new Promise(resolve=> resolve(url));
     });
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
@@ -28,7 +29,7 @@ describe("redux", ()=> {
       test: "/api/url",
       test2: "/api/url2",
     }).use("fetch", (url)=> {
-      return new Promise((resolve)=> resolve(url));
+      return new Promise(resolve=> resolve(url));
     });
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
@@ -36,7 +37,7 @@ describe("redux", ()=> {
 
     return async(
       store.dispatch,
-      (cb)=> rest.actions.test(cb),
+      cb=> rest.actions.test(cb),
       rest.actions.test2
     ).then((d)=> {
       expect(d.data).to.eql("/api/url2");
@@ -47,7 +48,7 @@ describe("redux", ()=> {
   it("check async 2", (done)=> {
     const rest = reduxApi({
       test: "/api/url"
-    }).use("fetch", (url)=> new Promise((resolve)=> resolve(url)));
+    }).use("fetch", url=> new Promise(resolve=> resolve(url)));
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
     const store = createStoreWithMiddleware(reducer);
@@ -66,12 +67,12 @@ describe("redux", ()=> {
     const rest = reduxApi({
       test: "/api/url"
     }).use("fetch",
-      (url)=> new Promise((resolve)=> resolve(url)))
+      url=> new Promise(resolve=> resolve(url)))
     .use("middlewareParser",
       ({ getState, dispatch })=> ({ getState, dispatch }));
     const reducer = combineReducers(rest.reducers);
 
-    const cutsomThunkMiddleware = ({ dispatch, getState })=> (next)=> (action)=> {
+    const cutsomThunkMiddleware = ({ dispatch, getState })=> next=> (action)=> {
       if (typeof action === "function") {
         return action({ dispatch, getState });
       }
@@ -89,7 +90,7 @@ describe("redux", ()=> {
   it("check double call", (done)=> {
     const rest = reduxApi({
       test: "/test"
-    }).use("fetch", (url)=> new Promise((resolve)=> {
+    }).use("fetch", url=> new Promise((resolve)=> {
       setTimeout(()=> resolve({ url }), 100);
     }));
 
@@ -143,7 +144,7 @@ describe("redux", ()=> {
     let store;
     const rest = reduxApi({
       test: "/test"
-    }).use("fetch", (url)=> new Promise((resolve)=> {
+    }).use("fetch", url=> new Promise((resolve)=> {
       setTimeout(()=> {
         resolve({ url });
         expect(store.getState().test).to.eql({
@@ -241,7 +242,7 @@ describe("redux", ()=> {
     const rest = reduxApi({
       test: "/api/url",
     }).use("fetch", (url)=> {
-      return new Promise((resolve)=> resolve(url));
+      return new Promise(resolve=> resolve(url));
     });
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
@@ -270,7 +271,7 @@ describe("redux", ()=> {
     const rest = reduxApi({
       test: "/api/url",
     }).use("fetch", (url)=> {
-      return new Promise((resolve)=> resolve(url));
+      return new Promise(resolve=> resolve(url));
     });
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
@@ -310,7 +311,7 @@ describe("redux", ()=> {
           return data;
         }
       }
-    }).use("fetch", (url)=> new Promise((resolve)=> resolve(url)));
+    }).use("fetch", url=> new Promise(resolve=> resolve(url)));
 
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
