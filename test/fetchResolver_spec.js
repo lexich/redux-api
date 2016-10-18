@@ -1,4 +1,5 @@
 "use strict";
+
 /* global describe, it */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import { expect } from "chai";
@@ -44,7 +45,7 @@ describe("fetchResolver", function() {
   });
   it("check usage without prefetch options", function() {
     let counter = 0;
-    fetchResolver(0, {}, ()=> counter++);
+    fetchResolver(0, {}, ()=> { counter += 1; });
     expect(counter).to.eql(1);
   });
 });

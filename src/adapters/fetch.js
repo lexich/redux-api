@@ -12,7 +12,7 @@ function toJSON(resp) {
 
 export default function (fetch) {
   return function (url, opts) {
-    return fetch(url, opts).then((resp)=> toJSON(resp)
+    return fetch(url, opts).then(resp=> toJSON(resp)
               .then((data)=> {
                 if (resp.status >= 200 && resp.status < 300) {
                   return data;

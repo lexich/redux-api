@@ -85,14 +85,14 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const opts = merge({}, globalOptions, baseOptions, params);
     const response = meta.fetch(urlT, opts);
     const result = !meta.validation ? response : response.then(
-      (data)=> new Promise(
+      data=> new Promise(
         (resolve, reject)=> meta.validation(data,
-          (err)=> err ? reject(err) : resolve(data))));
+          err=> err ? reject(err) : resolve(data))));
     if (responseHandler) {
       if (result && result.then) {
         result.then(
-          (data)=> responseHandler(null, data),
-          (err)=> responseHandler(err)
+          data=> responseHandler(null, data),
+          err=> responseHandler(err)
         );
       } else {
         responseHandler(result);

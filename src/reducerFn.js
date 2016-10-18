@@ -1,4 +1,5 @@
 "use strict";
+
 /* eslint no-case-declarations: 0 */
 /**
  * Reducer contructor

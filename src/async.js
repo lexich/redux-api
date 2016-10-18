@@ -5,26 +5,24 @@
  * @return {[type]}             [description]
  * @example
  * async(dispatch,
- *   (cb)=> actions.test(1, cb),
+ *   cb=> actions.test(1, cb),
  *   actions.test2
  * ).then(()=> async(dispatch, actions.test3))
  */
-export default function async(dispatch, ...args) {
-  const fn = args[0];
-  const nextArgs = args.slice(1);
+export default function async(dispatch, currentFunction = null, ...restFunctions) {
   return new Promise(
     (resolve, reject)=> {
-      if (!fn) {
+      if (!currentFunction) {
         reject("no chain function");
       } else {
-        dispatch(fn((err, data)=> {
+        dispatch(currentFunction((err, data)=> {
           err ? reject(err) : resolve(data);
         }) || {});
       }
     })
   .then((data)=> {
-    if (nextArgs.length) {
-      return async(dispatch, ...nextArgs);
+    if (restFunctions.length) {
+      return async(dispatch, ...restFunctions);
     } else {
       return data;
     }

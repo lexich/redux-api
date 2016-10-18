@@ -1,4 +1,5 @@
 "use strict";
+
 /* eslint no-void: 0 */
 
 import libUrl from "url";

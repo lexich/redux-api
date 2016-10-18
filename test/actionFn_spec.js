@@ -1,4 +1,5 @@
 "use strict";
+
 /* global describe, it */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 import { expect } from "chai";
@@ -47,7 +48,7 @@ describe("actionFn", function() {
     const api = actionFn("/test", "test", null, ACTIONS, {
       transformer,
       fetch: ()=> {
-        executeCounter++;
+        executeCounter += 1;
         return fetchSuccess();
       }
     });
@@ -181,7 +182,7 @@ describe("actionFn", function() {
     const api = actionFn("/test/:id", "test", function(url, params, _getState) {
       expect(_getState).to.exist;
       expect(getState === _getState).to.be.true;
-      callOptions++;
+      callOptions += 1;
       return { ...params,  test: 1 };
     }, ACTIONS, {
       transformer,
@@ -279,7 +280,7 @@ describe("actionFn", function() {
       transformer,
       fetch: fetchSuccess,
       validation(data, cb) {
-        counter++;
+        counter += 1;
         expData = data;
         cb();
       }
@@ -298,7 +299,7 @@ describe("actionFn", function() {
       transformer,
       fetch: fetchSuccess,
       validation(data, cb) {
-        counter++;
+        counter += 1;
         expData = data;
         cb();
       }
@@ -335,7 +336,7 @@ describe("actionFn", function() {
       transformer,
       fetch: fetchSuccess,
       validation(data, cb) {
-        counter++;
+        counter += 1;
         expData = data;
         cb("invalid");
       }
@@ -480,7 +481,7 @@ describe("actionFn", function() {
       transformer,
       fetch: fetchSuccess,
       helpers: {
-        test: ()=> (cb)=> cb(null, [{ id: 1 }, { async: true }])
+        test: ()=> cb=> cb(null, [{ id: 1 }, { async: true }])
       }
     });
     const result = api.test()(()=> {}, getState);
@@ -490,11 +491,11 @@ describe("actionFn", function() {
     const meta = {
       transformer,
       fetch(url, opts) {
-        return new Promise((resolve)=> resolve({ url, opts }));
+        return new Promise(resolve=> resolve({ url, opts }));
       },
       helpers: {
-        asyncSuccess: ()=> (cb)=> cb(null, [{ id: 1 }, { async: true }]),
-        asyncFail: ()=> (cb)=> cb("Error")
+        asyncSuccess: ()=> cb=> cb(null, [{ id: 1 }, { async: true }]),
+        asyncFail: ()=> cb=> cb("Error")
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -535,7 +536,7 @@ describe("actionFn", function() {
       transformer,
       crud: true,
       fetch(url, opts) {
-        return new Promise((resolve)=> resolve({ url, opts }));
+        return new Promise(resolve=> resolve({ url, opts }));
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -691,7 +692,7 @@ describe("actionFn", function() {
       transformer,
       crud: true,
       fetch(url, opts) {
-        return new Promise((resolve)=> resolve({ url, opts }));
+        return new Promise(resolve=> resolve({ url, opts }));
       },
       helpers: {
         get() {

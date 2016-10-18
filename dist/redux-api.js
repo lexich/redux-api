@@ -58,6 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	
 	/* eslint no-void: 0 */
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -66,7 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	exports.default = reduxApi;
 	
@@ -161,7 +162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    },
 	    init: function init(fetch) {
-	      var isServer = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	      var isServer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 	      var rootUrl = arguments[2];
 	
 	      /* eslint no-console: 0 */
@@ -260,7 +261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	// Copyright Joyent, Inc. and other Node contributors.
 	//
@@ -954,7 +955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	// Load modules
 	
@@ -1440,7 +1441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	// Load modules
 	
@@ -1704,7 +1705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	var stringifyPrimitive = function stringifyPrimitive(v) {
 	  switch (typeof v === 'undefined' ? 'undefined' : _typeof(v)) {
@@ -1767,7 +1768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	/*! https://mths.be/punycode v1.3.2 by @mathias */
 	;(function (root) {
@@ -2475,8 +2476,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {Function+Object}     action function object
 	 */
 	function actionFn(url, name, options) {
-	  var ACTIONS = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
-	  var meta = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+	  var ACTIONS = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+	  var meta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 	  var actionFetch = ACTIONS.actionFetch;
 	  var actionSuccess = ACTIONS.actionSuccess;
 	  var actionFail = ACTIONS.actionFail;
@@ -2492,7 +2493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param  {Function} getState    helper meta function
 	  */
 	  var request = function request(pathvars, params) {
-	    var getState = arguments.length <= 2 || arguments[2] === undefined ? none : arguments[2];
+	    var getState = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : none;
 	
 	    var resultUrlT = (0, _urlTransform2.default)(url, pathvars, meta.urlOptions);
 	    var rootUrl = meta.holder ? meta.holder.rootUrl : null;
@@ -2703,7 +2704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          // If helper alias using async functionality
 	          if (helpersResult instanceof Function) {
 	            helpersResult(function (error) {
-	              var newArgs = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+	              var newArgs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 	
 	              if (error) {
 	                callback(error);
@@ -2741,9 +2742,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.default = async;
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
 	/**
 	 *
 	 * @param  {[type]}    dispatch [description]
@@ -2751,28 +2749,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {[type]}             [description]
 	 * @example
 	 * async(dispatch,
-	 *   (cb)=> actions.test(1, cb),
+	 *   cb=> actions.test(1, cb),
 	 *   actions.test2
 	 * ).then(()=> async(dispatch, actions.test3))
 	 */
 	function async(dispatch) {
-	  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	    args[_key - 1] = arguments[_key];
+	  for (var _len = arguments.length, restFunctions = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+	    restFunctions[_key - 2] = arguments[_key];
 	  }
 	
-	  var fn = args[0];
-	  var nextArgs = args.slice(1);
+	  var currentFunction = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+	
 	  return new Promise(function (resolve, reject) {
-	    if (!fn) {
+	    if (!currentFunction) {
 	      reject("no chain function");
 	    } else {
-	      dispatch(fn(function (err, data) {
+	      dispatch(currentFunction(function (err, data) {
 	        err ? reject(err) : resolve(data);
 	      }) || {});
 	    }
 	  }).then(function (data) {
-	    if (nextArgs.length) {
-	      return async.apply(undefined, [dispatch].concat(_toConsumableArray(nextArgs)));
+	    if (restFunctions.length) {
+	      return async.apply(undefined, [dispatch].concat(restFunctions));
 	    } else {
 	      return data;
 	    }
@@ -2837,9 +2835,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function none() {}
 	
 	function fetchResolver() {
-	  var index = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-	  var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	  var cb = arguments.length <= 2 || arguments[2] === undefined ? none : arguments[2];
+	  var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+	  var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  var cb = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : none;
 	
 	  if (!opts.prefetch || index >= opts.prefetch.length) {
 	    cb();
@@ -2859,6 +2857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	
 	/* eslint no-case-declarations: 0 */
 	/**
 	 * Reducer contructor
@@ -2877,7 +2876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = reducerFn;
 	function reducerFn(initialState) {
-	  var actions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	  var actions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	  var reducer = arguments[2];
 	  var actionFetch = actions.actionFetch;
 	  var actionSuccess = actions.actionSuccess;
@@ -2885,7 +2884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var actionReset = actions.actionReset;
 	
 	  return function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
 	    var action = arguments[1];
 	
 	    switch (action.type) {
