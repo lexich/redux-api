@@ -55,8 +55,9 @@ const PREFIX = "@@redux-api";
  * ```
  */
 
-export default function reduxApi(config) {
+export default function reduxApi(config, customPrefix) {
   config || (config = {});
+  customPrefix || (customPrefix = "");
   const fetchHolder = {
     fetch: null,
     server: false,
@@ -105,10 +106,10 @@ export default function reduxApi(config) {
     } = opts;
 
     const ACTIONS = {
-      actionFetch: `${PREFIX}@${reducerName}`,
-      actionSuccess: `${PREFIX}@${reducerName}_success`,
-      actionFail: `${PREFIX}@${reducerName}_fail`,
-      actionReset: `${PREFIX}@${reducerName}_delete`
+      actionFetch: `${PREFIX}@${customPrefix}${reducerName}`,
+      actionSuccess: `${PREFIX}@${customPrefix}${reducerName}_success`,
+      actionFail: `${PREFIX}@${customPrefix}${reducerName}_fail`,
+      actionReset: `${PREFIX}@${customPrefix}${reducerName}_delete`
     };
 
     const meta = {
