@@ -22,6 +22,7 @@ const PREFIX = "@@redux-api";
 /**
  * Entry api point
  * @param {Object} config Rest api configuration
+ * @param {String} customPrefix Custom prefix of actions
  * @param {Function} fetch Adapter for rest requests
  * @param {Boolean} isServer false by default (fif you want to use it for isomorphic apps)
  * @return {actions, reducers}        { actions, reducers}

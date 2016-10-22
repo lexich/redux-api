@@ -140,8 +140,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * ```
 	 */
 	
-	function reduxApi(config) {
+	function reduxApi(config, customPrefix) {
 	  config || (config = {});
+	  customPrefix || (customPrefix = "");
 	  var fetchHolder = {
 	    fetch: null,
 	    server: false,
@@ -199,10 +200,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    var ACTIONS = {
-	      actionFetch: PREFIX + "@" + reducerName,
-	      actionSuccess: PREFIX + "@" + reducerName + "_success",
-	      actionFail: PREFIX + "@" + reducerName + "_fail",
-	      actionReset: PREFIX + "@" + reducerName + "_delete"
+	      actionFetch: PREFIX + "@" + customPrefix + reducerName,
+	      actionSuccess: PREFIX + "@" + customPrefix + reducerName + "_success",
+	      actionFail: PREFIX + "@" + customPrefix + reducerName + "_fail",
+	      actionReset: PREFIX + "@" + customPrefix + reducerName + "_delete"
 	    };
 	
 	    var meta = {
