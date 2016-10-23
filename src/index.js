@@ -22,7 +22,7 @@ const PREFIX = "@@redux-api";
 /**
  * Entry api point
  * @param {Object} config Rest api configuration
- * @param {String} customPrefix Custom prefix of actions
+ * @param {Object} custom custom settings for Rest api
  * @param {Function} fetch Adapter for rest requests
  * @param {Boolean} isServer false by default (fif you want to use it for isomorphic apps)
  * @return {actions, reducers}        { actions, reducers}
@@ -56,9 +56,12 @@ const PREFIX = "@@redux-api";
  * ```
  */
 
-export default function reduxApi(config, customPrefix) {
+export default function reduxApi(config, custom) {
   config || (config = {});
-  customPrefix || (customPrefix = "");
+  custom = {
+    prefix: "",
+    ...custom
+  };
   const fetchHolder = {
     fetch: null,
     server: false,
@@ -107,10 +110,10 @@ export default function reduxApi(config, customPrefix) {
     } = opts;
 
     const ACTIONS = {
-      actionFetch: `${PREFIX}@${customPrefix}${reducerName}`,
-      actionSuccess: `${PREFIX}@${customPrefix}${reducerName}_success`,
-      actionFail: `${PREFIX}@${customPrefix}${reducerName}_fail`,
-      actionReset: `${PREFIX}@${customPrefix}${reducerName}_delete`
+      actionFetch: `${PREFIX}@${custom.prefix}${reducerName}`,
+      actionSuccess: `${PREFIX}@${custom.prefix}${reducerName}_success`,
+      actionFail: `${PREFIX}@${custom.prefix}${reducerName}_fail`,
+      actionReset: `${PREFIX}@${custom.prefix}${reducerName}_delete`
     };
 
     const meta = {

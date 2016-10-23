@@ -65,9 +65,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	exports.default = reduxApi;
 	
@@ -107,7 +107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Entry api point
 	 * @param {Object} config Rest api configuration
-	 * @param {String} customPrefix Custom prefix of actions
+	 * @param {Object} custom custom settings for Rest api
 	 * @param {Function} fetch Adapter for rest requests
 	 * @param {Boolean} isServer false by default (fif you want to use it for isomorphic apps)
 	 * @return {actions, reducers}        { actions, reducers}
@@ -141,9 +141,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * ```
 	 */
 	
-	function reduxApi(config, customPrefix) {
+	function reduxApi(config, custom) {
 	  config || (config = {});
-	  customPrefix || (customPrefix = "");
+	  custom = _extends({
+	    prefix: ""
+	  }, custom);
 	  var fetchHolder = {
 	    fetch: null,
 	    server: false,
@@ -201,10 +203,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    var ACTIONS = {
-	      actionFetch: PREFIX + "@" + customPrefix + reducerName,
-	      actionSuccess: PREFIX + "@" + customPrefix + reducerName + "_success",
-	      actionFail: PREFIX + "@" + customPrefix + reducerName + "_fail",
-	      actionReset: PREFIX + "@" + customPrefix + reducerName + "_delete"
+	      actionFetch: PREFIX + "@" + custom.prefix + reducerName,
+	      actionSuccess: PREFIX + "@" + custom.prefix + reducerName + "_success",
+	      actionFail: PREFIX + "@" + custom.prefix + reducerName + "_fail",
+	      actionReset: PREFIX + "@" + custom.prefix + reducerName + "_delete"
 	    };
 	
 	    var meta = {
