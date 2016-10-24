@@ -5,7 +5,7 @@
 import reduxApi, {transformers} from "redux-api";
 ```
 
-#### reduxApi(options)
+#### reduxApi(options, baseConfig)
 - @description create endpoint
 - @param **options** - configuration of rest-api endpoints
   - @type: Object
@@ -41,6 +41,11 @@ import reduxApi, {transformers} from "redux-api";
       }
     }
 ```
+@param **baseConfig** - additional base configuration
+@param baseConfig.prefix - custom prefix for ACTIONS if you use more then 1 restApi instance
+@type: String
+@default: ""
+
 
 ###Configuration options
 #### url
