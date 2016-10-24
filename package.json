@@ -21,6 +21,7 @@
     "compile": "node_modules/.bin/babel src --out-dir lib",
     "browser-dev": "node_modules/.bin/webpack -d src/index.js dist/redux-api.js",
     "browser-min": "cross-env NODE_ENV=production node_modules/.bin/webpack -d src/index.js dist/redux-api.min.js",
+    "release": "node_modules/.bin/standard-version --no-verify && git push --follow-tags origin master; npm publish",
     "precommit": "npm test",
     "prepush": "npm test && npm run build",
     "postmerge": "npm install"
@@ -53,6 +54,7 @@
     "mocha-lcov-reporter": "1.2.0",
     "redux": "3.6.0",
     "redux-thunk": "2.1.0",
+    "standard-version": "^3.0.0",
     "webpack": "1.13.2",
     "yaspeller": "3.0.0"
   },
