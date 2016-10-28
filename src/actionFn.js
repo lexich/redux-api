@@ -4,6 +4,7 @@ import fastApply from "fast-apply";
 import libUrl from "url";
 import urlTransform from "./urlTransform";
 import merge from "./utils/merge";
+import get from "./utils/get";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
@@ -117,14 +118,14 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const middlewareParser = (meta.holder && meta.holder.middlewareParser) ||
         defaultMiddlewareArgsParser;
       const { dispatch, getState } = middlewareParser(...middlewareArgs);
-      const { reducerName } = meta;
+      const { reducerName, prefix } = meta;
       const state = getState();
-      const store = state[reducerName];
-      const requestOptions = { pathvars, params };
-      if (store && store.loading) {
+      const isLoading = get(state, prefix, reducerName, "loading");
+      if (isLoading) {
         return;
       }
-      const prevData = state && state[reducerName] && state[reducerName].data;
+      const requestOptions = { pathvars, params };
+      const prevData =  get(state, prefix, reducerName, "data");
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch,

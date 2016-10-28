@@ -324,8 +324,20 @@ describe("redux", ()=> {
   it("multiple endpoints", function() {
     const fetch = url=> Promise.resolve(url);
 
+    const expectedData = [
+      [(void 0), (void 0)],
+      ["/test1", {}]
+    ];
+    const actualData = [];
+
     const rest1 = reduxApi({
-      test: "/test1"
+      test: {
+        url: "/test1",
+        transformer(data, prevData) {
+          actualData.push([data, prevData]);
+          return data ? { data } : {};
+        }
+      }
     }, { prefix: "r1" }).use("fetch", fetch);
 
     const rest2 = reduxApi({
@@ -435,11 +447,15 @@ describe("redux", ()=> {
     return store.dispatch(rest1.actions.test())
       .then(()=> store.dispatch(rest2.actions.test()))
       .then(()=> {
-        expect(receiveArgs).to.have.length(expectedArgs.length);
+        expect(receiveArgs).to.have.length(4);
         expect(receiveArgs[0]).to.eql(expectedArgs[0]);
         expect(receiveArgs[1]).to.eql(expectedArgs[1]);
         expect(receiveArgs[2]).to.eql(expectedArgs[2]);
         expect(receiveArgs[3]).to.eql(expectedArgs[3]);
+
+        expect(actualData).to.have.length(2);
+        expect(actualData[0]).to.eql(expectedData[0]);
+        expect(actualData[1]).to.eql(expectedData[1]);
       });
   });
 });

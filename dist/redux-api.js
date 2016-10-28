@@ -228,6 +228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      validation: validation,
 	      helpers: helpers,
 	      transformer: transformer,
+	      prefix: prefix,
 	      crud: crud
 	    };
 	
@@ -2410,6 +2411,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _merge2 = _interopRequireDefault(_merge);
 	
+	var _get = __webpack_require__(/*! ./utils/get */ 22);
+	
+	var _get2 = _interopRequireDefault(_get);
+	
 	var _fetchResolver = __webpack_require__(/*! ./fetchResolver */ 18);
 	
 	var _fetchResolver2 = _interopRequireDefault(_fetchResolver);
@@ -2565,14 +2570,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var dispatch = _middlewareParser.dispatch;
 	      var getState = _middlewareParser.getState;
 	      var reducerName = meta.reducerName;
+	      var prefix = meta.prefix;
 	
 	      var state = getState();
-	      var store = state[reducerName];
-	      var requestOptions = { pathvars: pathvars, params: params };
-	      if (store && store.loading) {
+	      var isLoading = (0, _get2.default)(state, prefix, reducerName, "loading");
+	      if (isLoading) {
 	        return;
 	      }
-	      var prevData = state && state[reducerName] && state[reducerName].data;
+	      var requestOptions = { pathvars: pathvars, params: params };
+	      var prevData = (0, _get2.default)(state, prefix, reducerName, "data");
 	      dispatch({ type: actionFetch, syncing: syncing, request: requestOptions });
 	      var fetchResolverOpts = {
 	        dispatch: dispatch,
@@ -2977,7 +2983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _url = __webpack_require__(/*! url */ 1);
 	
-	var _omit = __webpack_require__(/*! ./utils/omit */ 22);
+	var _omit = __webpack_require__(/*! ./utils/omit */ 23);
 	
 	var _omit2 = _interopRequireDefault(_omit);
 	
@@ -3050,6 +3056,37 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 22 */
+/*!**************************!*\
+  !*** ./src/utils/get.js ***!
+  \**************************/
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	/* eslint no-void: 0 */
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (obj) {
+	  for (var _len = arguments.length, path = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    path[_key - 1] = arguments[_key];
+	  }
+	
+	  return path.reduce(function (memo, name) {
+	    return isEmpty(name) ? memo : memo && memo[name];
+	  }, obj);
+	};
+	
+	function isEmpty(name) {
+	  return name === "" || name === null || name === void 0;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 23 */
 /*!***************************!*\
   !*** ./src/utils/omit.js ***!
   \***************************/

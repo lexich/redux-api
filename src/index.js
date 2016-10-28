@@ -130,6 +130,7 @@ export default function reduxApi(config, baseConfig) {
       validation,
       helpers,
       transformer,
+      prefix,
       crud
     };
 
