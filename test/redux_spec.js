@@ -320,4 +320,126 @@ describe("redux", ()=> {
       .then(()=> store.dispatch(rest.actions.test2()))
       .then(()=> expect(expectedArgs).to.eql(["none"]));
   });
+
+  it("multiple endpoints", function() {
+    const fetch = url=> Promise.resolve(url);
+
+    const rest1 = reduxApi({
+      test: "/test1"
+    }, { prefix: "r1" }).use("fetch", fetch);
+
+    const rest2 = reduxApi({
+      test: "/test2"
+    }, { prefix: "r2" }).use("fetch", fetch);
+
+    const reducer = combineReducers({
+      r1: combineReducers(rest1.reducers),
+      r2: combineReducers(rest2.reducers)
+    });
+
+    const expectedArgs = [
+      ["@@redux-api@r1test", {
+        r1: {
+          test: {
+            sync: false,
+            syncing: false,
+            loading: true,
+            data: {},
+            error: null
+          }
+        },
+        r2: {
+          test: {
+            sync: false,
+            syncing: false,
+            loading: false,
+            data: {}
+          }
+        }
+      }],
+      ["@@redux-api@r1test_success", {
+        r1: {
+          test: {
+            sync: true,
+            syncing: false,
+            loading: false,
+            data: { data: "/test1" },
+            error: null
+          }
+        },
+        r2: {
+          test: {
+            sync: false,
+            syncing: false,
+            loading: false,
+            data: {}
+          }
+        }
+      }],
+      ["@@redux-api@r2test", {
+        r1: {
+          test: {
+            data: { data: "/test1" },
+            error: null,
+            loading: false,
+            sync: true,
+            syncing: false
+          }
+        },
+        r2: {
+          test: {
+            data: {},
+            error: null,
+            loading: true,
+            sync: false,
+            syncing: false
+          }
+        }
+      }],
+      ["@@redux-api@r2test_success", {
+        r1: {
+          test: {
+            sync: true,
+            syncing: false,
+            loading: false,
+            data: { data: "/test1" },
+            error: null
+          }
+        },
+        r2: {
+          test: {
+            sync: true,
+            syncing: false,
+            loading: false,
+            data: { data: "/test2" },
+            error: null
+          }
+        }
+      }],
+    ];
+    const receiveArgs = [];
+    function midleware({ getState }) {
+      return next=> (action)=> {
+        const result = next(action);
+        if (typeof action !== "function") {
+          receiveArgs.push([action.type, getState()]);
+        }
+        return result;
+      };
+    }
+
+    const createStoreWithMiddleware = applyMiddleware(midleware, thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+
+
+    return store.dispatch(rest1.actions.test())
+      .then(()=> store.dispatch(rest2.actions.test()))
+      .then(()=> {
+        expect(receiveArgs).to.have.length(expectedArgs.length);
+        expect(receiveArgs[0]).to.eql(expectedArgs[0]);
+        expect(receiveArgs[1]).to.eql(expectedArgs[1]);
+        expect(receiveArgs[2]).to.eql(expectedArgs[2]);
+        expect(receiveArgs[3]).to.eql(expectedArgs[3]);
+      });
+  });
 });
