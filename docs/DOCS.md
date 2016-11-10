@@ -35,7 +35,7 @@ import reduxApi, {transformers} from "redux-api";
       entry: {
         url: "/api/v1/entry",
         transformer: transformers.object, //it's default value
-        options: function(url, params) {  //it's default value
+        options: function(url, params, getState) {  //it's default value
           return {};
         }
       }
