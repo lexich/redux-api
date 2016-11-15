@@ -58,7 +58,6 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
-  const responseHandler = meta && meta.holder && meta.holder.responseHandler;
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -66,6 +65,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Function} getState    helper meta function
   */
   const request = (pathvars, params, getState=none)=> {
+    const responseHandler = meta && meta.holder && meta.holder.responseHandler;
     const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
     const rootUrl = meta.holder ? meta.holder.rootUrl : null;
     let urlT = resultUrlT;
