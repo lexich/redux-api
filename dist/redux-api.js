@@ -187,17 +187,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      console.warn("Deprecated `broadcast` option. you shoud use `events`" + "to catch redux-api events (see https://github.com/lexich/redux-api/blob/master/DOCS.md#Events)");
 	    }
 	
-	    var url = opts.url;
-	    var urlOptions = opts.urlOptions;
-	    var options = opts.options;
-	    var transformer = opts.transformer;
-	    var broadcast = opts.broadcast;
-	    var crud = opts.crud;
-	    var reducerName = opts.reducerName;
-	    var prefetch = opts.prefetch;
-	    var postfetch = opts.postfetch;
-	    var validation = opts.validation;
-	    var helpers = opts.helpers;
+	    var url = opts.url,
+	        urlOptions = opts.urlOptions,
+	        options = opts.options,
+	        transformer = opts.transformer,
+	        broadcast = opts.broadcast,
+	        crud = opts.crud,
+	        reducerName = opts.reducerName,
+	        prefetch = opts.prefetch,
+	        postfetch = opts.postfetch,
+	        validation = opts.validation,
+	        helpers = opts.helpers;
 	
 	
 	    var prefix = baseConfig && baseConfig.prefix || "";
@@ -259,9 +259,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
-/*!**********************!*\
-  !*** ./~/url/url.js ***!
-  \**********************/
+/*!**************************************************!*\
+  !*** (webpack)/~/node-libs-browser/~/url/url.js ***!
+  \**************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -289,7 +289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var punycode = __webpack_require__(/*! punycode */ 12);
+	var punycode = __webpack_require__(/*! punycode */ 10);
 	
 	exports.parse = urlParse;
 	exports.resolve = urlResolve;
@@ -368,7 +368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'gopher:': true,
 	  'file:': true
 	},
-	    querystring = __webpack_require__(/*! querystring */ 11);
+	    querystring = __webpack_require__(/*! querystring */ 13);
 	
 	function urlParse(url, parseQueryString, slashesDenoteHost) {
 	  if (url && isObject(url) && url instanceof Url) return url;
@@ -1590,185 +1590,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/*!*********************************!*\
-  !*** ./~/querystring/decode.js ***!
-  \*********************************/
+/*!***********************************!*\
+  !*** (webpack)/buildin/module.js ***!
+  \***********************************/
 /***/ function(module, exports) {
 
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	"use strict";
 	
-	'use strict';
-	
-	// If obj.hasOwnProperty has been overridden, then calling
-	// obj.hasOwnProperty(prop) will break.
-	// See: https://github.com/joyent/node/issues/1707
-	
-	function hasOwnProperty(obj, prop) {
-	  return Object.prototype.hasOwnProperty.call(obj, prop);
-	}
-	
-	module.exports = function (qs, sep, eq, options) {
-	  sep = sep || '&';
-	  eq = eq || '=';
-	  var obj = {};
-	
-	  if (typeof qs !== 'string' || qs.length === 0) {
-	    return obj;
-	  }
-	
-	  var regexp = /\+/g;
-	  qs = qs.split(sep);
-	
-	  var maxKeys = 1000;
-	  if (options && typeof options.maxKeys === 'number') {
-	    maxKeys = options.maxKeys;
-	  }
-	
-	  var len = qs.length;
-	  // maxKeys <= 0 means that we should not limit keys count
-	  if (maxKeys > 0 && len > maxKeys) {
-	    len = maxKeys;
-	  }
-	
-	  for (var i = 0; i < len; ++i) {
-	    var x = qs[i].replace(regexp, '%20'),
-	        idx = x.indexOf(eq),
-	        kstr,
-	        vstr,
-	        k,
-	        v;
-	
-	    if (idx >= 0) {
-	      kstr = x.substr(0, idx);
-	      vstr = x.substr(idx + 1);
-	    } else {
-	      kstr = x;
-	      vstr = '';
-	    }
-	
-	    k = decodeURIComponent(kstr);
-	    v = decodeURIComponent(vstr);
-	
-	    if (!hasOwnProperty(obj, k)) {
-	      obj[k] = v;
-	    } else if (Array.isArray(obj[k])) {
-	      obj[k].push(v);
-	    } else {
-	      obj[k] = [obj[k], v];
-	    }
-	  }
-	
-	  return obj;
+	module.exports = function (module) {
+		if (!module.webpackPolyfill) {
+			module.deprecate = function () {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
 	};
 
 /***/ },
 /* 10 */
-/*!*********************************!*\
-  !*** ./~/querystring/encode.js ***!
-  \*********************************/
-/***/ function(module, exports) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
-	'use strict';
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
-	var stringifyPrimitive = function stringifyPrimitive(v) {
-	  switch (typeof v === 'undefined' ? 'undefined' : _typeof(v)) {
-	    case 'string':
-	      return v;
-	
-	    case 'boolean':
-	      return v ? 'true' : 'false';
-	
-	    case 'number':
-	      return isFinite(v) ? v : '';
-	
-	    default:
-	      return '';
-	  }
-	};
-	
-	module.exports = function (obj, sep, eq, name) {
-	  sep = sep || '&';
-	  eq = eq || '=';
-	  if (obj === null) {
-	    obj = undefined;
-	  }
-	
-	  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-	    return Object.keys(obj).map(function (k) {
-	      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
-	      if (Array.isArray(obj[k])) {
-	        return obj[k].map(function (v) {
-	          return ks + encodeURIComponent(stringifyPrimitive(v));
-	        }).join(sep);
-	      } else {
-	        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
-	      }
-	    }).join(sep);
-	  }
-	
-	  if (!name) return '';
-	  return encodeURIComponent(stringifyPrimitive(name)) + eq + encodeURIComponent(stringifyPrimitive(obj));
-	};
-
-/***/ },
-/* 11 */
-/*!********************************!*\
-  !*** ./~/querystring/index.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 9);
-	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 10);
-
-/***/ },
-/* 12 */
-/*!**************************************!*\
-  !*** ./~/url/~/punycode/punycode.js ***!
-  \**************************************/
+/*!******************************************************************!*\
+  !*** (webpack)/~/node-libs-browser/~/url/~/punycode/punycode.js ***!
+  \******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {'use strict';
@@ -2300,27 +2144,183 @@ return /******/ (function(modules) { // webpackBootstrap
 			root.punycode = punycode;
 		}
 	})(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../webpack/buildin/module.js */ 13)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../../../buildin/module.js */ 9)(module), (function() { return this; }())))
+
+/***/ },
+/* 11 */
+/*!*******************************************************************!*\
+  !*** (webpack)/~/node-libs-browser/~/url/~/querystring/decode.js ***!
+  \*******************************************************************/
+/***/ function(module, exports) {
+
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	
+	'use strict';
+	
+	// If obj.hasOwnProperty has been overridden, then calling
+	// obj.hasOwnProperty(prop) will break.
+	// See: https://github.com/joyent/node/issues/1707
+	
+	function hasOwnProperty(obj, prop) {
+	  return Object.prototype.hasOwnProperty.call(obj, prop);
+	}
+	
+	module.exports = function (qs, sep, eq, options) {
+	  sep = sep || '&';
+	  eq = eq || '=';
+	  var obj = {};
+	
+	  if (typeof qs !== 'string' || qs.length === 0) {
+	    return obj;
+	  }
+	
+	  var regexp = /\+/g;
+	  qs = qs.split(sep);
+	
+	  var maxKeys = 1000;
+	  if (options && typeof options.maxKeys === 'number') {
+	    maxKeys = options.maxKeys;
+	  }
+	
+	  var len = qs.length;
+	  // maxKeys <= 0 means that we should not limit keys count
+	  if (maxKeys > 0 && len > maxKeys) {
+	    len = maxKeys;
+	  }
+	
+	  for (var i = 0; i < len; ++i) {
+	    var x = qs[i].replace(regexp, '%20'),
+	        idx = x.indexOf(eq),
+	        kstr,
+	        vstr,
+	        k,
+	        v;
+	
+	    if (idx >= 0) {
+	      kstr = x.substr(0, idx);
+	      vstr = x.substr(idx + 1);
+	    } else {
+	      kstr = x;
+	      vstr = '';
+	    }
+	
+	    k = decodeURIComponent(kstr);
+	    v = decodeURIComponent(vstr);
+	
+	    if (!hasOwnProperty(obj, k)) {
+	      obj[k] = v;
+	    } else if (Array.isArray(obj[k])) {
+	      obj[k].push(v);
+	    } else {
+	      obj[k] = [obj[k], v];
+	    }
+	  }
+	
+	  return obj;
+	};
+
+/***/ },
+/* 12 */
+/*!*******************************************************************!*\
+  !*** (webpack)/~/node-libs-browser/~/url/~/querystring/encode.js ***!
+  \*******************************************************************/
+/***/ function(module, exports) {
+
+	// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	
+	'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
+	var stringifyPrimitive = function stringifyPrimitive(v) {
+	  switch (typeof v === 'undefined' ? 'undefined' : _typeof(v)) {
+	    case 'string':
+	      return v;
+	
+	    case 'boolean':
+	      return v ? 'true' : 'false';
+	
+	    case 'number':
+	      return isFinite(v) ? v : '';
+	
+	    default:
+	      return '';
+	  }
+	};
+	
+	module.exports = function (obj, sep, eq, name) {
+	  sep = sep || '&';
+	  eq = eq || '=';
+	  if (obj === null) {
+	    obj = undefined;
+	  }
+	
+	  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+	    return Object.keys(obj).map(function (k) {
+	      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+	      if (Array.isArray(obj[k])) {
+	        return obj[k].map(function (v) {
+	          return ks + encodeURIComponent(stringifyPrimitive(v));
+	        }).join(sep);
+	      } else {
+	        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+	      }
+	    }).join(sep);
+	  }
+	
+	  if (!name) return '';
+	  return encodeURIComponent(stringifyPrimitive(name)) + eq + encodeURIComponent(stringifyPrimitive(obj));
+	};
 
 /***/ },
 /* 13 */
-/*!***********************************!*\
-  !*** (webpack)/buildin/module.js ***!
-  \***********************************/
-/***/ function(module, exports) {
+/*!******************************************************************!*\
+  !*** (webpack)/~/node-libs-browser/~/url/~/querystring/index.js ***!
+  \******************************************************************/
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
-	module.exports = function (module) {
-		if (!module.webpackPolyfill) {
-			module.deprecate = function () {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	};
+	exports.decode = exports.parse = __webpack_require__(/*! ./decode */ 11);
+	exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ 12);
 
 /***/ },
 /* 14 */
@@ -2454,13 +2454,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      args[_key] = arguments[_key];
 	    }
 	
-	    var _extractArgs = extractArgs(args);
-	
-	    var _extractArgs2 = _slicedToArray(_extractArgs, 3);
-	
-	    var pathvars = _extractArgs2[0];
-	    var params = _extractArgs2[1];
-	    var cb = _extractArgs2[2];
+	    var _extractArgs = extractArgs(args),
+	        _extractArgs2 = _slicedToArray(_extractArgs, 3),
+	        pathvars = _extractArgs2[0],
+	        params = _extractArgs2[1],
+	        cb = _extractArgs2[2];
 	
 	    return [pathvars, _extends({}, params, { method: name.toUpperCase() }), cb];
 	  };
@@ -2487,14 +2485,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function actionFn(url, name, options) {
 	  var ACTIONS = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 	  var meta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
-	  var actionFetch = ACTIONS.actionFetch;
-	  var actionSuccess = ACTIONS.actionSuccess;
-	  var actionFail = ACTIONS.actionFail;
-	  var actionReset = ACTIONS.actionReset;
+	  var actionFetch = ACTIONS.actionFetch,
+	      actionSuccess = ACTIONS.actionSuccess,
+	      actionFail = ACTIONS.actionFail,
+	      actionReset = ACTIONS.actionReset;
 	
 	  var pubsub = new _PubSub2.default();
 	  var requestHolder = (0, _createHolder2.default)();
-	  var responseHandler = meta && meta.holder && meta.holder.responseHandler;
 	  /**
 	   * Fetch data from server
 	   * @param  {Object}   pathvars    path vars for url
@@ -2504,6 +2501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var request = function request(pathvars, params) {
 	    var getState = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : none;
 	
+	    var responseHandler = meta && meta.holder && meta.holder.responseHandler;
 	    var resultUrlT = (0, _urlTransform2.default)(url, pathvars, meta.urlOptions);
 	    var rootUrl = meta.holder ? meta.holder.rootUrl : null;
 	    var urlT = resultUrlT;
@@ -2551,13 +2549,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      args[_key2] = arguments[_key2];
 	    }
 	
-	    var _extractArgs3 = extractArgs(args);
-	
-	    var _extractArgs4 = _slicedToArray(_extractArgs3, 3);
-	
-	    var pathvars = _extractArgs4[0];
-	    var params = _extractArgs4[1];
-	    var callback = _extractArgs4[2];
+	    var _extractArgs3 = extractArgs(args),
+	        _extractArgs4 = _slicedToArray(_extractArgs3, 3),
+	        pathvars = _extractArgs4[0],
+	        params = _extractArgs4[1],
+	        callback = _extractArgs4[2];
 	
 	    var syncing = params ? !!params.syncing : false;
 	    params && delete params.syncing;
@@ -2565,12 +2561,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return function () {
 	      var middlewareParser = meta.holder && meta.holder.middlewareParser || defaultMiddlewareArgsParser;
 	
-	      var _middlewareParser = middlewareParser.apply(undefined, arguments);
+	      var _middlewareParser = middlewareParser.apply(undefined, arguments),
+	          dispatch = _middlewareParser.dispatch,
+	          getState = _middlewareParser.getState;
 	
-	      var dispatch = _middlewareParser.dispatch;
-	      var getState = _middlewareParser.getState;
-	      var reducerName = meta.reducerName;
-	      var prefix = meta.prefix;
+	      var reducerName = meta.reducerName,
+	          prefix = meta.prefix;
 	
 	      var state = getState();
 	      var isLoading = (0, _get2.default)(state, prefix, reducerName, "loading");
@@ -2662,13 +2658,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      args[_key3] = arguments[_key3];
 	    }
 	
-	    var _extractArgs5 = extractArgs(args);
-	
-	    var _extractArgs6 = _slicedToArray(_extractArgs5, 3);
-	
-	    var pathvars = _extractArgs6[0];
-	    var params = _extractArgs6[1];
-	    var callback = _extractArgs6[2];
+	    var _extractArgs5 = extractArgs(args),
+	        _extractArgs6 = _slicedToArray(_extractArgs5, 3),
+	        pathvars = _extractArgs6[0],
+	        params = _extractArgs6[1],
+	        callback = _extractArgs6[2];
 	
 	    var isServer = meta.holder ? meta.holder.server : false;
 	    return function (dispatch, getState) {
@@ -2692,10 +2686,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new Error("Helper name: \"" + helpername + "\" for endpoint \"" + name + "\" has been already reserved");
 	    }
 	
-	    var _ref = func instanceof Function ? { call: func } : func;
-	
-	    var sync = _ref.sync;
-	    var call = _ref.call;
+	    var _ref = func instanceof Function ? { call: func } : func,
+	        sync = _ref.sync,
+	        call = _ref.call;
 	
 	    memo[helpername] = function () {
 	      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
@@ -2888,10 +2881,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function reducerFn(initialState) {
 	  var actions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	  var reducer = arguments[2];
-	  var actionFetch = actions.actionFetch;
-	  var actionSuccess = actions.actionSuccess;
-	  var actionFail = actions.actionFail;
-	  var actionReset = actions.actionReset;
+	  var actionFetch = actions.actionFetch,
+	      actionSuccess = actions.actionSuccess,
+	      actionFail = actions.actionFail,
+	      actionReset = actions.actionReset;
 	
 	  return function () {
 	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -3023,20 +3016,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return urlWithParams;
 	  }
 	
-	  var _parse = (0, _url.parse)(urlWithParams);
-	
-	  var protocol = _parse.protocol;
-	  var host = _parse.host;
-	  var path = _parse.path;
+	  var _parse = (0, _url.parse)(urlWithParams),
+	      protocol = _parse.protocol,
+	      host = _parse.host,
+	      path = _parse.path;
 	
 	  var cleanURL = host ? protocol + "//" + host + path.replace(rxClean, "") : path.replace(rxClean, "");
 	  var usedKeysArray = Object.keys(usedKeys);
 	  if (usedKeysArray.length !== Object.keys(params).length) {
 	    var urlObject = cleanURL.split("?");
 	    options || (options = {});
-	    var _options = options;
-	    var arrayFormat = _options.arrayFormat;
-	    var delimiter = _options.delimiter;
+	    var _options = options,
+	        arrayFormat = _options.arrayFormat,
+	        delimiter = _options.delimiter;
 	
 	    var qsParseOptions = _extends({
 	      arrayFormat: arrayFormat,
