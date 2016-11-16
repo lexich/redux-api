@@ -367,4 +367,21 @@ describe("index", function() {
       "request", "reset", "sync"
     );
   });
+
+  it("check responseHandler option", ()=> {
+    let called = false;
+    function fetchSuccess() {
+      return new Promise(resolve=> resolve({ msg: "hello" }));
+    }
+    const res = reduxApi({
+      hello: "/test/",
+    })
+    .use("fetch", fetchSuccess)
+    .use("responseHandler", ()=> {
+      called = true;
+    });
+    return res.actions.hello.request().then(()=> {
+      expect(called).to.true;
+    });
+  });
 });
