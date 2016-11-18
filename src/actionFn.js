@@ -130,6 +130,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const fetchResolverOpts = {
         dispatch,
         getState,
+        requestOptions,
         actions: meta.actions,
         prefetch: meta.prefetch
       };

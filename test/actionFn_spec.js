@@ -430,17 +430,18 @@ describe("actionFn", function() {
         }
       ]
     };
+    const requestOptions = { pathvars: undefined, params: {} };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     const expectedEvent = [{
       type: ACTIONS.actionFetch,
       syncing: false,
-      request: { pathvars: undefined, params: {} }
+      request: requestOptions
     }, {
       type: ACTIONS.actionSuccess,
       data: { msg: "hello" },
       origData: { msg: "hello" },
       syncing: false,
-      request: { pathvars: undefined, params: {} }
+      request: requestOptions
     }];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
@@ -448,7 +449,7 @@ describe("actionFn", function() {
       expect(msg).to.eql(exp);
     }
     const expOpts = {
-      dispatch, getState, actions: undefined, prefetch: meta.prefetch
+      dispatch, getState, requestOptions, actions: undefined, prefetch: meta.prefetch
     };
     return new Promise((resolve)=> {
       api(resolve)(dispatch, getState);
