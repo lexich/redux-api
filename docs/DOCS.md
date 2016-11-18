@@ -241,10 +241,25 @@ In this case you global state is look like this:
       }
     ],
     options: function(url, params, getState) {
-      const {user: {data: {uuid}}} = getState();
+      const {profile: {data: {uuid}}} = getState();
       return { ...params, body: { ...params.body, uuid }};
     }
-  }
+  },
+  friends: {
+    url: "/user/:name/friends",
+    prefetch: [
+      function({actions, dispatch, getState, requestOptions}, cb) {
+        const {profile: {data: {uuid}}} = getState();
+        const {pathVars: {name}} = requestOptions;
+        uuid ? cb() : dispatch(actions.profile({name}, cb));
+      }
+      ,
+      options: function(url, params, getState) {
+        const {profile: {data: {uuid}}} = getState();
+        return { ...params, body: { ...params.body, uuid }};
+      }
+    ]
+  }  
 }
 ```
 
