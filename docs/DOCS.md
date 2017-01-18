@@ -252,13 +252,12 @@ In this case you global state is look like this:
         const {profile: {data: {uuid}}} = getState();
         const {pathVars: {name}} = requestOptions;
         uuid ? cb() : dispatch(actions.profile({name}, cb));
-      }
-      ,
-      options: function(url, params, getState) {
-        const {profile: {data: {uuid}}} = getState();
-        return { ...params, body: { ...params.body, uuid }};
-      }
-    ]
+      }     
+    ],
+    options: function(url, params, getState) {
+      const {profile: {data: {uuid}}} = getState();
+      return { ...params, body: { ...params.body, uuid }};
+    }
   }  
 }
 ```
