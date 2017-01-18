@@ -73,7 +73,7 @@ import "isomorphic-fetch";
 import reduxApi, {transformers} from "redux-api";
 import adapterFetch from "redux-api/lib/adapters/fetch";
 export default reduxApi({
-  // simple edpoint description
+  // simple endpoint description
   entry: `/api/v1/entry/:id`,
   // complex endpoint description
   regions: {
