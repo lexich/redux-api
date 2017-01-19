@@ -287,12 +287,12 @@ describe("redux", ()=> {
       [(void 0), (void 0), (void 0)],
       ["/api/test1", (void 0), {
         type: "@@redux-api@test1_success",
-        request: { pathvars: (void 0), params: (void 0)
-      } }],
+        request: { pathvars: (void 0), params: (void 0) }
+      }],
       ["/api/test2", "/api/test1", {
         type: "@@redux-api@test1_success",
-        request: { pathvars: (void 0), params: (void 0)
-      } }],
+        request: { pathvars: (void 0), params: (void 0) }
+      }],
       "none"
     ];
     const rest = reduxApi({

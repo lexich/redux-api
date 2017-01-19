@@ -5,6 +5,7 @@ import { parse } from "url";
 import omit from "./utils/omit";
 import merge from "./utils/merge";
 
+/* eslint no-useless-escape: 0 */
 const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
 
 /**
