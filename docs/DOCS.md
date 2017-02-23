@@ -427,10 +427,19 @@ rest.use("server", true);
 
 ####rootUrl
 - @description - root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`
+- @type: String | Functions
 - @example
 ```js
 const rest = reduxApi({...});
 rest.use("rootUrl", "http://localhost:3000");
+```
+
+Or a function
+```js
+const rest = reduxApi({...});
+rest.use("rootUrl", function(url, params getState) {
+  return getState().config.rootUrl;
+});
 ```
 
 ####options

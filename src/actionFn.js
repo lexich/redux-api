@@ -67,14 +67,18 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const request = (pathvars, params, getState=none)=> {
     const responseHandler = meta && meta.holder && meta.holder.responseHandler;
     const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
-    const rootUrl = meta.holder ? meta.holder.rootUrl : null;
     let urlT = resultUrlT;
+    let rootUrl = meta.holder ? meta.holder.rootUrl : null;
+    rootUrl = (rootUrl instanceof Function) ?
+      rootUrl(urlT, params, getState) :
+      rootUrl;
     if (rootUrl) {
+      const rootUrlObject = libUrl.parse(rootUrl);
       const urlObject = libUrl.parse(urlT);
       if (!urlObject.host) {
-        const urlPath = (rootUrl.path ? rootUrl.path.replace(/\/$/, "") : "") +
+        const urlPath = (rootUrlObject.path ? rootUrlObject.path.replace(/\/$/, "") : "") +
           "/" + (urlObject.path ? urlObject.path.replace(/^\//, "") : "");
-        urlT = `${rootUrl.protocol}//${rootUrl.host}${urlPath}`;
+        urlT = `${rootUrlObject.protocol}//${rootUrlObject.host}${urlPath}`;
       }
     }
     const globalOptions = !meta.holder ? {} :
