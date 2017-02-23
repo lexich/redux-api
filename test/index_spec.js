@@ -57,8 +57,20 @@ describe("index", function() {
     .use("server", false)
     .use("rootUrl", "http://api.ru/");
 
+    const res3 = reduxApi({
+      test1: "/url1/"
+    })
+    .use("fetch", fetchUrl)
+    .use("server", false)
+    .use("rootUrl", (url, params /* , getState */)=> {
+      expect(url).to.eql("/url1/");
+      expect(params).to.eql({ a: "b" });
+      return "http://api.net/";
+    });
+
     const act = res.actions;
     const act2 = res2.actions;
+    const act3 = res3.actions;
     return Promise.all([
       act.test1.request(),
       act.test2.request(),
@@ -67,7 +79,8 @@ describe("index", function() {
       act2.test1.request(),
       act2.test2.request(),
       act2.test3.request(),
-      act2.test4.request({ id: 2 })
+      act2.test4.request({ id: 2 }),
+      act3.test1.request({}, { a: "b" })
     ]).then(()=> {
       expect([
         "http://api.com/root/url1/",
@@ -77,7 +90,8 @@ describe("index", function() {
         "http://api.ru/url1/",
         "http://api.ru/url2",
         "http://api.ru/",
-        "http://api.ru/2"
+        "http://api.ru/2",
+        "http://api.net/url1/"
       ]).to.eql(urls);
     });
   });

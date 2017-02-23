@@ -2,7 +2,6 @@
 
 /* eslint no-void: 0 */
 
-import libUrl from "url";
 import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
 import transformers from "./transformers";
@@ -70,11 +69,7 @@ export default function reduxApi(config, baseConfig) {
 
   const cfg = {
     use(key, value) {
-      if (key === "rootUrl") {
-        value && (fetchHolder[key] = libUrl.parse(value));
-      } else {
-        fetchHolder[key] = value;
-      }
+      fetchHolder[key] = value;
 
       return this;
     },
