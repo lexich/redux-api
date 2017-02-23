@@ -435,6 +435,7 @@ rest.use("rootUrl", "http://localhost:3000");
 
 ####options
 - @description - Apply add options for each rest call.
+- @type: String | Functions
 - @example
 ```js
 const rest = reduxApi({...});
@@ -444,6 +445,18 @@ rest.use("options", function() {
     'Accept': 'application/json'
   };
   return { headers: headers };
+});
+```
+
+Or a function
+```js
+const rest = reduxApi({...});
+rest.use("options", function(url, params getState) {
+  return {
+    headers: {
+      'X-Token': getState().user.accessToken
+    }
+  };
 });
 ```
 
