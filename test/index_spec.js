@@ -369,19 +369,72 @@ describe("index", function() {
   });
 
   it("check responseHandler option", ()=> {
-    let called = false;
+    const error1 = new Error("bar");
+    const error2 = new Error("baz");
     function fetchSuccess() {
       return new Promise(resolve=> resolve({ msg: "hello" }));
     }
-    const res = reduxApi({
+    function fetchError() {
+      return new Promise((resolve, reject)=> reject(error2));
+    }
+
+    let calledSucess = false;
+    const resSuccess = reduxApi({
       hello: "/test/",
     })
     .use("fetch", fetchSuccess)
-    .use("responseHandler", ()=> {
-      called = true;
+    .use("responseHandler", (err, data)=> {
+      expect(err).to.equal(null);
+      expect(data).to.deep.equal({ msg: "hello" });
+
+      calledSucess = true;
+
+      return { modified: true };
     });
-    return res.actions.hello.request().then(()=> {
-      expect(called).to.true;
+
+    let calledError = false;
+    const resError = reduxApi({
+      hello: "/test/",
+    })
+    .use("fetch", fetchError)
+    .use("responseHandler", (err, data)=> {
+      expect(err).to.equal(error2);
+      expect(data).to.equal(undefined);
+
+      calledError = true;
+
+      throw error1;
     });
+
+    let calledWithoutReturn = false;
+    const resWithoutReturn = reduxApi({
+      hello: "/test/",
+    })
+    .use("fetch", fetchSuccess)
+    .use("responseHandler", (/* err, data */)=> {
+      calledWithoutReturn = true;
+    });
+
+    return Promise.all([
+      resSuccess.actions.hello.request().then((res)=> {
+        expect(calledSucess).to.true;
+        expect(res).to.deep.equal({ modified: true });
+      }),
+
+      resError.actions.hello.request()
+      .catch((err)=> {
+        return { inCatch: true, err };
+      })
+      .then((res)=> {
+        expect(calledError).to.true;
+        expect(res.inCatch).to.true;
+        expect(res.err).to.equal(error1);
+      }),
+
+      resWithoutReturn.actions.hello.request().then((res)=> {
+        expect(calledWithoutReturn).to.true;
+        expect(res).to.deep.equal({ msg: "hello" });
+      }),
+    ]);
   });
 });

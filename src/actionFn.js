@@ -91,15 +91,21 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           err=> err ? reject(err) : resolve(data))));
     if (responseHandler) {
       if (result && result.then) {
-        result.then(
-          data=> responseHandler(null, data),
+        return result.then(
+          (data)=> {
+            const res = responseHandler(null, data);
+            if (res === undefined) {
+              return data;
+            } else {
+              return res;
+            }
+          },
           err=> responseHandler(err)
         );
       } else {
-        responseHandler(result);
+        return responseHandler(result);
       }
     }
-    result && result.catch && result.catch(none);
     return result;
   };
 
