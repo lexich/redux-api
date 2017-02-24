@@ -253,12 +253,12 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           });
         } else {
           // if helper alias is synchronous
+          const [pathvars, params] = helpersResult;
           fastApply(
-            sync ? fn.sync : fn, null, helpersResult.concat(callback)
+            sync ? fn.sync : fn, null, [pathvars, params, callback]
           )(dispatch, getState);
         }
       });
-      result.catch(none);
       return result;
     };
     return memo;

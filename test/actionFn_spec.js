@@ -705,13 +705,13 @@ describe("actionFn", function() {
     const expectedEvent = [{
       type: "actionFetch",
       syncing: false,
-      request: { pathvars: { id: "overwrite" }, params: {} }
+      request: { pathvars: { id: "overwrite" }, params: undefined }
     }, {
       type: "actionSuccess",
       syncing: false,
-      data: { url: "/test/overwrite", opts: {} },
-      origData: { url: "/test/overwrite", opts: {} },
-      request: { pathvars: { id: "overwrite" }, params: {} }
+      data: { url: "/test/overwrite", opts: null },
+      origData: { url: "/test/overwrite", opts: null },
+      request: { pathvars: { id: "overwrite" }, params: undefined }
     }];
 
     return new Promise((resolve)=> {
