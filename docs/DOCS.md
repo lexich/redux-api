@@ -490,12 +490,12 @@ reduxApi({ ... }).use("responseHandler",
 ```js
 reduxApi({ ... }).use("responseHandler",
   (err, data)=> {
-    if (err.message = 'Not allowed') {
-      throw new NotAllowedErro()
+    if (err.message === 'Not allowed') {
+      throw new NotAllowedError();
     } else {
-      return data
+      return data;
     }
-  }
+  });
 ```
 
 ####init(adapter, isServer, rootUrl)
