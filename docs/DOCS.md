@@ -437,7 +437,7 @@ rest.use("rootUrl", "http://localhost:3000");
 Or a function
 ```js
 const rest = reduxApi({...});
-rest.use("rootUrl", function(url, params getState) {
+rest.use("rootUrl", function(url, params, getState) {
   return getState().config.rootUrl;
 });
 ```
