@@ -89,9 +89,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       data=> new Promise(
         (resolve, reject)=> meta.validation(data,
           err=> err ? reject(err) : resolve(data))));
+    let ret = result;
     if (responseHandler) {
       if (result && result.then) {
-        return result.then(
+        ret = result.then(
           (data)=> {
             const res = responseHandler(null, data);
             if (res === undefined) {
@@ -103,10 +104,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           err=> responseHandler(err)
         );
       } else {
-        return responseHandler(result);
+        ret = responseHandler(result);
       }
     }
-    return result;
+    ret && ret.catch && ret.catch(none);
+    return ret;
   };
 
   /**
