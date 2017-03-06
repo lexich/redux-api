@@ -259,6 +259,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
           )(dispatch, getState);
         }
       });
+      result.catch(none);
       return result;
     };
     return memo;
