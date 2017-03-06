@@ -489,12 +489,22 @@ reduxApi({ ... }).use("middlewareParser",
 ```
 
 ####responseHandler
-- @description - catch all http response from each redux-api endpoint. First argument is Error is response fail, second argument data from success response.
+- @description - catch all http response from each redux-api endpoint. First argument is Error is response fail, second argument data from success response. It can be used for logging, error handling or data transformation.
 - @example
 ```js
 reduxApi({ ... }).use("responseHandler",
   (err, data)=>
     err ? console.log("ERROR", err) : console.log("SUCCESS", data));
+```
+```js
+reduxApi({ ... }).use("responseHandler",
+  (err, data)=> {
+    if (err.message === 'Not allowed') {
+      throw new NotAllowedError();
+    } else {
+      return data;
+    }
+  });
 ```
 
 ####init(adapter, isServer, rootUrl)

@@ -1184,19 +1184,25 @@ function actionFn(url, name, options) {
         });
       });
     });
+    var ret = result;
     if (responseHandler) {
       if (result && result.then) {
-        result.then(function (data) {
-          return responseHandler(null, data);
+        ret = result.then(function (data) {
+          var res = responseHandler(null, data);
+          if (res === undefined) {
+            return data;
+          } else {
+            return res;
+          }
         }, function (err) {
           return responseHandler(err);
         });
       } else {
-        responseHandler(result);
+        ret = responseHandler(result);
       }
     }
-    result && result.catch && result.catch(none);
-    return result;
+    ret && ret.catch && ret.catch(none);
+    return ret;
   };
 
   /**

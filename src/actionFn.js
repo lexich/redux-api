@@ -93,18 +93,26 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       data=> new Promise(
         (resolve, reject)=> meta.validation(data,
           err=> err ? reject(err) : resolve(data))));
+    let ret = result;
     if (responseHandler) {
       if (result && result.then) {
-        result.then(
-          data=> responseHandler(null, data),
+        ret = result.then(
+          (data)=> {
+            const res = responseHandler(null, data);
+            if (res === undefined) {
+              return data;
+            } else {
+              return res;
+            }
+          },
           err=> responseHandler(err)
         );
       } else {
-        responseHandler(result);
+        ret = responseHandler(result);
       }
     }
-    result && result.catch && result.catch(none);
-    return result;
+    ret && ret.catch && ret.catch(none);
+    return ret;
   };
 
   /**
