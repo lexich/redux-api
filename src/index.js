@@ -98,7 +98,7 @@ export default function reduxApi(config, baseConfig) {
 
     const {
       url, urlOptions, options, transformer, broadcast, crud,
-      reducerName, prefetch, postfetch, validation, helpers,
+      reducerName, prefetch, postfetch, validation, helpers, cache
     } = opts;
 
     const prefix = (baseConfig && baseConfig.prefix) || "";
@@ -107,37 +107,43 @@ export default function reduxApi(config, baseConfig) {
       actionFetch: `${PREFIX}@${prefix}${reducerName}`,
       actionSuccess: `${PREFIX}@${prefix}${reducerName}_success`,
       actionFail: `${PREFIX}@${prefix}${reducerName}_fail`,
-      actionReset: `${PREFIX}@${prefix}${reducerName}_delete`
+      actionReset: `${PREFIX}@${prefix}${reducerName}_delete`,
+      actionCache: `${PREFIX}@${prefix}${reducerName}_cache`
+    };
+
+    const fetch = opts.fetch ? opts.fetch : function(...args) {
+      return fetchHolder.fetch.apply(this, args);
     };
 
     const meta = {
-      urlOptions,
-      fetch: opts.fetch ? opts.fetch : function(...args) {
-        return fetchHolder.fetch.apply(this, args);
-      },
       holder: fetchHolder,
-      broadcast,
       virtual: !!opts.virtual,
-      reducerName,
       actions: memo.actions,
+      urlOptions,
+      fetch,
+      broadcast,
+      reducerName,
       prefetch,
       postfetch,
       validation,
       helpers,
       transformer,
       prefix,
-      crud
+      crud,
+      cache
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
 
     if (!meta.virtual && !memo.reducers[reducerName]) {
-      const initialState = {
-        sync: false,
-        syncing: false,
-        loading: false,
-        data: transformer()
-      };
+      const data = transformer();
+      const sync = false;
+      const syncing = false;
+      const loading = false;
+      const initialState = cache ?
+        { sync, syncing, loading, data, cache: {} } :
+        { sync, syncing, loading, data };
+
       const reducer = opts.reducer ? opts.reducer.bind(memo) : null;
       memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, reducer);
     }

@@ -34,7 +34,8 @@ const ACTIONS = {
   actionFetch: "actionFetch",
   actionSuccess: "actionSuccess",
   actionFail: "actionFail",
-  actionReset: "actionReset"
+  actionReset: "actionReset",
+  actionCache: "actionCache"
 };
 
 describe("actionFn", function() {

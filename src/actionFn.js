@@ -8,42 +8,7 @@ import get from "./utils/get";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
-
-function none() {}
-
-function extractArgs(args) {
-  let pathvars;
-  let params={};
-  let callback;
-  if (args[0] instanceof Function) {
-    callback = args[0];
-  } else if (args[1] instanceof Function) {
-    pathvars = args[0];
-    callback = args[1];
-  } else {
-    pathvars = args[0];
-    params = args[1];
-    callback = args[2] || none;
-  }
-  return [pathvars, params, callback];
-}
-
-function helperCrudFunction(name) {
-  return (...args)=> {
-    const [pathvars, params, cb] = extractArgs(args);
-    return [pathvars, { ...params, method: name.toUpperCase() }, cb];
-  };
-}
-
-function defaultMiddlewareArgsParser(dispatch, getState) {
-  return { dispatch, getState };
-}
-
-export const CRUD = ["get", "post", "put", "delete", "patch"].reduce(
-  (memo, name)=> {
-    memo[name] = helperCrudFunction(name);
-    return memo;
-  }, {});
+import { none, extractArgs, defaultMiddlewareArgsParser, CRUD } from "./helpers";
 
 /**
  * Constructor for create action
@@ -55,16 +20,37 @@ export const CRUD = ["get", "post", "put", "delete", "patch"].reduce(
  * @return {Function+Object}     action function object
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
-  const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
+  const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
+
+  const fetch = function(url, opts, getState, dispatch) {
+    let id;
+    if (meta.cache && getState !== none) {
+      const state = getState();
+      const cache = get(state, meta.prefix, meta.reducerName, "cache");
+      id = meta.cache.id(url, opts);
+      const data = cache && id && cache[id] !== undefined && cache[id];
+      if (data) {
+        return Promise.resolve(data);
+      }
+    }
+    const response = meta.fetch(url, opts);
+    if (meta.cache && dispatch !== none && id) {
+      response.then((data)=> {
+        dispatch({ type: actionCache, id, data });
+      });
+    }
+    return response;
+  };
+
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
    * @param  {Object}   params      fetch params
    * @param  {Function} getState    helper meta function
   */
-  const request = (pathvars, params, getState=none)=> {
+  const request = (pathvars, params, getState=none, dispatch=none)=> {
     const responseHandler = meta && meta.holder && meta.holder.responseHandler;
     const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
     let urlT = resultUrlT;
@@ -88,7 +74,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       options(urlT, params, getState) :
       options;
     const opts = merge({}, globalOptions, baseOptions, params);
-    const response = meta.fetch(urlT, opts);
+    const response = fetch(urlT, opts, getState, dispatch);
     const result = !meta.validation ? response : response.then(
       data=> new Promise(
         (resolve, reject)=> meta.validation(data,
@@ -130,14 +116,13 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const middlewareParser = (meta.holder && meta.holder.middlewareParser) ||
         defaultMiddlewareArgsParser;
       const { dispatch, getState } = middlewareParser(...middlewareArgs);
-      const { reducerName, prefix } = meta;
       const state = getState();
-      const isLoading = get(state, prefix, reducerName, "loading");
+      const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
         return;
       }
       const requestOptions = { pathvars, params };
-      const prevData =  get(state, prefix, reducerName, "data");
+      const prevData =  get(state, meta.prefix, meta.reducerName, "data");
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch,
@@ -156,7 +141,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             requestHolder.set({
               resolve,
               reject,
-              promise: request(pathvars, params, getState).then(resolve, reject)
+              promise: request(pathvars, params, getState, dispatch).then(resolve, reject)
             });
           }).then((d)=> {
             requestHolder.pop();
