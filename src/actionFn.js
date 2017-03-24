@@ -9,6 +9,7 @@ import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
 import { none, extractArgs, defaultMiddlewareArgsParser, CRUD } from "./helpers";
+import { Manager } from "./cache-manager";
 
 /**
  * Constructor for create action
@@ -51,14 +52,22 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     return urlT;
   }
 
-  function fetch(pathvars, params, getState, dispatch) {
+  function fetch(pathvars, params, options, getState, dispatch) {
     const urlT = getUrl(pathvars, params, getState);
     const opts = getOptions(urlT, params, getState);
     let id = meta.reducerName || "";
-    if (meta.cache && getState !== none) {
+    let cacheManager = null;
+    if (options && options.expire !== undefined) {
+      cacheManager = meta.cache ? { ...meta.cache }: { ...Manager };
+      cacheManager.expire = options.expire;
+    } else if (meta.cache) {
+      cacheManager = meta.cache;
+    }
+
+    if (cacheManager && getState !== none) {
       const state = getState();
       const cache = get(state, meta.prefix, meta.reducerName, "cache");
-      id += "_" + meta.cache.id(pathvars, params);
+      id += "_" + cacheManager.id(pathvars, params);
       const cacheData = cache && id && cache[id] !== undefined && cache[id];
       if (cacheData) {
         const { expire } = cacheData;
@@ -70,9 +79,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       }
     }
     const response = meta.fetch(urlT, opts);
-    if (meta.cache && dispatch !== none && id) {
+    if (cacheManager && dispatch !== none && id) {
       response.then((data)=> {
-        dispatch({ type: actionCache, id, data, expire: meta.cache.expire });
+        dispatch({ type: actionCache, id, data, expire: cacheManager.expire });
       });
     }
     return response;
@@ -84,8 +93,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object}   params      fetch params
    * @param  {Function} getState    helper meta function
   */
-  const request = (pathvars, params, getState=none, dispatch=none)=> {
-    const response = fetch(pathvars, params, getState, dispatch);
+  function request(pathvars, params, options, getState=none, dispatch=none) {
+    const response = fetch(pathvars, params, options, getState, dispatch);
     const result = !meta.validation ? response : response.then(
       data=> new Promise(
         (resolve, reject)=> meta.validation(data,
@@ -111,7 +120,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     }
     ret && ret.catch && ret.catch(none);
     return ret;
-  };
+  }
 
   /**
    * Fetch data from server
@@ -153,7 +162,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             requestHolder.set({
               resolve,
               reject,
-              promise: request(pathvars, params, getState, dispatch).then(resolve, reject)
+              promise: request(pathvars, params, {}, getState, dispatch).then(resolve, reject)
             });
           }).then((d)=> {
             requestHolder.pop();
@@ -196,7 +205,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   /*
     Pure rest request
    */
-  fn.request = request;
+  fn.request = function(pathvars, params, options) {
+    return request(pathvars, params, options || {});
+  };
 
   /**
    * Reset store to initial state

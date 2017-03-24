@@ -49,6 +49,12 @@ export default function reducerFn(initialState, actions={}, reducer) {
           d.setSeconds(expire);
           expire = d;
         }
+        if (
+          state.cache.expire !== undefined &&
+          expire.valueOf() < state.cache.expire.valueOf()
+        ) {
+          expire = state.cache.expire;
+        }
         return {
           ...state,
           cache: { ...state.cache, [id]: { expire, data } }
