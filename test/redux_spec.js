@@ -7,6 +7,7 @@ import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import after from "lodash/after";
 import reduxApi, { async } from "../src/index";
+import { Manager } from "../src/cache-manager";
 
 function storeHelper(rest) {
   const reducer = combineReducers(rest.reducers);
@@ -468,6 +469,37 @@ describe("redux", ()=> {
         const state = store.getState();
         expect(state.test.cache).to.eql({
           "test_id1=1;id2=2;": {
+            data: "/api/1/2", expire: false
+          }
+        });
+        return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
+      })
+      .then(()=> {
+        expect(requestCount).to.eql(1);
+      });
+  });
+
+  it("check cache options with rewrite id", function() {
+    let requestCount = 0;
+    const rest = reduxApi({
+      test: {
+        url: "/api/:id1/:id2",
+        cache: {
+          id(urlparams) {
+            return Manager.id(urlparams) + "test";
+          }
+        }
+      }
+    }).use("fetch", (url)=> {
+      requestCount+=1;
+      return new Promise(resolve=> resolve(url));
+    });
+    const store = storeHelper(rest);
+    return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }))
+      .then(()=> {
+        const state = store.getState();
+        expect(state.test.cache).to.eql({
+          "test_id1=1;id2=2;test": {
             data: "/api/1/2", expire: false
           }
         });
