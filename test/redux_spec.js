@@ -451,7 +451,7 @@ describe("redux", ()=> {
   });
 
 
-  it("check cache options", function() {
+  it("check default cache options", function() {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -466,11 +466,42 @@ describe("redux", ()=> {
     return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }))
       .then(()=> {
         const state = store.getState();
-        expect(state.test.cache).to.eql({ "test_id1=1;id2=2;": "/api/1/2" });
+        expect(state.test.cache).to.eql({
+          "test_id1=1;id2=2;": {
+            data: "/api/1/2", expire: false
+          }
+        });
         return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
       })
       .then(()=> {
         expect(requestCount).to.eql(1);
+      });
+  });
+
+  it("check cache options with expire=0 request", function() {
+    let requestCount = 0;
+    const rest = reduxApi({
+      test: {
+        url: "/api/:id1/:id2",
+        cache: {
+          expire: 0
+        }
+      }
+    }).use("fetch", (url)=> {
+      requestCount+=1;
+      return new Promise(resolve=> resolve(url));
+    });
+    const store = storeHelper(rest);
+    return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }))
+      .then(()=> {
+        const state = store.getState();
+        const d = state.test.cache["test_id1=1;id2=2;"];
+        expect(d).to.exist;
+        expect(d.data).to.eql("/api/1/2");
+        return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
+      })
+      .then(()=> {
+        expect(requestCount).to.eql(2);
       });
   });
 });

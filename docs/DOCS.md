@@ -138,6 +138,34 @@ import reduxApi, {transformers} from "redux-api";
       }
 ```
 
+#### cache
+- @description: cache response. By default cache is turn off. If cache = true - this means that cache is permanent. Also cache can be object. see example
+- @type Boolean, Object, null
+- @default: null
+- @example
+```js
+{
+  permanent: {
+    url: "/api/v1/permanent",
+    cache: true
+  },
+  expires1: {
+    url: "/api/v1/expires/1",
+    cache: { expire: 360 }, // 360 seconds
+  },
+  expires2: {
+    url: "/api/v1/expires/2",
+    cache: {
+      expire: new Date("...."), // use concrete Date
+      id(params, params) {
+        // here you can overwrite cache id for request
+        return `you custom id for request`;
+      }
+    }
+  }
+}
+```
+
 #### broadcast
 - @deprecated
 - @description: list of actions which would emit after data fetching.

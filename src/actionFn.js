@@ -59,15 +59,20 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const state = getState();
       const cache = get(state, meta.prefix, meta.reducerName, "cache");
       id += "_" + meta.cache.id(pathvars, params);
-      const data = cache && id && cache[id] !== undefined && cache[id];
-      if (data) {
-        return Promise.resolve(data);
+      const cacheData = cache && id && cache[id] !== undefined && cache[id];
+      if (cacheData) {
+        const { expire } = cacheData;
+        const isCachedData = expire === false ||
+          (expire instanceof Date && expire.valueOf() > (new Date()).valueOf());
+        if (isCachedData) {
+          return Promise.resolve(cacheData.data);
+        }
       }
     }
     const response = meta.fetch(urlT, opts);
     if (meta.cache && dispatch !== none && id) {
       response.then((data)=> {
-        dispatch({ type: actionCache, id, data });
+        dispatch({ type: actionCache, id, data, expire: meta.cache.expire });
       });
     }
     return response;

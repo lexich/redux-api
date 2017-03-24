@@ -43,9 +43,15 @@ export default function reducerFn(initialState, actions={}, reducer) {
           { ...initialState };
       case actionCache:
         const { id, data } = action;
+        let expire = action.expire;
+        if (typeof expire === "number" || expire instanceof Number) {
+          const d = new Date();
+          d.setSeconds(expire);
+          expire = d;
+        }
         return {
           ...state,
-          cache: { ...state.cache, [id]: data }
+          cache: { ...state.cache, [id]: { expire, data } }
         };
       default:
         return reducer ? reducer(state, action) : state;

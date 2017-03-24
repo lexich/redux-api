@@ -1,4 +1,5 @@
 export const Manager = {
+  expire: false,
   id(params) {
     if (!params) { return ""; }
     return Object.keys(params).reduce(
