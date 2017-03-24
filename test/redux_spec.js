@@ -8,6 +8,12 @@ import thunk from "redux-thunk";
 import after from "lodash/after";
 import reduxApi, { async } from "../src/index";
 
+function storeHelper(rest) {
+  const reducer = combineReducers(rest.reducers);
+  const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+  return createStoreWithMiddleware(reducer);
+}
+
 describe("redux", ()=> {
   it("check redux", ()=> {
     const rest = reduxApi({
@@ -15,9 +21,7 @@ describe("redux", ()=> {
     }).use("fetch", (url)=> {
       return new Promise(resolve=> resolve(url));
     });
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
+    const store = storeHelper(rest);
     return new Promise((resolve)=> {
       store.dispatch(rest.actions.test(resolve));
     }).then(()=> {
@@ -31,10 +35,7 @@ describe("redux", ()=> {
     }).use("fetch", (url)=> {
       return new Promise(resolve=> resolve(url));
     });
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
-
+    const store = storeHelper(rest);
     return async(
       store.dispatch,
       cb=> rest.actions.test(cb),
@@ -49,9 +50,7 @@ describe("redux", ()=> {
     const rest = reduxApi({
       test: "/api/url"
     }).use("fetch", url=> new Promise(resolve=> resolve(url)));
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
+    const store = storeHelper(rest);
     function testAction() {
       return (dispatch, getState)=> {
         async(dispatch, rest.actions.test).then((data)=> {
@@ -204,9 +203,7 @@ describe("redux", ()=> {
       });
     });
 
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
+    const store = storeHelper(rest);
     expect(store.getState()).to.eql({
       external: { sync: false, syncing: false, loading: false, data: {} },
       test: { sync: false, syncing: false, loading: false, data: {} }
@@ -244,9 +241,7 @@ describe("redux", ()=> {
     }).use("fetch", (url)=> {
       return new Promise(resolve=> resolve(url));
     });
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
+    const store = storeHelper(rest);
     return new Promise((resolve)=> {
       store.dispatch(rest.actions.test(resolve));
     }).then(()=> {
@@ -273,9 +268,7 @@ describe("redux", ()=> {
     }).use("fetch", (url)=> {
       return new Promise(resolve=> resolve(url));
     });
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
+    const store = storeHelper(rest);
     const result = store.dispatch(rest.actions.test());
     expect(result instanceof Promise).to.be.true;
     return result.then((data)=> {
@@ -313,9 +306,7 @@ describe("redux", ()=> {
       }
     }).use("fetch", url=> new Promise(resolve=> resolve(url)));
 
-    const reducer = combineReducers(rest.reducers);
-    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    const store = createStoreWithMiddleware(reducer);
+    const store = storeHelper(rest);
     return store.dispatch(rest.actions.test1())
       .then(()=> store.dispatch(rest.actions.test2()))
       .then(()=> expect(expectedArgs).to.eql(["none"]));
@@ -456,6 +447,30 @@ describe("redux", ()=> {
         expect(actualData).to.have.length(2);
         expect(actualData[0]).to.eql(expectedData[0]);
         expect(actualData[1]).to.eql(expectedData[1]);
+      });
+  });
+
+
+  it("check cache options", function() {
+    let requestCount = 0;
+    const rest = reduxApi({
+      test: {
+        url: "/api/:id1/:id2",
+        cache: true
+      }
+    }).use("fetch", (url)=> {
+      requestCount+=1;
+      return new Promise(resolve=> resolve(url));
+    });
+    const store = storeHelper(rest);
+    return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }))
+      .then(()=> {
+        const state = store.getState();
+        expect(state.test.cache).to.eql({ "test_id1=1;id2=2;": "/api/1/2" });
+        return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
+      })
+      .then(()=> {
+        expect(requestCount).to.eql(1);
       });
   });
 });

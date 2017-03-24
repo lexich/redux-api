@@ -54,11 +54,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   function fetch(pathvars, params, getState, dispatch) {
     const urlT = getUrl(pathvars, params, getState);
     const opts = getOptions(urlT, params, getState);
-    let id;
+    let id = meta.reducerName || "";
     if (meta.cache && getState !== none) {
       const state = getState();
       const cache = get(state, meta.prefix, meta.reducerName, "cache");
-      id = meta.cache.id(urlT, opts);
+      id += "_" + meta.cache.id(pathvars, params);
       const data = cache && id && cache[id] !== undefined && cache[id];
       if (data) {
         return Promise.resolve(data);

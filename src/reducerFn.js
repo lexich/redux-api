@@ -42,10 +42,10 @@ export default function reducerFn(initialState, actions={}, reducer) {
           { ...state, sync: false } :
           { ...initialState };
       case actionCache:
-        const { key, data } = action;
+        const { id, data } = action;
         return {
           ...state,
-          cache: { ...state.cache, [key]: data }
+          cache: { ...state.cache, [id]: data }
         };
       default:
         return reducer ? reducer(state, action) : state;

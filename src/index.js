@@ -6,7 +6,7 @@ import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
 import transformers from "./transformers";
 import async from "./async";
-
+import cacheManager from "./cache-manager";
 // export { transformers, async };
 
 /**
@@ -98,7 +98,7 @@ export default function reduxApi(config, baseConfig) {
 
     const {
       url, urlOptions, options, transformer, broadcast, crud,
-      reducerName, prefetch, postfetch, validation, helpers, cache
+      reducerName, prefetch, postfetch, validation, helpers
     } = opts;
 
     const prefix = (baseConfig && baseConfig.prefix) || "";
@@ -119,6 +119,7 @@ export default function reduxApi(config, baseConfig) {
       holder: fetchHolder,
       virtual: !!opts.virtual,
       actions: memo.actions,
+      cache: cacheManager(opts.cache),
       urlOptions,
       fetch,
       broadcast,
@@ -129,8 +130,7 @@ export default function reduxApi(config, baseConfig) {
       helpers,
       transformer,
       prefix,
-      crud,
-      cache
+      crud
     };
 
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
@@ -140,7 +140,7 @@ export default function reduxApi(config, baseConfig) {
       const sync = false;
       const syncing = false;
       const loading = false;
-      const initialState = cache ?
+      const initialState = opts.cache ?
         { sync, syncing, loading, data, cache: {} } :
         { sync, syncing, loading, data };
 
