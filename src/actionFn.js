@@ -24,40 +24,21 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const pubsub = new PubSub();
   const requestHolder = createHolder();
 
-  const fetch = function(url, opts, getState, dispatch) {
-    let id;
-    if (meta.cache && getState !== none) {
-      const state = getState();
-      const cache = get(state, meta.prefix, meta.reducerName, "cache");
-      id = meta.cache.id(url, opts);
-      const data = cache && id && cache[id] !== undefined && cache[id];
-      if (data) {
-        return Promise.resolve(data);
-      }
-    }
-    const response = meta.fetch(url, opts);
-    if (meta.cache && dispatch !== none && id) {
-      response.then((data)=> {
-        dispatch({ type: actionCache, id, data });
-      });
-    }
-    return response;
-  };
+  function getOptions(urlT, params, getState) {
+    const globalOptions = !meta.holder ? {} :
+      (meta.holder.options instanceof Function) ?
+        meta.holder.options(urlT, params, getState) : (meta.holder.options);
+    const baseOptions = !(options instanceof Function) ? options :
+      options(urlT, params, getState);
+    return merge({}, globalOptions, baseOptions, params);
+  }
 
-  /**
-   * Fetch data from server
-   * @param  {Object}   pathvars    path vars for url
-   * @param  {Object}   params      fetch params
-   * @param  {Function} getState    helper meta function
-  */
-  const request = (pathvars, params, getState=none, dispatch=none)=> {
-    const responseHandler = meta && meta.holder && meta.holder.responseHandler;
+  function getUrl(pathvars, params, getState) {
     const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
     let urlT = resultUrlT;
-    let rootUrl = meta.holder ? meta.holder.rootUrl : null;
-    rootUrl = (rootUrl instanceof Function) ?
-      rootUrl(urlT, params, getState) :
-      rootUrl;
+    let rootUrl = get(meta, "holder", "rootUrl");
+    rootUrl = !(rootUrl instanceof Function) ? rootUrl :
+      rootUrl(urlT, params, getState);
     if (rootUrl) {
       const rootUrlObject = libUrl.parse(rootUrl);
       const urlObject = libUrl.parse(urlT);
@@ -67,19 +48,45 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         urlT = `${rootUrlObject.protocol}//${rootUrlObject.host}${urlPath}`;
       }
     }
-    const globalOptions = !meta.holder ? {} :
-      (meta.holder.options instanceof Function) ?
-        meta.holder.options(urlT, params, getState) : (meta.holder.options);
-    const baseOptions = (options instanceof Function) ?
-      options(urlT, params, getState) :
-      options;
-    const opts = merge({}, globalOptions, baseOptions, params);
-    const response = fetch(urlT, opts, getState, dispatch);
+    return urlT;
+  }
+
+  function fetch(pathvars, params, getState, dispatch) {
+    const urlT = getUrl(pathvars, params, getState);
+    const opts = getOptions(urlT, params, getState);
+    let id;
+    if (meta.cache && getState !== none) {
+      const state = getState();
+      const cache = get(state, meta.prefix, meta.reducerName, "cache");
+      id = meta.cache.id(urlT, opts);
+      const data = cache && id && cache[id] !== undefined && cache[id];
+      if (data) {
+        return Promise.resolve(data);
+      }
+    }
+    const response = meta.fetch(urlT, opts);
+    if (meta.cache && dispatch !== none && id) {
+      response.then((data)=> {
+        dispatch({ type: actionCache, id, data });
+      });
+    }
+    return response;
+  }
+
+  /**
+   * Fetch data from server
+   * @param  {Object}   pathvars    path vars for url
+   * @param  {Object}   params      fetch params
+   * @param  {Function} getState    helper meta function
+  */
+  const request = (pathvars, params, getState=none, dispatch=none)=> {
+    const response = fetch(pathvars, params, getState, dispatch);
     const result = !meta.validation ? response : response.then(
       data=> new Promise(
         (resolve, reject)=> meta.validation(data,
           err=> err ? reject(err) : resolve(data))));
     let ret = result;
+    const responseHandler = get(meta, "holder", "responseHandler");
     if (responseHandler) {
       if (result && result.then) {
         ret = result.then(
@@ -113,7 +120,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     params && delete params.syncing;
     pubsub.push(callback);
     return (...middlewareArgs)=> {
-      const middlewareParser = (meta.holder && meta.holder.middlewareParser) ||
+      const middlewareParser = get(meta, "holder", "middlewareParser") ||
         defaultMiddlewareArgsParser;
       const { dispatch, getState } = middlewareParser(...middlewareArgs);
       const state = getState();
