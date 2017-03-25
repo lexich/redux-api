@@ -9,7 +9,7 @@ import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
 import { none, extractArgs, defaultMiddlewareArgsParser, CRUD } from "./helpers";
-import { getCacheManager } from "./cache-manager";
+import { getCacheManager } from "./utils/cache";
 
 /**
  * Constructor for create action

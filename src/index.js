@@ -6,7 +6,7 @@ import reducerFn from "./reducerFn";
 import actionFn from "./actionFn";
 import transformers from "./transformers";
 import async from "./async";
-import cacheManager from "./cache-manager";
+import cacheManager from "./utils/cache";
 // export { transformers, async };
 
 /**

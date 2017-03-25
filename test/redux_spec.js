@@ -7,7 +7,7 @@ import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import after from "lodash/after";
 import reduxApi, { async } from "../src/index";
-import { Manager } from "../src/cache-manager";
+import { Manager } from "../src/utils/cache";
 
 function storeHelper(rest) {
   const reducer = combineReducers(rest.reducers);

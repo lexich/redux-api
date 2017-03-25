@@ -1,7 +1,7 @@
 "use strict";
 
 /* eslint no-case-declarations: 0 */
-import { setExpire } from "./cache-manager";
+import { setExpire } from "./utils/cache";
 
 /**
  * Reducer contructor
