@@ -51,6 +51,8 @@
     "prefer-arrow-callback": 0,
     "arrow-body-style": 0,
     "no-confusing-arrow": 0,
-    "react/require-extension": 0
+    "react/require-extension": 0,
+    "import/no-unresolved": 0,
+    "import/extentions": 0
   }
 }

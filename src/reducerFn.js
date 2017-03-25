@@ -1,6 +1,8 @@
 "use strict";
 
 /* eslint no-case-declarations: 0 */
+import { setExpire } from "./cache-manager";
+
 /**
  * Reducer contructor
  * @param  {Object}   initialState default initial state
@@ -43,18 +45,7 @@ export default function reducerFn(initialState, actions={}, reducer) {
           { ...initialState };
       case actionCache:
         const { id, data } = action;
-        let expire = action.expire;
-        if (typeof expire === "number" || expire instanceof Number) {
-          const d = new Date();
-          d.setSeconds(expire);
-          expire = d;
-        }
-        if (
-          state.cache.expire !== undefined &&
-          expire.valueOf() < state.cache.expire.valueOf()
-        ) {
-          expire = state.cache.expire;
-        }
+        const expire = setExpire(action.expire, state.cache.expire);
         return {
           ...state,
           cache: { ...state.cache, [id]: { expire, data } }

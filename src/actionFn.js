@@ -9,7 +9,7 @@ import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
 import { none, extractArgs, defaultMiddlewareArgsParser, CRUD } from "./helpers";
-import { Manager } from "./cache-manager";
+import { getCacheManager } from "./cache-manager";
 
 /**
  * Constructor for create action
@@ -52,30 +52,21 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     return urlT;
   }
 
-  function fetch(pathvars, params, options, getState, dispatch) {
+  function fetch(pathvars, params, options = {}, getState=none, dispatch=none) {
     const urlT = getUrl(pathvars, params, getState);
     const opts = getOptions(urlT, params, getState);
     let id = meta.reducerName || "";
-    let cacheManager = null;
-    if (options && options.expire !== undefined) {
-      cacheManager = meta.cache ? { ...meta.cache }: { ...Manager };
-      cacheManager.expire = options.expire;
-    } else if (meta.cache) {
-      cacheManager = meta.cache;
-    }
+    const cacheManager = getCacheManager(options.expire, meta.cache);
 
     if (cacheManager && getState !== none) {
       const state = getState();
       const cache = get(state, meta.prefix, meta.reducerName, "cache");
       id += "_" + cacheManager.id(pathvars, params);
-      const cacheData = cache && id && cache[id] !== undefined && cache[id];
-      if (cacheData) {
-        const { expire } = cacheData;
-        const isCachedData = expire === false ||
-          (expire instanceof Date && expire.valueOf() > (new Date()).valueOf());
-        if (isCachedData) {
-          return Promise.resolve(cacheData.data);
-        }
+      const data = cacheManager.getData(
+        cache && id && cache[id] !== undefined && cache[id]
+      );
+      if (data !== undefined) {
+        return Promise.resolve(data);
       }
     }
     const response = meta.fetch(urlT, opts);
