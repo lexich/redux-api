@@ -19,16 +19,18 @@ export const Manager = {
   }
 };
 
-export function setExpire(value, oldDate) {
+export function setExpire(value, oldDate, now) {
   let expire = value;
   if (oldDate instanceof Date) {
     if (typeof expire === "number" || expire instanceof Number) {
-      const d = new Date();
-      d.setSeconds(expire);
+      const d = new Date(now);
+      d.setSeconds(d.getSeconds() + expire);
       expire = d;
     }
-    if (expire.valueOf() < oldDate.valueOf()) {
-      expire = oldDate;
+    if (expire instanceof Date) {
+      if (expire.valueOf() < oldDate.valueOf()) {
+        expire = oldDate;
+      }
     }
   }
   return expire;
