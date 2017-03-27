@@ -30,4 +30,20 @@ describe("get", function() {
     const c = get(obj, "c", "b", "a");
     expect(c).to.not.exist;
   });
+
+  it("check `get` array path", function() {
+    const obj = {
+      a: { b: { c: 2 } }
+    };
+    const c = get(obj, ["a", "b"], "c");
+    expect(c).to.eql(2);
+  });
+
+  it("check `get` array incorrect path", function() {
+    const obj = {
+      a: { b: { c: 2 } }
+    };
+    const c = get(obj, ["c", "b"], "a");
+    expect(c).to.not.exist;
+  });
 });
