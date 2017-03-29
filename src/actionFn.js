@@ -8,42 +8,8 @@ import get from "./utils/get";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
-
-function none() {}
-
-function extractArgs(args) {
-  let pathvars;
-  let params={};
-  let callback;
-  if (args[0] instanceof Function) {
-    callback = args[0];
-  } else if (args[1] instanceof Function) {
-    pathvars = args[0];
-    callback = args[1];
-  } else {
-    pathvars = args[0];
-    params = args[1];
-    callback = args[2] || none;
-  }
-  return [pathvars, params, callback];
-}
-
-function helperCrudFunction(name) {
-  return (...args)=> {
-    const [pathvars, params, cb] = extractArgs(args);
-    return [pathvars, { ...params, method: name.toUpperCase() }, cb];
-  };
-}
-
-function defaultMiddlewareArgsParser(dispatch, getState) {
-  return { dispatch, getState };
-}
-
-export const CRUD = ["get", "post", "put", "delete", "patch"].reduce(
-  (memo, name)=> {
-    memo[name] = helperCrudFunction(name);
-    return memo;
-  }, {});
+import { none, extractArgs, defaultMiddlewareArgsParser, CRUD } from "./helpers";
+import { getCacheManager } from "./utils/cache";
 
 /**
  * Constructor for create action
@@ -55,23 +21,25 @@ export const CRUD = ["get", "post", "put", "delete", "patch"].reduce(
  * @return {Function+Object}     action function object
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
-  const { actionFetch, actionSuccess, actionFail, actionReset } = ACTIONS;
+  const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
-  /**
-   * Fetch data from server
-   * @param  {Object}   pathvars    path vars for url
-   * @param  {Object}   params      fetch params
-   * @param  {Function} getState    helper meta function
-  */
-  const request = (pathvars, params, getState=none)=> {
-    const responseHandler = meta && meta.holder && meta.holder.responseHandler;
+
+  function getOptions(urlT, params, getState) {
+    const globalOptions = !meta.holder ? {} :
+      (meta.holder.options instanceof Function) ?
+        meta.holder.options(urlT, params, getState) : (meta.holder.options);
+    const baseOptions = !(options instanceof Function) ? options :
+      options(urlT, params, getState);
+    return merge({}, globalOptions, baseOptions, params);
+  }
+
+  function getUrl(pathvars, params, getState) {
     const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
     let urlT = resultUrlT;
-    let rootUrl = meta.holder ? meta.holder.rootUrl : null;
-    rootUrl = (rootUrl instanceof Function) ?
-      rootUrl(urlT, params, getState) :
-      rootUrl;
+    let rootUrl = get(meta, "holder", "rootUrl");
+    rootUrl = !(rootUrl instanceof Function) ? rootUrl :
+      rootUrl(urlT, params, getState);
     if (rootUrl) {
       const rootUrlObject = libUrl.parse(rootUrl);
       const urlObject = libUrl.parse(urlT);
@@ -81,19 +49,49 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         urlT = `${rootUrlObject.protocol}//${rootUrlObject.host}${urlPath}`;
       }
     }
-    const globalOptions = !meta.holder ? {} :
-      (meta.holder.options instanceof Function) ?
-        meta.holder.options(urlT, params, getState) : (meta.holder.options);
-    const baseOptions = (options instanceof Function) ?
-      options(urlT, params, getState) :
-      options;
-    const opts = merge({}, globalOptions, baseOptions, params);
+    return urlT;
+  }
+
+  function fetch(pathvars, params, options = {}, getState=none, dispatch=none) {
+    const urlT = getUrl(pathvars, params, getState);
+    const opts = getOptions(urlT, params, getState);
+    let id = meta.reducerName || "";
+    const cacheManager = getCacheManager(options.expire, meta.cache);
+
+    if (cacheManager && getState !== none) {
+      const state = getState();
+      const cache = get(state, meta.prefix, meta.reducerName, "cache");
+      id += "_" + cacheManager.id(pathvars, params);
+      const data = cacheManager.getData(
+        cache && id && cache[id] !== undefined && cache[id]
+      );
+      if (data !== undefined) {
+        return Promise.resolve(data);
+      }
+    }
     const response = meta.fetch(urlT, opts);
+    if (cacheManager && dispatch !== none && id) {
+      response.then((data)=> {
+        dispatch({ type: actionCache, id, data, expire: cacheManager.expire });
+      });
+    }
+    return response;
+  }
+
+  /**
+   * Fetch data from server
+   * @param  {Object}   pathvars    path vars for url
+   * @param  {Object}   params      fetch params
+   * @param  {Function} getState    helper meta function
+  */
+  function request(pathvars, params, options, getState=none, dispatch=none) {
+    const response = fetch(pathvars, params, options, getState, dispatch);
     const result = !meta.validation ? response : response.then(
       data=> new Promise(
         (resolve, reject)=> meta.validation(data,
           err=> err ? reject(err) : resolve(data))));
     let ret = result;
+    const responseHandler = get(meta, "holder", "responseHandler");
     if (responseHandler) {
       if (result && result.then) {
         ret = result.then(
@@ -113,7 +111,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     }
     ret && ret.catch && ret.catch(none);
     return ret;
-  };
+  }
 
   /**
    * Fetch data from server
@@ -127,17 +125,16 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     params && delete params.syncing;
     pubsub.push(callback);
     return (...middlewareArgs)=> {
-      const middlewareParser = (meta.holder && meta.holder.middlewareParser) ||
+      const middlewareParser = get(meta, "holder", "middlewareParser") ||
         defaultMiddlewareArgsParser;
       const { dispatch, getState } = middlewareParser(...middlewareArgs);
-      const { reducerName, prefix } = meta;
       const state = getState();
-      const isLoading = get(state, prefix, reducerName, "loading");
+      const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
         return;
       }
       const requestOptions = { pathvars, params };
-      const prevData =  get(state, prefix, reducerName, "data");
+      const prevData =  get(state, meta.prefix, meta.reducerName, "data");
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch,
@@ -156,7 +153,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             requestHolder.set({
               resolve,
               reject,
-              promise: request(pathvars, params, getState).then(resolve, reject)
+              promise: request(pathvars, params, {}, getState, dispatch).then(resolve, reject)
             });
           }).then((d)=> {
             requestHolder.pop();
@@ -199,7 +196,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   /*
     Pure rest request
    */
-  fn.request = request;
+  fn.request = function(pathvars, params, options) {
+    return request(pathvars, params, options || {});
+  };
 
   /**
    * Reset store to initial state

@@ -1,6 +1,8 @@
 "use strict";
 
 /* eslint no-case-declarations: 0 */
+import { setExpire } from "./utils/cache";
+
 /**
  * Reducer contructor
  * @param  {Object}   initialState default initial state
@@ -10,7 +12,7 @@
  * @return {Function}              reducer function
  */
 export default function reducerFn(initialState, actions={}, reducer) {
-  const { actionFetch, actionSuccess, actionFail, actionReset } = actions;
+  const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = actions;
   return (state=initialState, action)=> {
     switch (action.type) {
       case actionFetch:
@@ -41,6 +43,13 @@ export default function reducerFn(initialState, actions={}, reducer) {
         return (mutation === "sync") ?
           { ...state, sync: false } :
           { ...initialState };
+      case actionCache:
+        const { id, data } = action;
+        const expire = setExpire(action.expire, state.cache.expire);
+        return {
+          ...state,
+          cache: { ...state.cache, [id]: { expire, data } }
+        };
       default:
         return reducer ? reducer(state, action) : state;
     }
