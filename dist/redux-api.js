@@ -73,11 +73,97 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.setExpire = setExpire;
+exports.getCacheManager = getCacheManager;
+
+exports.default = function (cache) {
+  if (!cache) {
+    return null;
+  }
+  if (cache === true) {
+    return Manager;
+  } else {
+    return _extends({}, Manager, cache);
+  }
+};
+
+var Manager = exports.Manager = {
+  expire: false,
+  getData: function getData(cache, now) {
+    if (!cache) {
+      return;
+    }
+    var expire = cache.expire,
+        data = cache.data;
+
+    if (expire === false || expire === undefined || expire === null) {
+      return data;
+    }
+    if (expire instanceof Date) {
+      if (expire.valueOf() > (now || new Date()).valueOf()) {
+        return data;
+      }
+    }
+  },
+  id: function id(params) {
+    if (!params) {
+      return "";
+    }
+    return Object.keys(params).reduce(function (memo, key) {
+      return memo + (key + "=" + params[key] + ";");
+    }, "");
+  }
+};
+
+function setExpire(value, oldDate, now) {
+  var expire = value;
+  if (oldDate instanceof Date) {
+    if (typeof expire === "number" || expire instanceof Number) {
+      var d = now ? new Date(now) : new Date();
+      d.setSeconds(d.getSeconds() + expire);
+      expire = d;
+    }
+    if (expire instanceof Date) {
+      if (expire.valueOf() < oldDate.valueOf()) {
+        expire = oldDate;
+      }
+    }
+  }
+  return expire;
+}
+
+function getCacheManager(expire, cache) {
+  if (expire !== undefined) {
+    var ret = _extends({}, Manager, cache);
+    if (ret.expire !== false) {
+      ret.expire = setExpire(expire, ret.expire);
+    }
+    return ret;
+  } else if (cache) {
+    return _extends({}, Manager, cache);
+  } else {
+    return null;
+  }
+}
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -265,7 +351,7 @@ exports.isBuffer = function (obj) {
 };
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -294,8 +380,8 @@ exports.isBuffer = function (obj) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var punycode = __webpack_require__(9);
-var util = __webpack_require__(16);
+var punycode = __webpack_require__(10);
+var util = __webpack_require__(17);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -378,7 +464,7 @@ slashedProtocol = {
   'gopher:': true,
   'file:': true
 },
-    querystring = __webpack_require__(15);
+    querystring = __webpack_require__(16);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -980,7 +1066,7 @@ Url.prototype.parseHost = function () {
 };
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1030,7 +1116,7 @@ function mergePair(a, b) {
 }
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -1039,7 +1125,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1048,7 +1134,6 @@ module.exports = __webpack_amd_options__;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CRUD = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -1056,83 +1141,43 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 exports.default = actionFn;
 
-var _fastApply = __webpack_require__(8);
+var _fastApply = __webpack_require__(9);
 
 var _fastApply2 = _interopRequireDefault(_fastApply);
 
-var _url = __webpack_require__(1);
+var _url = __webpack_require__(2);
 
 var _url2 = _interopRequireDefault(_url);
 
-var _urlTransform = __webpack_require__(22);
+var _urlTransform = __webpack_require__(24);
 
 var _urlTransform2 = _interopRequireDefault(_urlTransform);
 
-var _merge = __webpack_require__(2);
+var _merge = __webpack_require__(3);
 
 var _merge2 = _interopRequireDefault(_merge);
 
-var _get = __webpack_require__(23);
+var _get = __webpack_require__(25);
 
 var _get2 = _interopRequireDefault(_get);
 
-var _fetchResolver = __webpack_require__(21);
+var _fetchResolver = __webpack_require__(22);
 
 var _fetchResolver2 = _interopRequireDefault(_fetchResolver);
 
-var _PubSub = __webpack_require__(19);
+var _PubSub = __webpack_require__(20);
 
 var _PubSub2 = _interopRequireDefault(_PubSub);
 
-var _createHolder = __webpack_require__(20);
+var _createHolder = __webpack_require__(21);
 
 var _createHolder2 = _interopRequireDefault(_createHolder);
 
+var _helpers = __webpack_require__(23);
+
+var _cache = __webpack_require__(0);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function none() {}
-
-function extractArgs(args) {
-  var pathvars = void 0;
-  var params = {};
-  var callback = void 0;
-  if (args[0] instanceof Function) {
-    callback = args[0];
-  } else if (args[1] instanceof Function) {
-    pathvars = args[0];
-    callback = args[1];
-  } else {
-    pathvars = args[0];
-    params = args[1];
-    callback = args[2] || none;
-  }
-  return [pathvars, params, callback];
-}
-
-function helperCrudFunction(name) {
-  return function () {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var _extractArgs = extractArgs(args),
-        _extractArgs2 = _slicedToArray(_extractArgs, 3),
-        pathvars = _extractArgs2[0],
-        params = _extractArgs2[1],
-        cb = _extractArgs2[2];
-
-    return [pathvars, _extends({}, params, { method: name.toUpperCase() }), cb];
-  };
-}
-
-function defaultMiddlewareArgsParser(dispatch, getState) {
-  return { dispatch: dispatch, getState: getState };
-}
-
-var CRUD = exports.CRUD = ["get", "post", "put", "delete", "patch"].reduce(function (memo, name) {
-  memo[name] = helperCrudFunction(name);
-  return memo;
-}, {});
 
 /**
  * Constructor for create action
@@ -1149,24 +1194,23 @@ function actionFn(url, name, options) {
   var actionFetch = ACTIONS.actionFetch,
       actionSuccess = ACTIONS.actionSuccess,
       actionFail = ACTIONS.actionFail,
-      actionReset = ACTIONS.actionReset;
+      actionReset = ACTIONS.actionReset,
+      actionCache = ACTIONS.actionCache;
 
   var pubsub = new _PubSub2.default();
   var requestHolder = (0, _createHolder2.default)();
-  /**
-   * Fetch data from server
-   * @param  {Object}   pathvars    path vars for url
-   * @param  {Object}   params      fetch params
-   * @param  {Function} getState    helper meta function
-  */
-  var request = function request(pathvars, params) {
-    var getState = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : none;
 
-    var responseHandler = meta && meta.holder && meta.holder.responseHandler;
+  function getOptions(urlT, params, getState) {
+    var globalOptions = !meta.holder ? {} : meta.holder.options instanceof Function ? meta.holder.options(urlT, params, getState) : meta.holder.options;
+    var baseOptions = !(options instanceof Function) ? options : options(urlT, params, getState);
+    return (0, _merge2.default)({}, globalOptions, baseOptions, params);
+  }
+
+  function getUrl(pathvars, params, getState) {
     var resultUrlT = (0, _urlTransform2.default)(url, pathvars, meta.urlOptions);
     var urlT = resultUrlT;
-    var rootUrl = meta.holder ? meta.holder.rootUrl : null;
-    rootUrl = rootUrl instanceof Function ? rootUrl(urlT, params, getState) : rootUrl;
+    var rootUrl = (0, _get2.default)(meta, "holder", "rootUrl");
+    rootUrl = !(rootUrl instanceof Function) ? rootUrl : rootUrl(urlT, params, getState);
     if (rootUrl) {
       var rootUrlObject = _url2.default.parse(rootUrl);
       var urlObject = _url2.default.parse(urlT);
@@ -1175,10 +1219,48 @@ function actionFn(url, name, options) {
         urlT = rootUrlObject.protocol + "//" + rootUrlObject.host + urlPath;
       }
     }
-    var globalOptions = !meta.holder ? {} : meta.holder.options instanceof Function ? meta.holder.options(urlT, params, getState) : meta.holder.options;
-    var baseOptions = options instanceof Function ? options(urlT, params, getState) : options;
-    var opts = (0, _merge2.default)({}, globalOptions, baseOptions, params);
+    return urlT;
+  }
+
+  function fetch(pathvars, params) {
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var getState = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _helpers.none;
+    var dispatch = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : _helpers.none;
+
+    var urlT = getUrl(pathvars, params, getState);
+    var opts = getOptions(urlT, params, getState);
+    var id = meta.reducerName || "";
+    var cacheManager = (0, _cache.getCacheManager)(options.expire, meta.cache);
+
+    if (cacheManager && getState !== _helpers.none) {
+      var state = getState();
+      var cache = (0, _get2.default)(state, meta.prefix, meta.reducerName, "cache");
+      id += "_" + cacheManager.id(pathvars, params);
+      var data = cacheManager.getData(cache && id && cache[id] !== undefined && cache[id]);
+      if (data !== undefined) {
+        return Promise.resolve(data);
+      }
+    }
     var response = meta.fetch(urlT, opts);
+    if (cacheManager && dispatch !== _helpers.none && id) {
+      response.then(function (data) {
+        dispatch({ type: actionCache, id: id, data: data, expire: cacheManager.expire });
+      });
+    }
+    return response;
+  }
+
+  /**
+   * Fetch data from server
+   * @param  {Object}   pathvars    path vars for url
+   * @param  {Object}   params      fetch params
+   * @param  {Function} getState    helper meta function
+  */
+  function request(pathvars, params, options) {
+    var getState = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _helpers.none;
+    var dispatch = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : _helpers.none;
+
+    var response = fetch(pathvars, params, options, getState, dispatch);
     var result = !meta.validation ? response : response.then(function (data) {
       return new Promise(function (resolve, reject) {
         return meta.validation(data, function (err) {
@@ -1187,6 +1269,7 @@ function actionFn(url, name, options) {
       });
     });
     var ret = result;
+    var responseHandler = (0, _get2.default)(meta, "holder", "responseHandler");
     if (responseHandler) {
       if (result && result.then) {
         ret = result.then(function (data) {
@@ -1203,9 +1286,9 @@ function actionFn(url, name, options) {
         ret = responseHandler(result);
       }
     }
-    ret && ret.catch && ret.catch(none);
+    ret && ret.catch && ret.catch(_helpers.none);
     return ret;
-  };
+  }
 
   /**
    * Fetch data from server
@@ -1214,36 +1297,33 @@ function actionFn(url, name, options) {
    * @param  {Function} callback)   callback execute after end request
    */
   function fn() {
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
 
-    var _extractArgs3 = extractArgs(args),
-        _extractArgs4 = _slicedToArray(_extractArgs3, 3),
-        pathvars = _extractArgs4[0],
-        params = _extractArgs4[1],
-        callback = _extractArgs4[2];
+    var _extractArgs = (0, _helpers.extractArgs)(args),
+        _extractArgs2 = _slicedToArray(_extractArgs, 3),
+        pathvars = _extractArgs2[0],
+        params = _extractArgs2[1],
+        callback = _extractArgs2[2];
 
     var syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
     pubsub.push(callback);
     return function () {
-      var middlewareParser = meta.holder && meta.holder.middlewareParser || defaultMiddlewareArgsParser;
+      var middlewareParser = (0, _get2.default)(meta, "holder", "middlewareParser") || _helpers.defaultMiddlewareArgsParser;
 
       var _middlewareParser = middlewareParser.apply(undefined, arguments),
           dispatch = _middlewareParser.dispatch,
           getState = _middlewareParser.getState;
 
-      var reducerName = meta.reducerName,
-          prefix = meta.prefix;
-
       var state = getState();
-      var isLoading = (0, _get2.default)(state, prefix, reducerName, "loading");
+      var isLoading = (0, _get2.default)(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
         return;
       }
       var requestOptions = { pathvars: pathvars, params: params };
-      var prevData = (0, _get2.default)(state, prefix, reducerName, "data");
+      var prevData = (0, _get2.default)(state, meta.prefix, meta.reducerName, "data");
       dispatch({ type: actionFetch, syncing: syncing, request: requestOptions });
       var fetchResolverOpts = {
         dispatch: dispatch,
@@ -1262,7 +1342,7 @@ function actionFn(url, name, options) {
             requestHolder.set({
               resolve: resolve,
               reject: reject,
-              promise: request(pathvars, params, getState).then(resolve, reject)
+              promise: request(pathvars, params, {}, getState, dispatch).then(resolve, reject)
             });
           }).then(function (d) {
             requestHolder.pop();
@@ -1297,7 +1377,7 @@ function actionFn(url, name, options) {
           });
         });
       });
-      result.catch(none);
+      result.catch(_helpers.none);
       return result;
     };
   }
@@ -1305,7 +1385,9 @@ function actionFn(url, name, options) {
   /*
     Pure rest request
    */
-  fn.request = request;
+  fn.request = function (pathvars, params, options) {
+    return request(pathvars, params, options || {});
+  };
 
   /**
    * Reset store to initial state
@@ -1324,15 +1406,15 @@ function actionFn(url, name, options) {
    * @param  {Function} callback) callback execute after end request
    */
   fn.sync = function () {
-    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      args[_key3] = arguments[_key3];
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
     }
 
-    var _extractArgs5 = extractArgs(args),
-        _extractArgs6 = _slicedToArray(_extractArgs5, 3),
-        pathvars = _extractArgs6[0],
-        params = _extractArgs6[1],
-        callback = _extractArgs6[2];
+    var _extractArgs3 = (0, _helpers.extractArgs)(args),
+        _extractArgs4 = _slicedToArray(_extractArgs3, 3),
+        pathvars = _extractArgs4[0],
+        params = _extractArgs4[1],
+        callback = _extractArgs4[2];
 
     var isServer = meta.holder ? meta.holder.server : false;
     return function (dispatch, getState) {
@@ -1349,7 +1431,7 @@ function actionFn(url, name, options) {
 
   var helpers = meta.helpers || {};
   if (meta.crud) {
-    helpers = _extends({}, CRUD, helpers);
+    helpers = _extends({}, _helpers.CRUD, helpers);
   }
   var fnHelperCallback = function fnHelperCallback(memo, func, helpername) {
     if (memo[helpername]) {
@@ -1361,13 +1443,13 @@ function actionFn(url, name, options) {
         call = _ref.call;
 
     memo[helpername] = function () {
-      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        args[_key4] = arguments[_key4];
+      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
       }
 
       return function (dispatch, getState) {
         var index = args.length - 1;
-        var callbackFn = args[index] instanceof Function ? args[index] : none;
+        var callbackFn = args[index] instanceof Function ? args[index] : _helpers.none;
         var helpersResult = (0, _fastApply2.default)(call, { getState: getState, dispatch: dispatch, actions: meta.actions }, args);
         var result = new Promise(function (resolve, reject) {
           var callback = function callback(err, data) {
@@ -1394,7 +1476,7 @@ function actionFn(url, name, options) {
             (0, _fastApply2.default)(sync ? fn.sync : fn, null, [pathvars, params, callback])(dispatch, getState);
           }
         });
-        result.catch(none);
+        result.catch(_helpers.none);
         return result;
       };
     };
@@ -1405,9 +1487,10 @@ function actionFn(url, name, options) {
     return fnHelperCallback(memo, helpers[key], key, helpers);
   }, fn);
 }
+module.exports = exports["default"];
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1454,21 +1537,13 @@ function async(dispatch) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 /* eslint no-case-declarations: 0 */
-/**
- * Reducer contructor
- * @param  {Object}   initialState default initial state
- * @param  {Object}   actions      actions map
- * @param  {Function} transformer  transformer function
- * @param  {Function} reducer      custom reducer function
- * @return {Function}              reducer function
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1477,13 +1552,27 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = reducerFn;
+
+var _cache = __webpack_require__(0);
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Reducer contructor
+ * @param  {Object}   initialState default initial state
+ * @param  {Object}   actions      actions map
+ * @param  {Function} transformer  transformer function
+ * @param  {Function} reducer      custom reducer function
+ * @return {Function}              reducer function
+ */
 function reducerFn(initialState) {
   var actions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var reducer = arguments[2];
   var actionFetch = actions.actionFetch,
       actionSuccess = actions.actionSuccess,
       actionFail = actions.actionFail,
-      actionReset = actions.actionReset;
+      actionReset = actions.actionReset,
+      actionCache = actions.actionCache;
 
   return function () {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -1514,6 +1603,14 @@ function reducerFn(initialState) {
         var mutation = action.mutation;
 
         return mutation === "sync" ? _extends({}, state, { sync: false }) : _extends({}, initialState);
+      case actionCache:
+        var id = action.id,
+            data = action.data;
+
+        var expire = (0, _cache.setExpire)(action.expire, state.cache.expire);
+        return _extends({}, state, {
+          cache: _extends({}, state.cache, _defineProperty({}, id, { expire: expire, data: data }))
+        });
       default:
         return reducer ? reducer(state, action) : state;
     }
@@ -1522,7 +1619,7 @@ function reducerFn(initialState) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1551,7 +1648,7 @@ exports.default = {
 module.exports = exports["default"];
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1580,7 +1677,7 @@ function fastApply(fn, context, args) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2094,7 +2191,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	/** Expose `punycode` */
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
 	// like the following:
-	if ("function" == 'function' && _typeof(__webpack_require__(3)) == 'object' && __webpack_require__(3)) {
+	if ("function" == 'function' && _typeof(__webpack_require__(4)) == 'object' && __webpack_require__(4)) {
 		!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 			return punycode;
 		}.call(exports, __webpack_require__, exports, module),
@@ -2114,10 +2211,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		root.punycode = punycode;
 	}
 })(undefined);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)(module), __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)(module), __webpack_require__(18)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2125,8 +2222,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 // Load modules
 
-var Stringify = __webpack_require__(12);
-var Parse = __webpack_require__(11);
+var Stringify = __webpack_require__(13);
+var Parse = __webpack_require__(12);
 
 // Declare internals
 
@@ -2138,7 +2235,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2146,7 +2243,7 @@ module.exports = {
 
 // Load modules
 
-var Utils = __webpack_require__(0);
+var Utils = __webpack_require__(1);
 
 // Declare internals
 
@@ -2315,7 +2412,7 @@ module.exports = function (str, options) {
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2325,7 +2422,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 // Load modules
 
-var Utils = __webpack_require__(0);
+var Utils = __webpack_require__(1);
 
 // Declare internals
 
@@ -2464,7 +2561,7 @@ module.exports = function (obj, options) {
 };
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2558,7 +2655,7 @@ var isArray = Array.isArray || function (xs) {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2649,17 +2746,17 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(13);
-exports.encode = exports.stringify = __webpack_require__(14);
+exports.decode = exports.parse = __webpack_require__(14);
+exports.encode = exports.stringify = __webpack_require__(15);
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2683,7 +2780,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2713,7 +2810,7 @@ try {
 module.exports = g;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2743,7 +2840,7 @@ module.exports = function (module) {
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2794,7 +2891,7 @@ exports.default = PubSub;
 module.exports = exports["default"];
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2833,7 +2930,7 @@ exports.default = function () {
 module.exports = exports["default"];
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2861,7 +2958,70 @@ function fetchResolver() {
 module.exports = exports["default"];
 
 /***/ }),
-/* 22 */
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+exports.none = none;
+exports.extractArgs = extractArgs;
+exports.helperCrudFunction = helperCrudFunction;
+exports.defaultMiddlewareArgsParser = defaultMiddlewareArgsParser;
+function none() {}
+
+function extractArgs(args) {
+  var pathvars = void 0;
+  var params = {};
+  var callback = void 0;
+  if (args[0] instanceof Function) {
+    callback = args[0];
+  } else if (args[1] instanceof Function) {
+    pathvars = args[0];
+    callback = args[1];
+  } else {
+    pathvars = args[0];
+    params = args[1];
+    callback = args[2] || none;
+  }
+  return [pathvars, params, callback];
+}
+
+function helperCrudFunction(name) {
+  return function () {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var _extractArgs = extractArgs(args),
+        _extractArgs2 = _slicedToArray(_extractArgs, 3),
+        pathvars = _extractArgs2[0],
+        params = _extractArgs2[1],
+        cb = _extractArgs2[2];
+
+    return [pathvars, _extends({}, params, { method: name.toUpperCase() }), cb];
+  };
+}
+
+function defaultMiddlewareArgsParser(dispatch, getState) {
+  return { dispatch: dispatch, getState: getState };
+}
+
+var CRUD = exports.CRUD = ["get", "post", "put", "delete", "patch"].reduce(function (memo, name) {
+  memo[name] = helperCrudFunction(name);
+  return memo;
+}, {});
+
+/***/ }),
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2875,17 +3035,17 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.default = urlTransform;
 
-var _qs = __webpack_require__(10);
+var _qs = __webpack_require__(11);
 
 var _qs2 = _interopRequireDefault(_qs);
 
-var _url = __webpack_require__(1);
+var _url = __webpack_require__(2);
 
-var _omit = __webpack_require__(24);
+var _omit = __webpack_require__(26);
 
 var _omit2 = _interopRequireDefault(_omit);
 
-var _merge = __webpack_require__(2);
+var _merge = __webpack_require__(3);
 
 var _merge2 = _interopRequireDefault(_merge);
 
@@ -2953,7 +3113,7 @@ function urlTransform(url, params, options) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2965,24 +3125,27 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (obj) {
-  for (var _len = arguments.length, path = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    path[_key - 1] = arguments[_key];
-  }
-
-  return path.reduce(function (memo, name) {
-    return isEmpty(name) ? memo : memo && memo[name];
-  }, obj);
-};
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function isEmpty(name) {
   return name === "" || name === null || name === void 0;
 }
 
+function get(obj) {
+  for (var _len = arguments.length, path = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    path[_key - 1] = arguments[_key];
+  }
+
+  return path.reduce(function (memo, name) {
+    return Array.isArray(name) ? get.apply(undefined, [memo].concat(_toConsumableArray(name))) : isEmpty(name) ? memo : memo && memo[name];
+  }, obj);
+}
+
+exports.default = get;
 module.exports = exports["default"];
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3010,7 +3173,7 @@ exports.default = function (object, props) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3028,21 +3191,25 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 exports.default = reduxApi;
 
-var _reducerFn = __webpack_require__(6);
+var _reducerFn = __webpack_require__(7);
 
 var _reducerFn2 = _interopRequireDefault(_reducerFn);
 
-var _actionFn = __webpack_require__(4);
+var _actionFn = __webpack_require__(5);
 
 var _actionFn2 = _interopRequireDefault(_actionFn);
 
-var _transformers = __webpack_require__(7);
+var _transformers = __webpack_require__(8);
 
 var _transformers2 = _interopRequireDefault(_transformers);
 
-var _async = __webpack_require__(5);
+var _async = __webpack_require__(6);
 
 var _async2 = _interopRequireDefault(_async);
+
+var _cache = __webpack_require__(0);
+
+var _cache2 = _interopRequireDefault(_cache);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3155,23 +3322,27 @@ function reduxApi(config, baseConfig) {
       actionFetch: PREFIX + "@" + prefix + reducerName,
       actionSuccess: PREFIX + "@" + prefix + reducerName + "_success",
       actionFail: PREFIX + "@" + prefix + reducerName + "_fail",
-      actionReset: PREFIX + "@" + prefix + reducerName + "_delete"
+      actionReset: PREFIX + "@" + prefix + reducerName + "_delete",
+      actionCache: PREFIX + "@" + prefix + reducerName + "_cache"
+    };
+
+    var fetch = opts.fetch ? opts.fetch : function () {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return fetchHolder.fetch.apply(this, args);
     };
 
     var meta = {
-      urlOptions: urlOptions,
-      fetch: opts.fetch ? opts.fetch : function () {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        return fetchHolder.fetch.apply(this, args);
-      },
       holder: fetchHolder,
-      broadcast: broadcast,
       virtual: !!opts.virtual,
-      reducerName: reducerName,
       actions: memo.actions,
+      cache: (0, _cache2.default)(opts.cache),
+      urlOptions: urlOptions,
+      fetch: fetch,
+      broadcast: broadcast,
+      reducerName: reducerName,
       prefetch: prefetch,
       postfetch: postfetch,
       validation: validation,
@@ -3184,12 +3355,12 @@ function reduxApi(config, baseConfig) {
     memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
 
     if (!meta.virtual && !memo.reducers[reducerName]) {
-      var initialState = {
-        sync: false,
-        syncing: false,
-        loading: false,
-        data: transformer()
-      };
+      var data = transformer();
+      var sync = false;
+      var syncing = false;
+      var loading = false;
+      var initialState = opts.cache ? { sync: sync, syncing: syncing, loading: loading, data: data, cache: {} } : { sync: sync, syncing: syncing, loading: loading, data: data };
+
       var reducer = opts.reducer ? opts.reducer.bind(memo) : null;
       memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, reducer);
     }
