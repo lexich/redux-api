@@ -53,6 +53,6 @@
     "no-confusing-arrow": 0,
     "react/require-extension": 0,
     "import/no-unresolved": 0,
-    "import/extentions": { "js": "always" }
+    "import/extentions": 0
   }
 }

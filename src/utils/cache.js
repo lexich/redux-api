@@ -1,13 +1,13 @@
 export const Manager = {
   expire: false,
-  getData(cache) {
+  getData(cache, now) {
     if (!cache) { return; }
     const { expire, data } = cache;
     if (expire === false || expire === undefined || expire === null) {
       return data;
     }
     if (expire instanceof Date) {
-      if (expire.valueOf() > new Date().valueOf()) {
+      if (expire.valueOf() > (now || new Date()).valueOf()) {
         return data;
       }
     }
@@ -23,7 +23,7 @@ export function setExpire(value, oldDate, now) {
   let expire = value;
   if (oldDate instanceof Date) {
     if (typeof expire === "number" || expire instanceof Number) {
-      const d = new Date(now);
+      const d = now ? new Date(now) : new Date();
       d.setSeconds(d.getSeconds() + expire);
       expire = d;
     }
@@ -38,12 +38,13 @@ export function setExpire(value, oldDate, now) {
 
 export function getCacheManager(expire, cache) {
   if (expire !== undefined) {
-    const ret = cache ? { ...cache }: { ...Manager };
+    const ret = { ...Manager, ...cache };
     if (ret.expire !== false) {
       ret.expire = setExpire(expire, ret.expire);
     }
+    return ret;
   } else if (cache) {
-    return cache;
+    return { ...Manager, ...cache };
   } else {
     return null;
   }

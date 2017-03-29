@@ -2,7 +2,7 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 
 import { expect } from "chai";
-import cache, { Manager, setExpire } from "../src/utils/cache";
+import cache, { Manager, setExpire, getCacheManager } from "../src/utils/cache";
 
 describe("cache-manager", ()=> {
   it("check empty call", ()=> {
@@ -42,11 +42,58 @@ describe("cache-manager", ()=> {
     expect(res3).to.eql(date1000);
   });
 
-  it("check getCacheManager", ()=> {
-    expect(false).to.eql(true, "need implement test");
+  it("check getCacheManager null check", ()=> {
+    const ret1 = getCacheManager();
+    expect(ret1).to.be.null;
   });
 
-  it("check Manager.getData", ()=> {
-    expect(false).to.eql(true, "need implement test");
+  it("check getCacheManager only expire without cache", ()=> {
+    const ret2 = getCacheManager(1);
+    expect(ret2.expire).to.be.false; // can't rewrite false expire
+    expect(ret2.getData).to.be.instanceof(Function);
+    expect(ret2.id).to.be.instanceof(Function);
+  });
+
+  it("check getCacheManager full check", ()=> {
+    const date = new Date();
+    const ret3 = getCacheManager(1, { expire: date });
+
+    const expireDate = new Date(date);
+    expireDate.setSeconds(expireDate.getSeconds() + 1);
+    expect(ret3.expire).to.be.eql(expireDate);
+    expect(ret3.getData).to.be.instanceof(Function);
+    expect(ret3.id).to.be.instanceof(Function);
+  });
+
+  it("check getCacheManager check only cache", ()=> {
+    const date = new Date();
+    const cache = { expire: date };
+    const ret3 = getCacheManager(undefined, cache);
+
+    expect(ret3.expire).to.be.eql(cache.expire);
+    expect(ret3.getData).to.be.instanceof(Function);
+    expect(ret3.id).to.be.instanceof(Function);
+  });
+
+  it("check Manager.getData empty args", ()=> {
+    expect(Manager.getData()).to.not.exist;
+  });
+
+  it("check Manager.getData with only data cache", ()=> {
+    expect(Manager.getData({ data: "Test" })).to.eql("Test");
+    expect(Manager.getData({ data: "Test", expire: false })).to.eql("Test");
+    expect(Manager.getData({ data: "Test", expire: null })).to.eql("Test");
+  });
+
+  it("check Manager.getData with only data cache", ()=> {
+    const now = new Date();
+    const before = new Date(now);
+    before.setSeconds(before.getSeconds() - 1);
+    const after = new Date(now);
+    after.setSeconds(after.getSeconds() + 1);
+    expect(Manager.getData({ data: "Test", expire: after }, now))
+      .to.eql("Test");
+    expect(Manager.getData({ data: "Test", expire: before }, now))
+      .to.not.exist;
   });
 });
