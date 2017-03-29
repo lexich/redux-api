@@ -536,4 +536,33 @@ describe("redux", ()=> {
         expect(requestCount).to.eql(2);
       });
   });
+
+  it("check double call crud alias", function() {
+    let fetchCounter = 0;
+    const rest = reduxApi({
+      test: {
+        url: "/api/test",
+        crud: true
+      }
+    }).use("fetch",
+      (url)=> {
+        fetchCounter += 1;
+        return new Promise(resolve=> resolve(url));
+      });
+
+    const store = storeHelper(rest);
+    let counter = 0;
+    function callback() {
+      counter += 1;
+    }
+
+    return store.dispatch(rest.actions.test.get(callback))
+      .then(()=>
+        store.dispatch(rest.actions.test.put(callback))
+      )
+      .then(()=> {
+        expect(fetchCounter).to.eql(2, "fetch should be perform twice");
+        expect(counter).to.eql(2, "call should be perform twice");
+      });
+  });
 });
