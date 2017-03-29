@@ -2,7 +2,7 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
 
 import { expect } from "chai";
-import cache, { Manager, setExpire, getCacheManager } from "../src/utils/cache";
+import cache, { Manager, setExpire, getCacheManager, MockNowDate } from "../src/utils/cache";
 
 describe("cache-manager", ()=> {
   it("check empty call", ()=> {
@@ -30,10 +30,13 @@ describe("cache-manager", ()=> {
   it("check setExpire", ()=> {
     const date = new Date();
     const SECOND = 1000;
-    const res1 = (+setExpire(1, date, date)) - (+date);
+    MockNowDate.push(date);
+    const res1 = (+setExpire(1, date)) - (+date);
     expect(res1).to.eql(1 * SECOND);
 
-    const res2 = setExpire(false, date, date);
+
+    MockNowDate.push(date);
+    const res2 = setExpire(false, date);
     expect(res2).to.eql(false);
 
     const date1000 = new Date(date);
@@ -58,9 +61,7 @@ describe("cache-manager", ()=> {
     const date = new Date();
     const ret3 = getCacheManager(1, { expire: date });
 
-    const expireDate = new Date(date);
-    expireDate.setSeconds(expireDate.getSeconds() + 1);
-    expect(ret3.expire).to.be.eql(expireDate);
+    expect(ret3.expire).to.be.instanceof(Date);
     expect(ret3.getData).to.be.instanceof(Function);
     expect(ret3.id).to.be.instanceof(Function);
   });
@@ -91,9 +92,11 @@ describe("cache-manager", ()=> {
     before.setSeconds(before.getSeconds() - 1);
     const after = new Date(now);
     after.setSeconds(after.getSeconds() + 1);
-    expect(Manager.getData({ data: "Test", expire: after }, now))
-      .to.eql("Test");
-    expect(Manager.getData({ data: "Test", expire: before }, now))
-      .to.not.exist;
+
+    MockNowDate.push(now);
+    expect(Manager.getData({ data: "Test", expire: after })).to.eql("Test");
+
+    MockNowDate.push(now);
+    expect(Manager.getData({ data: "Test", expire: before })).to.not.exist;
   });
 });

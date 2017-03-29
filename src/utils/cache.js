@@ -1,13 +1,29 @@
+export const MockNowDate = {
+  date: undefined,
+  push(date) {
+    this.date = date;
+  },
+  pop() {
+    if (this.date) {
+      const d = this.date;
+      this.date = undefined;
+      return new Date(d);
+    } else {
+      return new Date();
+    }
+  }
+};
+
 export const Manager = {
   expire: false,
-  getData(cache, now) {
+  getData(cache) {
     if (!cache) { return; }
     const { expire, data } = cache;
     if (expire === false || expire === undefined || expire === null) {
       return data;
     }
     if (expire instanceof Date) {
-      if (expire.valueOf() > (now || new Date()).valueOf()) {
+      if (expire.valueOf() > MockNowDate.pop().valueOf()) {
         return data;
       }
     }
@@ -19,11 +35,11 @@ export const Manager = {
   }
 };
 
-export function setExpire(value, oldDate, now) {
+export function setExpire(value, oldDate) {
   let expire = value;
   if (oldDate instanceof Date) {
     if (typeof expire === "number" || expire instanceof Number) {
-      const d = now ? new Date(now) : new Date();
+      const d = MockNowDate.pop();
       d.setSeconds(d.getSeconds() + expire);
       expire = d;
     }

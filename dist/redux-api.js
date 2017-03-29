@@ -103,9 +103,25 @@ exports.default = function (cache) {
   }
 };
 
+var MockNowDate = exports.MockNowDate = {
+  date: undefined,
+  push: function push(date) {
+    this.date = date;
+  },
+  pop: function pop() {
+    if (this.date) {
+      var d = this.date;
+      this.date = undefined;
+      return new Date(d);
+    } else {
+      return new Date();
+    }
+  }
+};
+
 var Manager = exports.Manager = {
   expire: false,
-  getData: function getData(cache, now) {
+  getData: function getData(cache) {
     if (!cache) {
       return;
     }
@@ -116,7 +132,7 @@ var Manager = exports.Manager = {
       return data;
     }
     if (expire instanceof Date) {
-      if (expire.valueOf() > (now || new Date()).valueOf()) {
+      if (expire.valueOf() > MockNowDate.pop().valueOf()) {
         return data;
       }
     }
@@ -131,11 +147,11 @@ var Manager = exports.Manager = {
   }
 };
 
-function setExpire(value, oldDate, now) {
+function setExpire(value, oldDate) {
   var expire = value;
   if (oldDate instanceof Date) {
     if (typeof expire === "number" || expire instanceof Number) {
-      var d = now ? new Date(now) : new Date();
+      var d = MockNowDate.pop();
       d.setSeconds(d.getSeconds() + expire);
       expire = d;
     }
