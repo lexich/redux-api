@@ -804,4 +804,34 @@ describe("actionFn", function() {
       expect(resp[0].err).to.be.an.instanceof(Error);
     });
   });
+
+  it("chained callbacks all resolve",  function() {
+    const meta = {
+      transformer,
+      crud: true,
+      fetch(url, opts) {
+        return new Promise(resolve=> resolve({ url, opts }));
+      }
+    };
+    const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
+
+    let callCount = 0;
+
+    function spy(resolve) {
+      callCount += 1;
+      resolve();
+    }
+    function none() {}
+
+    function chainedAction(resolve) {
+      api.get({ id: 1 }, ()=> spy(resolve))(none, getState);
+    }
+
+    return new Promise(resolve=>
+      api.get(
+        { id: 1 },
+        ()=> chainedAction(resolve)
+      )(none, getState)
+    ).then(()=> expect(callCount).to.have.length.equal(1));
+  });
 });

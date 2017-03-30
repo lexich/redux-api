@@ -8,11 +8,13 @@ export default class PubSub {
     (cb instanceof Function) && this.container.push(cb);
   }
   resolve(data) {
-    this.container.forEach(cb=> cb(null, data));
+    const container = this.container;
     this.container = [];
+    container.forEach(cb=> cb(null, data));
   }
   reject(err) {
-    this.container.forEach(cb=> cb(err));
+    const container = this.container;
     this.container = [];
+    container.forEach(cb=> cb(err));
   }
 }

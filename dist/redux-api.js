@@ -2885,18 +2885,20 @@ var PubSub = function () {
   }, {
     key: "resolve",
     value: function resolve(data) {
-      this.container.forEach(function (cb) {
+      var container = this.container;
+      this.container = [];
+      container.forEach(function (cb) {
         return cb(null, data);
       });
-      this.container = [];
     }
   }, {
     key: "reject",
     value: function reject(err) {
-      this.container.forEach(function (cb) {
+      var container = this.container;
+      this.container = [];
+      container.forEach(function (cb) {
         return cb(err);
       });
-      this.container = [];
     }
   }]);
 
