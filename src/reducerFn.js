@@ -45,7 +45,8 @@ export default function reducerFn(initialState, actions={}, reducer) {
           { ...initialState };
       case actionCache:
         const { id, data } = action;
-        const expire = setExpire(action.expire, state.cache.expire);
+        const cacheExpire = state.cache[id] ? state.cache[id].expire : null;
+        const expire = setExpire(action.expire, cacheExpire);
         return {
           ...state,
           cache: { ...state.cache, [id]: { expire, data } }

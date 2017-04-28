@@ -12,6 +12,7 @@ export default reduxApi({
   userRepos: {
     url: `${URL}/users/:user/repos`,
     options: { headers },
+    cache: { expire: 5000 },
     transformer(data) {
       return map(data, (item)=> {
         return {
@@ -24,6 +25,9 @@ export default reduxApi({
   },
   repo: {
     url: `${URL}/repos/:user/:repo`,
-    options: { headers }
+    options: { headers },
+    cache: {
+      expire: 5000
+    }
   }
 });
