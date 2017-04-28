@@ -43,6 +43,12 @@ describe("cache-manager", ()=> {
     date1000.setSeconds(1000 + date1000.getSeconds());
     const res3 = setExpire(date1000, date, date);
     expect(res3).to.eql(date1000);
+
+
+    MockNowDate.push(date);
+    const res4 = setExpire(1);
+    expect(res4).to.be.instanceof(Date);
+    expect(+res4 - +date).to.eql(1 * SECOND);
   });
 
   it("check getCacheManager null check", ()=> {

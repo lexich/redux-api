@@ -37,16 +37,14 @@ export const Manager = {
 
 export function setExpire(value, oldDate) {
   let expire = value;
-  if (oldDate instanceof Date) {
-    if (typeof expire === "number" || expire instanceof Number) {
-      const d = MockNowDate.pop();
-      d.setSeconds(d.getSeconds() + expire);
-      expire = d;
-    }
-    if (expire instanceof Date) {
-      if (expire.valueOf() < oldDate.valueOf()) {
-        expire = oldDate;
-      }
+  if (typeof expire === "number" || expire instanceof Number) {
+    const d = MockNowDate.pop();
+    d.setSeconds(d.getSeconds() + expire);
+    expire = d;
+  }
+  if (oldDate instanceof Date && expire instanceof Date) {
+    if (expire.valueOf() < oldDate.valueOf()) {
+      expire = oldDate;
     }
   }
   return expire;
