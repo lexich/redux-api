@@ -149,16 +149,14 @@ var Manager = exports.Manager = {
 
 function setExpire(value, oldDate) {
   var expire = value;
-  if (oldDate instanceof Date) {
-    if (typeof expire === "number" || expire instanceof Number) {
-      var d = MockNowDate.pop();
-      d.setSeconds(d.getSeconds() + expire);
-      expire = d;
-    }
-    if (expire instanceof Date) {
-      if (expire.valueOf() < oldDate.valueOf()) {
-        expire = oldDate;
-      }
+  if (typeof expire === "number" || expire instanceof Number) {
+    var d = MockNowDate.pop();
+    d.setSeconds(d.getSeconds() + expire);
+    expire = d;
+  }
+  if (oldDate instanceof Date && expire instanceof Date) {
+    if (expire.valueOf() < oldDate.valueOf()) {
+      expire = oldDate;
     }
   }
   return expire;
@@ -1623,7 +1621,8 @@ function reducerFn(initialState) {
         var id = action.id,
             data = action.data;
 
-        var expire = (0, _cache.setExpire)(action.expire, state.cache.expire);
+        var cacheExpire = state.cache[id] ? state.cache[id].expire : null;
+        var expire = (0, _cache.setExpire)(action.expire, cacheExpire);
         return _extends({}, state, {
           cache: _extends({}, state.cache, _defineProperty({}, id, { expire: expire, data: data }))
         });
