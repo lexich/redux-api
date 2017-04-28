@@ -246,6 +246,25 @@ In this case you global state is look like this:
 { items: [ ... ] }
 ```
 
+#### compose
+```js
+const rest = reduxApi({
+  test: {
+    url: "/api/test/:id"
+  },
+  collection: {
+    compose({actions: { test }}) {
+      const params = {};
+      const opts = { expire: false }
+      return {
+        1: test.request({ id: 1 }, params, opts),
+        2: test.request({ id: 2 }, params, opts)
+      }
+    }
+  }
+})
+```
+
 #### prefetch
 - @description: you can organize chain of calling events before the current endpoint will be executed
 - @type: Array<Function>
