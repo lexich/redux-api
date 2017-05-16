@@ -22,8 +22,8 @@ import { getCacheManager } from "./utils/cache";
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = ACTIONS;
-  const pubsub = new PubSub();
   const requestHolder = createHolder();
+  let currentPubsub = null;
 
   function getOptions(urlT, params, getState) {
     const globalOptions = !meta.holder ? {} :
@@ -122,6 +122,13 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   function fn(...args) {
     const [pathvars, params, callback] = extractArgs(args);
     const syncing = params ? !!params.syncing : false;
+    let parentPubsub = currentPubsub;
+    const pubsub = currentPubsub = new PubSub();
+    if (parentPubsub) {
+      parentPubsub.push((error, data) => {
+        parentPubsub = null;
+      });
+    }
     params && delete params.syncing;
     pubsub.push(callback);
     return (...middlewareArgs)=> {
@@ -129,10 +136,6 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         defaultMiddlewareArgsParser;
       const { dispatch, getState } = middlewareParser(...middlewareArgs);
       const state = getState();
-      const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
-      if (isLoading) {
-        return;
-      }
       const requestOptions = { pathvars, params };
       const prevData =  get(state, meta.prefix, meta.reducerName, "data");
       dispatch({ type: actionFetch, syncing, request: requestOptions });
@@ -157,34 +160,56 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             });
           }).then((d)=> {
             requestHolder.pop();
-            const data = meta.transformer(d, prevData, {
-              type: actionSuccess, request: requestOptions
-            });
-            dispatch({
-              data,
-              origData: d,
-              type: actionSuccess,
-              syncing: false,
-              request: requestOptions
-            });
-            if (meta.broadcast) {
-              meta.broadcast.forEach((type)=> {
-                dispatch({ type, data, origData: d, request: requestOptions });
+            const final = () => {
+              if (currentPubsub === pubsub) {
+                currentPubsub = null;
+              }
+              const data = meta.transformer(d, prevData, {
+                type: actionSuccess, request: requestOptions
               });
-            }
-            if (meta.postfetch) {
-              meta.postfetch.forEach((postfetch)=> {
-                (postfetch instanceof Function) && postfetch({
-                  data, getState, dispatch, actions: meta.actions, request: requestOptions
+              dispatch({
+                data,
+                origData: d,
+                type: actionSuccess,
+                syncing: false,
+                request: requestOptions
+              });
+              if (meta.broadcast) {
+                meta.broadcast.forEach((type)=> {
+                  dispatch({ type, data, origData: d, request: requestOptions });
                 });
-              });
+              }
+              if (meta.postfetch) {
+                meta.postfetch.forEach((postfetch)=> {
+                  (postfetch instanceof Function) && postfetch({
+                    data, getState, dispatch, actions: meta.actions, request: requestOptions
+                  });
+                });
+              }
+              pubsub.resolve(data);
+              done(data);
+            };
+            if (parentPubsub) {
+              console.log('have parent')
+              parentPubsub.push(final);
+              parentPubsub = null;
+              return;
+            } else {
+              final();
             }
-            pubsub.resolve(data);
-            done(data);
           }, (error)=> {
-            dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
-            pubsub.reject(error);
-            fail(error);
+            const final = () => {
+              dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
+              pubsub.reject(error);
+              fail(error);
+            };
+            if (parentPubsub) {
+              parentPubsub.push(final);
+              parentPubsub = null;
+              return;
+            } else {
+              final();
+            }
           });
         });
       });
@@ -192,6 +217,8 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       return result;
     };
   }
+
+  fn._result = {};
 
   /*
     Pure rest request

@@ -101,6 +101,18 @@ describe("redux", ()=> {
         request: { pathvars: undefined, params: {} }
       },
       {
+        type: "@@redux-api@test",
+        syncing: true,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        data: { url: "/test" },
+        origData: { url: "/test" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
         data: { url: "/test" },
         origData: { url: "/test" },
         type: "@@redux-api@test_success",
@@ -135,6 +147,163 @@ describe("redux", ()=> {
     }));
     store.dispatch(rest.actions.test.sync((err, data)=> {
       expect(data).to.eql({ url: "/test" });
+      next();
+    }));
+  });
+
+  it("check double call second returns first", (done)=> {
+    let count = 0;
+    const rest = reduxApi({
+      test: "/test"
+    }).use("fetch", url=> {
+      const newUrl = `${url}-${count}`;
+      const timeout = count ? 100 : 200;
+      count++;
+      return new Promise((resolve)=> {
+        setTimeout(()=> resolve({ url: newUrl }), timeout);
+      });
+    });
+
+    const expectedAction = [
+      {
+        type: "@@redux-api@test",
+        syncing: true,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: "@@redux-api@test",
+        syncing: true,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        data: { url: "/test-0" },
+        origData: { url: "/test-0" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        data: { url: "/test-1" },
+        origData: { url: "/test-1" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
+    const reducer = combineReducers({
+      ...rest.reducers,
+      debug(state={}, action) {
+        if (!/^@@redux\//.test(action.type)) {
+          const exp = expectedAction.shift();
+          expect(action).to.eql(exp);
+        }
+        return state;
+      }
+    });
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+
+    const next = after(2, function() {
+      console.log('after')
+      store.dispatch(rest.actions.test.sync((err, data)=> {
+        console.log(data)
+        expect(data).to.eql({ url: "/test-1" });
+        expect(expectedAction).to.have.length(0);
+        done();
+      }));
+    });
+
+    store.dispatch(rest.actions.test.sync((err, data)=> {
+      expect(data).to.eql({ url: "/test-0" });
+      next();
+    }));
+    store.dispatch(rest.actions.test.sync((err, data)=> {
+      expect(data).to.eql({ url: "/test-1" });
+      next();
+    }));
+  });
+
+  it("check double get call second returns first, then after is called", (done)=> {
+    let count = 0;
+    const rest = reduxApi({
+      test: {
+        url: "/test",
+        crud: true
+      }
+    }).use("fetch", url=> {
+      const newUrl = `${url}-${count}`;
+      const timeout = count ? 100 : 200;
+      count++;
+      return new Promise((resolve)=> {
+        setTimeout(()=> resolve({ url: newUrl }), timeout);
+      });
+    });
+
+    const expectedAction = [
+      {
+        type: "@@redux-api@test",
+        syncing: false,
+        request: { pathvars: undefined, params: { method: 'GET'} }
+      },
+      {
+        type: "@@redux-api@test",
+        syncing: false,
+        request: { pathvars: undefined, params: { method: 'GET'} }
+      },
+      {
+        data: { url: "/test-0" },
+        origData: { url: "/test-0" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: { method: 'GET'} }
+      },
+      {
+        data: { url: "/test-1" },
+        origData: { url: "/test-1" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: { method: 'GET'} }
+      },
+      {
+        type: "@@redux-api@test",
+        syncing: false,
+        request: { pathvars: undefined, params: { method: 'GET'} }
+      },
+      {
+        data: { url: "/test-2" },
+        origData: { url: "/test-2" },
+        type: "@@redux-api@test_success",
+        syncing: false,
+        request: { pathvars: undefined, params: { method: 'GET'} }
+      },
+    ];
+    const reducer = combineReducers({
+      ...rest.reducers,
+      debug(state={}, action) {
+        if (!/^@@redux\//.test(action.type)) {
+          const exp = expectedAction.shift();
+          expect(action).to.eql(exp);
+        }
+        return state;
+      }
+    });
+    const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+    const store = createStoreWithMiddleware(reducer);
+
+    const next = after(2, function() {
+      store.dispatch(rest.actions.test.get((err, data)=> {
+        expect(data).to.eql({ url: "/test-2" });
+        expect(expectedAction).to.have.length(0);
+        done();
+      }));
+    });
+
+    store.dispatch(rest.actions.test.get((err, data)=> {
+      expect(data).to.eql({ url: "/test-0" });
+      next();
+    }));
+    store.dispatch(rest.actions.test.get((err, data)=> {
+      expect(data).to.eql({ url: "/test-1" });
       next();
     }));
   });
