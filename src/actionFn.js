@@ -22,7 +22,6 @@ import { getCacheManager } from "./utils/cache";
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = ACTIONS;
-  const pubsub = new PubSub();
   const requestHolder = createHolder();
 
   function getOptions(urlT, params, getState) {
@@ -122,6 +121,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   function fn(...args) {
     const [pathvars, params, callback] = extractArgs(args);
     const syncing = params ? !!params.syncing : false;
+    const pubsub = new PubSub();
     params && delete params.syncing;
     pubsub.push(callback);
     return (...middlewareArgs)=> {
