@@ -12,7 +12,8 @@ import { setExpire } from "./utils/cache";
  * @return {Function}              reducer function
  */
 export default function reducerFn(initialState, actions={}, reducer) {
-  const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = actions;
+  const { actionFetch, actionSuccess, actionFail,
+    actionReset, actionCache, actionAbort } = actions;
   return (state=initialState, action)=> {
     switch (action.type) {
       case actionFetch:
@@ -43,6 +44,8 @@ export default function reducerFn(initialState, actions={}, reducer) {
         return (mutation === "sync") ?
           { ...state, sync: false } :
           { ...initialState };
+      case actionAbort:
+        return { ...state, loading: false, syncing: false, error: action.error };
       case actionCache:
         const { id, data } = action;
         const cacheExpire = state.cache[id] ? state.cache[id].expire : null;

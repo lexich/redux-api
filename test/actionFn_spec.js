@@ -168,13 +168,16 @@ describe("actionFn", function() {
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
-      expect(msg).to.eql(exp);
+      expect(msg.type).to.eql(exp.type);
+      expect(msg.syncing).to.eql(exp.syncing);
+      expect(msg.request).to.eql(exp.request);
+      expect(msg.error).to.eql(exp.error);
     }
     return new Promise((resolve)=> {
       api(resolve)(dispatch, getState);
     }).then(()=> {
       expect(expectedEvent).to.have.length(0);
-    });
+    }, err=> expect(null).to.eql(err));
   });
 
   it("check options param", function() {
@@ -357,13 +360,16 @@ describe("actionFn", function() {
       api(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
-        expect(msg).to.eql(exp);
+        expect(msg.type).to.eql(exp.type);
+        expect(msg.syncing).to.eql(exp.syncing);
+        expect(msg.request).to.eql(exp.request);
+        expect(msg.error).to.eql(exp.error);
       }, getState);
     }).then(()=> {
       expect(expectedEvent).to.have.length(0);
       expect(counter).to.eql(1);
       expect(expData).to.eql({ msg: "hello" });
-    });
+    }, err=> expect(null).to.eql(err));
   });
   it("check postfetch option", function() {
     let expectedOpts;
@@ -460,7 +466,7 @@ describe("actionFn", function() {
         ["one", expOpts],
         ["two", expOpts],
       ]);
-    });
+    }, err=> expect(null).to.eql(err));
   });
   it("check incorrect helpers name", function() {
     expect(

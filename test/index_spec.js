@@ -117,7 +117,8 @@ describe("index", function() {
       "actionSuccess",
       "actionFail",
       "actionReset",
-      "actionCache"
+      "actionCache",
+      "actionAbort"
     );
     expect(res.reducers.test).to.exist;
     const expectedEvent = [

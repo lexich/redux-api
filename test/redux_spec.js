@@ -15,6 +15,8 @@ function storeHelper(rest) {
   return createStoreWithMiddleware(reducer);
 }
 
+function none() {}
+
 describe("redux", ()=> {
   it("check redux", ()=> {
     const rest = reduxApi({
@@ -84,7 +86,7 @@ describe("redux", ()=> {
       store.dispatch(rest.actions.test(resolve));
     }).then(()=> {
       expect(store.getState().test.data).to.eql({ data: "/api/url" });
-    });
+    }, err=> expect(null).to.eql(err));
   });
 
   it("check double call", (done)=> {
@@ -132,11 +134,11 @@ describe("redux", ()=> {
     store.dispatch(rest.actions.test.sync((err, data)=> {
       expect(data).to.eql({ url: "/test" });
       next();
-    }));
+    })).catch(none);
     store.dispatch(rest.actions.test.sync((err, data)=> {
       expect(data).to.eql({ url: "/test" });
       next();
-    }));
+    })).catch(none);
   });
 
   it("check abort request", (done)=> {
@@ -563,6 +565,72 @@ describe("redux", ()=> {
       .then(()=> {
         expect(fetchCounter).to.eql(2, "fetch should be perform twice");
         expect(counter).to.eql(2, "call should be perform twice");
+      });
+  });
+
+  it("check abort", ()=> {
+    const rest = reduxApi({
+      test: "/api/url",
+    }).use("fetch", (url)=> {
+      return new Promise(resolve=>
+        setTimeout(()=> resolve(url), 10)
+      );
+    });
+    const store = storeHelper(rest);
+
+    const ret1 = new Promise((resolve, reject)=>
+      store.dispatch(rest.actions.test())
+        .then(
+          ()=> reject("Abort shout generate error"),
+          (err)=> {
+            expect(err.message).to.eql("Application abort request");
+            expect(store.getState().test).to.eql({
+              sync: false,
+              syncing: false,
+              loading: false,
+              data: {},
+              error: err
+            });
+            resolve();
+          }));
+
+    store.dispatch(rest.actions.test.abort());
+    const ret2 = store.dispatch(rest.actions.test());
+
+    return Promise.all([ret1, ret2])
+      .then(()=> {
+        expect(store.getState().test.data).to.eql({ data: "/api/url" });
+      });
+  });
+
+  it("check force", ()=> {
+    const rest = reduxApi({
+      test: "/api/url",
+    }).use("fetch", (url)=> {
+      return new Promise(resolve=>
+        setTimeout(()=> resolve(url), 10)
+      );
+    });
+    const store = storeHelper(rest);
+    const ret1 = new Promise((resolve, reject)=>
+      store.dispatch(rest.actions.test())
+        .then(
+          ()=> reject("Abort shout generate error"),
+          (err)=> {
+            expect(err.message).to.eql("Application abort request");
+            expect(store.getState().test).to.eql({
+              sync: false,
+              syncing: false,
+              loading: false,
+              data: {},
+              error: err
+            });
+            resolve();
+          }));
+    const ret2 = store.dispatch(rest.actions.test.force());
+    return Promise.all([ret1, ret2])
+      .then(()=> {
+        expect(store.getState().test.data).to.eql({ data: "/api/url" });
       });
   });
 });

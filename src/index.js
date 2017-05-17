@@ -108,7 +108,8 @@ export default function reduxApi(config, baseConfig) {
       actionSuccess: `${PREFIX}@${prefix}${reducerName}_success`,
       actionFail: `${PREFIX}@${prefix}${reducerName}_fail`,
       actionReset: `${PREFIX}@${prefix}${reducerName}_delete`,
-      actionCache: `${PREFIX}@${prefix}${reducerName}_cache`
+      actionCache: `${PREFIX}@${prefix}${reducerName}_cache`,
+      actionAbort: `${PREFIX}@${prefix}${reducerName}_abort`
     };
 
     const fetch = opts.fetch ? opts.fetch : function(...args) {
