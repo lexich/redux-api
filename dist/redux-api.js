@@ -1209,7 +1209,8 @@ function actionFn(url, name, options) {
       actionSuccess = ACTIONS.actionSuccess,
       actionFail = ACTIONS.actionFail,
       actionReset = ACTIONS.actionReset,
-      actionCache = ACTIONS.actionCache;
+      actionCache = ACTIONS.actionCache,
+      actionAbort = ACTIONS.actionAbort;
 
   var pubsub = new _PubSub2.default();
   var requestHolder = (0, _createHolder2.default)();
@@ -1262,6 +1263,13 @@ function actionFn(url, name, options) {
       });
     }
     return response;
+  }
+
+  function abort() {
+    var defer = requestHolder.pop();
+    var err = new Error("Application abort request");
+    defer && defer.reject(err);
+    return err;
   }
 
   /**
@@ -1334,7 +1342,7 @@ function actionFn(url, name, options) {
       var state = getState();
       var isLoading = (0, _get2.default)(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
-        return;
+        return Promise.reject("isLoading");
       }
       var requestOptions = { pathvars: pathvars, params: params };
       var prevData = (0, _get2.default)(state, meta.prefix, meta.reducerName, "data");
@@ -1385,7 +1393,13 @@ function actionFn(url, name, options) {
             pubsub.resolve(data);
             done(data);
           }, function (error) {
-            dispatch({ type: actionFail, syncing: false, error: error, request: requestOptions });
+            dispatch({
+              error: error,
+              type: actionFail,
+              loading: false,
+              syncing: false,
+              request: requestOptions
+            });
             pubsub.reject(error);
             fail(error);
           });
@@ -1407,9 +1421,31 @@ function actionFn(url, name, options) {
    * Reset store to initial state
    */
   fn.reset = function (mutation) {
-    var defer = requestHolder.pop();
-    defer && defer.reject(new Error("Application abort request"));
+    abort();
     return mutation === "sync" ? { type: actionReset, mutation: mutation } : { type: actionReset };
+  };
+
+  /*
+    Abort request
+   */
+  fn.abort = function () {
+    var error = abort();
+    return { type: actionAbort, error: error };
+  };
+
+  fn.force = function () {
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    return function (dispatch, getState) {
+      var state = getState();
+      var isLoading = (0, _get2.default)(state, meta.prefix, meta.reducerName, "loading");
+      if (isLoading) {
+        dispatch(fn.abort());
+      }
+      return fn.apply(undefined, args)(dispatch, getState);
+    };
   };
 
   /**
@@ -1420,8 +1456,8 @@ function actionFn(url, name, options) {
    * @param  {Function} callback) callback execute after end request
    */
   fn.sync = function () {
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
+    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      args[_key3] = arguments[_key3];
     }
 
     var _extractArgs3 = (0, _helpers.extractArgs)(args),
@@ -1457,8 +1493,8 @@ function actionFn(url, name, options) {
         call = _ref.call;
 
     memo[helpername] = function () {
-      for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
       }
 
       return function (dispatch, getState) {
@@ -1586,7 +1622,8 @@ function reducerFn(initialState) {
       actionSuccess = actions.actionSuccess,
       actionFail = actions.actionFail,
       actionReset = actions.actionReset,
-      actionCache = actions.actionCache;
+      actionCache = actions.actionCache,
+      actionAbort = actions.actionAbort;
 
   return function () {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -1617,6 +1654,8 @@ function reducerFn(initialState) {
         var mutation = action.mutation;
 
         return mutation === "sync" ? _extends({}, state, { sync: false }) : _extends({}, initialState);
+      case actionAbort:
+        return _extends({}, state, { loading: false, syncing: false, error: action.error });
       case actionCache:
         var id = action.id,
             data = action.data;
@@ -3340,7 +3379,8 @@ function reduxApi(config, baseConfig) {
       actionSuccess: PREFIX + "@" + prefix + reducerName + "_success",
       actionFail: PREFIX + "@" + prefix + reducerName + "_fail",
       actionReset: PREFIX + "@" + prefix + reducerName + "_delete",
-      actionCache: PREFIX + "@" + prefix + reducerName + "_cache"
+      actionCache: PREFIX + "@" + prefix + reducerName + "_cache",
+      actionAbort: PREFIX + "@" + prefix + reducerName + "_abort"
     };
 
     var fetch = opts.fetch ? opts.fetch : function () {
