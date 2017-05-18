@@ -21,7 +21,8 @@ import { getCacheManager } from "./utils/cache";
  * @return {Function+Object}     action function object
  */
 export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
-  const { actionFetch, actionSuccess, actionFail, actionReset, actionCache } = ACTIONS;
+  const { actionFetch, actionSuccess, actionFail,
+    actionReset, actionCache, actionAbort } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
 
@@ -78,6 +79,13 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     return response;
   }
 
+  function abort() {
+    const defer = requestHolder.pop();
+    const err = new Error("Application abort request");
+    defer && defer.reject(err);
+    return err;
+  }
+
   /**
    * Fetch data from server
    * @param  {Object}   pathvars    path vars for url
@@ -131,7 +139,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const state = getState();
       const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
-        return;
+        return Promise.reject("isLoading");
       }
       const requestOptions = { pathvars, params };
       const prevData =  get(state, meta.prefix, meta.reducerName, "data");
@@ -182,7 +190,13 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             pubsub.resolve(data);
             done(data);
           }, (error)=> {
-            dispatch({ type: actionFail, syncing: false, error, request: requestOptions });
+            dispatch({
+              error,
+              type: actionFail,
+              loading: false,
+              syncing: false,
+              request: requestOptions
+            });
             pubsub.reject(error);
             fail(error);
           });
@@ -204,9 +218,27 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * Reset store to initial state
    */
   fn.reset = (mutation)=> {
-    const defer = requestHolder.pop();
-    defer && defer.reject(new Error("Application abort request"));
+    abort();
     return mutation === "sync" ? { type: actionReset, mutation } : { type: actionReset };
+  };
+
+  /*
+    Abort request
+   */
+  fn.abort = function() {
+    const error = abort();
+    return { type: actionAbort, error };
+  };
+
+  fn.force = function(...args) {
+    return (dispatch, getState)=> {
+      const state = getState();
+      const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
+      if (isLoading) {
+        dispatch(fn.abort());
+      }
+      return fn(...args)(dispatch, getState);
+    };
   };
 
   /**

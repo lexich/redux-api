@@ -595,7 +595,7 @@ dispatch(rest.actions.entries.sync());
 ### Actions sub methods
 
 #### sync(urlparams, params, callback)
-- @description: this method save you from twice requests flag `sync`. if `sync===true` request wouldn't execute. In server-side mode calls twice
+- @description: this method save you from twice requests flag `sync`. if `sync === true` request wouldn't execute. In server-side mode calls twice
 - @param **urlparams**  - update url according Url schema
 - @param **params**     - add additional params to rest request
 - @param **callback**   - callback function when action ends
@@ -610,6 +610,27 @@ function onEnter(state, replaceState, callback) {
 
 ```
 
+### abort()
+- @description: abort loading request
+- @type: null
+- @example:
+```js
+import {actions} from "./rest";
+dispatch(actions.entries({ id: 1 }))
+actions.entries.abort() // abort previous request
+dispatch(actions.entries({ id: 2 }))
+```
+
+### force(urlparams, params, callback)
+- @description: abort previous request if it performs and after that perform new request. This method combines `abort` and direct call action methods.
+- @type: Function
+- @example:
+```
+import {actions} from "./rest";
+dispatch(actions.entries({ id: 1 }))
+dispatch(actions.entries.force({ id: 2 }))
+```
+
 #### reset(mutation)
 - @description: Reset state of current reducer and application's abort request if it processed.
 - @type: Function
@@ -618,7 +639,7 @@ function onEnter(state, replaceState, callback) {
 ```js
 import {actions} from "./rest";
 function onLeave(state, replaceState, cb) {
-  dispatch(rest.actions.entries.reset(cb));
+  dispatch(actions.entries.reset(cb));
 }
 
 ```
