@@ -730,6 +730,44 @@ describe("actionFn", function() {
     }).then(()=> expect(expectedEvent).to.have.length(0));
   });
 
+  it("check crud option with overwrite 2",  function() {
+    const meta = {
+      transformer,
+      crud: true,
+      fetch(url, opts) {
+        return new Promise(resolve=> resolve({ url, opts }));
+      },
+      helpers: {
+        get(param) {
+          return [{ id: param.id }, null];
+        }
+      }
+    };
+    const api = actionFn("/test/", "test", null, ACTIONS, meta);
+    const expectedEvent = [{
+      type: "actionFetch",
+      syncing: false,
+      request: {
+        pathvars: { id: 1 },
+        params: null
+      }
+    }, {
+      type: "actionSuccess",
+      syncing: false,
+      data: { url: "/test/?id=1", opts: null },
+      origData: { url: "/test/?id=1", opts: null },
+      request: { pathvars: { id: 1 }, params: null }
+    }];
+
+    return new Promise((resolve)=> {
+      api.get({ id: 1 }, resolve)(function(msg) {
+        expect(expectedEvent).to.have.length.above(0);
+        const exp = expectedEvent.shift();
+        expect(msg).to.eql(exp);
+      }, getState);
+    }).then(()=> expect(expectedEvent).to.have.length(0));
+  });
+
   it("check merge params", function() {
     let params;
     const meta = {
