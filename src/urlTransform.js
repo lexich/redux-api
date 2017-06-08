@@ -58,5 +58,5 @@ export default function urlTransform(url, params, options) {
     const urlStringParams = qs.stringify(mergeParams, qsStringifyOptions);
     return `${urlObject[0]}?${urlStringParams}`;
   }
-  return cleanURL;
+  return cleanURL.replace(/\/+/, '/');
 }
