@@ -34,8 +34,8 @@ export default function urlTransform(url, params, options) {
   if (!urlWithParams) { return urlWithParams; }
   const { protocol, host, path } = parse(urlWithParams);
   const cleanURL = (host) ?
-    `${protocol}//${host}${path.replace(rxClean, "")}` :
-    path.replace(rxClean, "");
+    `${protocol}//${host}${path.replace(rxClean, "").replace(/\/+/g, '/')}` :
+    path.replace(rxClean, "").replace(/\/+/g, '/');
   const usedKeysArray = Object.keys(usedKeys);
   if (usedKeysArray.length !== Object.keys(params).length) {
     const urlObject = cleanURL.split("?");
@@ -58,5 +58,5 @@ export default function urlTransform(url, params, options) {
     const urlStringParams = qs.stringify(mergeParams, qsStringifyOptions);
     return `${urlObject[0]}?${urlStringParams}`;
   }
-  return cleanURL.replace(/\/+/, "/");
+  return cleanURL;
 }
