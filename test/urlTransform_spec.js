@@ -39,7 +39,7 @@ describe("urlTransform", function() {
 
   it("check clean params", function() {
     expect(urlTransform("/test/:id")).to.eql("/test/");
-    expect(urlTransform("/test/:id/")).to.eql("/test//");
+    expect(urlTransform("/test/:id/")).to.eql("/test/");
     expect(urlTransform("/test/(:id)")).to.eql("/test/");
   });
 
