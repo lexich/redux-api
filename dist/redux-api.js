@@ -3108,7 +3108,7 @@ var _merge2 = _interopRequireDefault(_merge);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint no-useless-escape: 0 */
-var rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
+var rxClean = /(\(:[^\)]+\)|:[^\/]+\/?)/g;
 
 /**
  * Url modification
@@ -3124,13 +3124,12 @@ function urlTransform(url, params, options) {
   }
   params || (params = {});
   var usedKeys = {};
-
   var urlWithParams = Object.keys(params).reduce(function (url, key) {
     var value = params[key];
-    var rx = new RegExp("(\\(:" + key + "\\)|:" + key + ")", "g");
-    return url.replace(rx, function () {
+    var rx = new RegExp("(\\(:" + key + "\\)|:" + key + ")(/?)", "g");
+    return url.replace(rx, function (_, _1, slash) {
       usedKeys[key] = value;
-      return value;
+      return value ? value + slash : value;
     });
   }, url);
 

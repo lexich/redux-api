@@ -6,7 +6,7 @@ import omit from "./utils/omit";
 import merge from "./utils/merge";
 
 /* eslint no-useless-escape: 0 */
-const rxClean = /(\(:[^\)]+\)|:[^\/]+)/g;
+const rxClean = /(\(:[^\)]+\)|:[^\/]+\/?)/g;
 
 /**
  * Url modification
@@ -20,22 +20,19 @@ export default function urlTransform(url, params, options) {
   if (!url) { return ""; }
   params || (params = {});
   const usedKeys = {};
-
   const urlWithParams = Object.keys(params).reduce((url, key)=> {
     const value = params[key];
-    const rx = new RegExp(`(\\(:${key}\\)|:${key})`, "g");
-    return url.replace(rx, ()=> {
+    const rx = new RegExp(`(\\(:${key}\\)|:${key})(\/?)`, "g");
+    return url.replace(rx, (_, _1, slash)=> {
       usedKeys[key] = value;
-      return value;
+      return value ? (value + slash) : value;
     });
   }, url);
-
 
   if (!urlWithParams) { return urlWithParams; }
   const { protocol, host, path } = parse(urlWithParams);
   const cleanURL = (host) ?
-    `${protocol}//${host}${path.replace(rxClean, "")}` :
-    path.replace(rxClean, "");
+    `${protocol}//${host}${path.replace(rxClean, "")}` : path.replace(rxClean, "");
   const usedKeysArray = Object.keys(usedKeys);
   if (usedKeysArray.length !== Object.keys(params).length) {
     const urlObject = cleanURL.split("?");
