@@ -718,10 +718,13 @@ async(dispatch,
 
 ### Store state schema
 ```js
+import reduxApi from "redux-api";
+
 const rest = reduxApi({
   user: "/user/1"
 });
 ```
+In the above example, an endpoint for a user object is created. The corresponding initial store state for this object is the following: 
 
 ```js
 // initialState
@@ -735,3 +738,8 @@ const rest = reduxApi({
   }
 }
 ```
+- The `sync` flag will be set to `true` after the first dispatched request is handled.
+- The `syncing` flag is set to `true` while a dispatched sync request is being handled, but only when the `sync` flag is `false`. This can only happen once when not manually resetting the `sync` flag during execution, since the `sync` flag is set to `true` after the first dispatched request is handled.
+- The `loading` flag is set to `true` while a dispatched request is being handled. After the dispatched request is handled, its value will be reset to `false`.
+- The `error` property contains the response error of a dispatched request after it is handled.
+- The `data` property contains the response data of a dispatched request after it is handled.
