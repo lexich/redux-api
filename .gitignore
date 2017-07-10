@@ -10,3 +10,6 @@ bower_components
 
 #VSCode metadata
 .vscode
+
+#IntelliJ metadata
+*.iml
