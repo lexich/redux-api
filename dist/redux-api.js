@@ -1611,7 +1611,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Reducer contructor
  * @param  {Object}   initialState default initial state
  * @param  {Object}   actions      actions map
- * @param  {Function} transformer  transformer function
  * @param  {Function} reducer      custom reducer function
  * @return {Function}              reducer function
  */
@@ -1629,9 +1628,12 @@ function reducerFn(initialState) {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
     var action = arguments[1];
 
+    var params = action.params || {};
     switch (action.type) {
       case actionFetch:
         return _extends({}, state, {
+          pathvars: action.pathvars || {},
+          body: params.body || {},
           loading: true,
           error: null,
           syncing: !!action.syncing
@@ -1653,9 +1655,18 @@ function reducerFn(initialState) {
       case actionReset:
         var mutation = action.mutation;
 
-        return mutation === "sync" ? _extends({}, state, { sync: false }) : _extends({}, initialState);
+        return mutation === "sync" ? _extends({}, state, {
+          pathvars: {},
+          body: {},
+          sync: false }) : _extends({}, initialState);
       case actionAbort:
-        return _extends({}, state, { loading: false, syncing: false, error: action.error });
+        return _extends({}, state, {
+          pathvars: {},
+          body: {},
+          loading: false,
+          syncing: false,
+          error: action.error
+        });
       case actionCache:
         var id = action.id,
             data = action.data;
@@ -3415,7 +3426,7 @@ function reduxApi(config, baseConfig) {
       var sync = false;
       var syncing = false;
       var loading = false;
-      var initialState = opts.cache ? { sync: sync, syncing: syncing, loading: loading, data: data, cache: {} } : { sync: sync, syncing: syncing, loading: loading, data: data };
+      var initialState = opts.cache ? { sync: sync, syncing: syncing, loading: loading, data: data, pathvars: {}, body: {}, cache: {} } : { sync: sync, syncing: syncing, loading: loading, data: data, pathvars: {}, body: {} };
 
       var reducer = opts.reducer ? opts.reducer.bind(memo) : null;
       memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, reducer);
