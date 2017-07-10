@@ -14,12 +14,13 @@ export default function reducerFn(initialState, actions={}, reducer) {
   const { actionFetch, actionSuccess, actionFail,
     actionReset, actionCache, actionAbort } = actions;
   return (state=initialState, action)=> {
+    const params = action.params || {};
     switch (action.type) {
       case actionFetch:
         return {
           ...state,
-          pathvars:{},
-          body:{},
+          pathvars: action.pathvars || {},
+          body: params.body || {},
           loading: true,
           error: null,
           syncing: !!action.syncing
@@ -27,8 +28,6 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionSuccess:
         return {
           ...state,
-          pathvars:{},
-          body:{},
           loading: false,
           sync: true,
           syncing: false,
@@ -38,8 +37,6 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionFail:
         return {
           ...state,
-          pathvars:{},
-          body:{},
           loading: false,
           error: action.error,
           syncing: false
@@ -47,7 +44,10 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionReset:
         const { mutation } = action;
         return (mutation === "sync") ?
-          { ...state, sync: false } :
+          { ...state,
+            pathvars:{},
+            body:{},
+            sync: false } :
           { ...initialState };
       case actionAbort:
         return {
@@ -64,8 +64,6 @@ export default function reducerFn(initialState, actions={}, reducer) {
         const expire = setExpire(action.expire, cacheExpire);
         return {
           ...state,
-          pathvars:{},
-          body:{},
           cache: { ...state.cache, [id]: { expire, data } }
         };
       default:
