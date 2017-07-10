@@ -1,6 +1,6 @@
 {
   "name": "redux-api",
-  "version": "0.10.6",
+  "version": "0.10.7",
   "main": "dist/redux-api.min.js",
   "dependencies": {}
 }
