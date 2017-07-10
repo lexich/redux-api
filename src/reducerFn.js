@@ -7,7 +7,6 @@ import { setExpire } from "./utils/cache";
  * Reducer contructor
  * @param  {Object}   initialState default initial state
  * @param  {Object}   actions      actions map
- * @param  {Function} transformer  transformer function
  * @param  {Function} reducer      custom reducer function
  * @return {Function}              reducer function
  */
@@ -15,10 +14,13 @@ export default function reducerFn(initialState, actions={}, reducer) {
   const { actionFetch, actionSuccess, actionFail,
     actionReset, actionCache, actionAbort } = actions;
   return (state=initialState, action)=> {
+    const params = action.params || {};
     switch (action.type) {
       case actionFetch:
         return {
           ...state,
+          pathvars: action.pathvars || {},
+          body: params.body || {},
           loading: true,
           error: null,
           syncing: !!action.syncing
@@ -42,10 +44,20 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionReset:
         const { mutation } = action;
         return (mutation === "sync") ?
-          { ...state, sync: false } :
-          { ...initialState };
+        { ...state,
+          pathvars: {},
+          body: {},
+          sync: false } :
+        { ...initialState };
       case actionAbort:
-        return { ...state, loading: false, syncing: false, error: action.error };
+        return {
+          ...state,
+          pathvars: {},
+          body: {},
+          loading: false,
+          syncing: false,
+          error: action.error
+        };
       case actionCache:
         const { id, data } = action;
         const cacheExpire = state.cache[id] ? state.cache[id].expire : null;

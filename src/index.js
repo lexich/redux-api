@@ -142,8 +142,8 @@ export default function reduxApi(config, baseConfig) {
       const syncing = false;
       const loading = false;
       const initialState = opts.cache ?
-        { sync, syncing, loading, data, cache: {} } :
-        { sync, syncing, loading, data };
+        { sync, syncing, loading, data, pathvars: {}, body: {}, cache: {} } :
+        { sync, syncing, loading, data, pathvars: {}, body: {} };
 
       const reducer = opts.reducer ? opts.reducer.bind(memo) : null;
       memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, reducer);

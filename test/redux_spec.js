@@ -153,6 +153,8 @@ describe("redux", ()=> {
           sync: false,
           syncing: false,
           loading: false,
+          pathvars: {},
+          body: {},
           data: {},
           error: new Error("Error: Application abort request")
         });
@@ -165,23 +167,23 @@ describe("redux", ()=> {
     store = createStoreWithMiddleware(reducer);
 
     expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: false, data: {} }
+      { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
     );
 
     store.dispatch(rest.actions.test((err)=> {
       expect(err).to.eql(new Error("Error: Application abort request"));
       expect(store.getState().test).to.eql(
-        { sync: false, syncing: false, loading: true, data: {} }
+        { sync: false, syncing: false, loading: true, pathvars: {}, body: {}, data: {} }
       );
     }));
 
     expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: true, data: {}, error: null }
+      { sync: false, syncing: false, loading: true, pathvars: {}, body: {}, data: {}, error: null }
     );
     store.dispatch(rest.actions.test.reset());
 
     expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: false, data: {} }
+      { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
     );
   });
 
@@ -208,8 +210,8 @@ describe("redux", ()=> {
 
     const store = storeHelper(rest);
     expect(store.getState()).to.eql({
-      external: { sync: false, syncing: false, loading: false, data: {} },
-      test: { sync: false, syncing: false, loading: false, data: {} }
+      external: { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} },
+      test: { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
     });
 
     return new Promise((done)=> {
@@ -226,6 +228,8 @@ describe("redux", ()=> {
           sync: true,
           syncing: false,
           loading: false,
+          pathvars: {},
+          body: {},
           data: { url: "/external" },
           error: null
         },
@@ -233,6 +237,8 @@ describe("redux", ()=> {
           sync: false,
           syncing: false,
           loading: false,
+          pathvars: {},
+          body: {},
           data: { url: "/external" }
         }
       });
@@ -252,6 +258,8 @@ describe("redux", ()=> {
         sync: true,
         syncing: false,
         loading: false,
+        pathvars: {},
+        body: {},
         data: { data: "/api/url" },
         error: null
       });
@@ -260,6 +268,8 @@ describe("redux", ()=> {
         sync: false,
         syncing: false,
         loading: false,
+        pathvars: {},
+        body: {},
         data: { data: "/api/url" },
         error: null
       });
@@ -350,6 +360,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: true,
+            pathvars: {},
+            body: {},
             data: {},
             error: null
           }
@@ -359,6 +371,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: false,
+            pathvars: {},
+            body: {},
             data: {}
           }
         }
@@ -369,6 +383,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
+            pathvars: {},
+            body: {},
             data: { data: "/test1" },
             error: null
           }
@@ -378,6 +394,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: false,
+            pathvars: {},
+            body: {},
             data: {}
           }
         }
@@ -385,20 +403,24 @@ describe("redux", ()=> {
       ["@@redux-api@r2test", {
         r1: {
           test: {
-            data: { data: "/test1" },
-            error: null,
-            loading: false,
             sync: true,
-            syncing: false
+            syncing: false,
+            loading: false,
+            pathvars: {},
+            body: {},
+            data: { data: "/test1" },
+            error: null
           }
         },
         r2: {
           test: {
-            data: {},
-            error: null,
-            loading: true,
             sync: false,
-            syncing: false
+            syncing: false,
+            loading: true,
+            pathvars: {},
+            body: {},
+            data: {},
+            error: null
           }
         }
       }],
@@ -408,6 +430,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
+            pathvars: {},
+            body: {},
             data: { data: "/test1" },
             error: null
           }
@@ -417,6 +441,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
+            pathvars: {},
+            body: {},
             data: { data: "/test2" },
             error: null
           }
@@ -581,17 +607,23 @@ describe("redux", ()=> {
     const ret1 = new Promise((resolve, reject)=>
       store.dispatch(rest.actions.test())
         .then(
-          ()=> reject("Abort shout generate error"),
+          ()=> reject("Abort should generate error"),
           (err)=> {
-            expect(err.message).to.eql("Application abort request");
-            expect(store.getState().test).to.eql({
-              sync: false,
-              syncing: false,
-              loading: false,
-              data: {},
-              error: err
-            });
-            resolve();
+            try {
+              expect(err.message).to.eql("Application abort request");
+              expect(store.getState().test).to.eql({
+                sync: false,
+                syncing: false,
+                loading: false,
+                pathvars: {},
+                body: {},
+                data: {},
+                error: err
+              });
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
           }));
 
     store.dispatch(rest.actions.test.abort());
@@ -622,6 +654,8 @@ describe("redux", ()=> {
               sync: false,
               syncing: false,
               loading: false,
+              pathvars: {},
+              body: {},
               data: {},
               error: err
             });

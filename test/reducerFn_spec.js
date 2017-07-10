@@ -13,7 +13,7 @@ describe("reducerFn", function() {
     expect(isFunction(fn)).to.be.true;
   });
   it("check", function() {
-    const initialState = { loading: false, data: { msg: "Hello" } };
+    const initialState = { loading: false, pathvars: {}, body: {}, data: { msg: "Hello" } };
     const actions = {
       actionFetch: "actionFetch",
       actionSuccess: "actionSuccess",
@@ -23,25 +23,94 @@ describe("reducerFn", function() {
     const fn = reducerFn(initialState, actions);
     const res1 = fn(initialState, { type: actions.actionFetch });
     expect(res1).to.eql({
-      loading: true, error: null, data: { msg: "Hello" }, syncing: false
+      loading: true, error: null, data: { msg: "Hello" }, syncing: false, pathvars: {}, body: {}
     });
 
     const res2 = fn(initialState, { type: actions.actionSuccess, data: true });
     expect(res2).to.eql({
-      loading: false, error: null, data: true, sync: true, syncing: false
+      loading: false, error: null, data: true, sync: true, syncing: false, pathvars: {}, body: {}
     });
 
     const res3 = fn(initialState, { type: actions.actionFail, error: "Error" });
     expect(res3).to.eql({
-      loading: false, error: "Error", data: { msg: "Hello" }, syncing: false
+      loading: false, error: "Error", data: { msg: "Hello" }, syncing: false, pathvars: {}, body: {}
     });
 
     const res4 = fn(initialState, { type: actions.actionReset });
-    expect(res4).to.eql(initialState);
-    expect(res4 !== initialState).to.be.true;
+    expect(res4).to.deep.eq(initialState);
 
     const res5 = fn(undefined, { type: "fake" });
-    expect(res5 === initialState).to.be.true;
+    expect(res5).to.deep.eq(initialState);
+  });
+
+  it("check with path variables", function() {
+    const initialState = { loading: false, pathvars: {}, body: {}, data: { msg: "Hello" } };
+    const actions = {
+      actionFetch: "actionFetch",
+      actionSuccess: "actionSuccess",
+      actionFail: "actionFail",
+      actionReset: "actionReset"
+    };
+    const fn = reducerFn(initialState, actions);
+
+    const res1 = fn(initialState, { type: actions.actionFetch, pathvars: { id: 42 } });
+    expect(res1).to.eql({
+      loading: true, error: null, data: { msg: "Hello" }, syncing: false, pathvars: { id: 42 }, body: {}
+    });
+
+    const res2 = fn(res1, { type: actions.actionSuccess, data: true });
+    expect(res2).to.eql({
+      loading: false,
+      error: null,
+      data: true,
+      sync: true,
+      syncing: false,
+      pathvars: { id: 42 },
+      body: {}
+    });
+
+    const res3 = fn(res1, { type: actions.actionFail, error: "Error" });
+    expect(res3).to.eql({
+      loading: false, error: "Error", data: { msg: "Hello" }, syncing: false, pathvars: { id: 42 }, body: {}
+    });
+
+    const res4 = fn(res2, { type: actions.actionReset });
+    expect(res4).to.deep.eq(initialState);
+
+    const res5 = fn(undefined, { type: "fake" });
+    expect(res5).to.deep.eq(initialState);
+  });
+
+  it("check with body", function() {
+    const initialState = { loading: false, pathvars: {}, body: {}, data: { msg: "Hello" } };
+    const actions = {
+      actionFetch: "actionFetch",
+      actionSuccess: "actionSuccess",
+      actionFail: "actionFail",
+      actionReset: "actionReset"
+    };
+    const fn = reducerFn(initialState, actions);
+
+    const res1 = fn(initialState, { type: actions.actionFetch, pathvars: { other: "var" }, params: { method: "post", body: { hello: "world", it: { should: { store: " the body" } } } } });
+    expect(res1).to.eql({
+      loading: true, error: null, data: { msg: "Hello" }, syncing: false, pathvars: { other: "var" }, body: { hello: "world", it: { should: { store: " the body" } } }
+    });
+
+    const res2 = fn(res1, { type: actions.actionSuccess, data: true });
+    expect(res2).to.eql({
+      loading: false, error: null, data: true, sync: true, syncing: false, pathvars: { other: "var" }, body: { hello: "world", it: { should: { store: " the body" } } }
+    });
+
+    const res3 = fn(res1, { type: actions.actionFail, error: "Error" });
+    expect(res3).to.eql({
+      loading: false, error: "Error", data: { msg: "Hello" }, syncing: false, pathvars: { other: "var" }, body: { hello: "world", it: { should: { store: " the body" } } }
+    });
+
+    const res4 = fn(res2, { type: actions.actionReset });
+    expect(res4).to.deep.eq(initialState);
+
+    const res5 = fn(undefined, { type: "fake" });
+    expect(res5).to.deep.eq(initialState);
   });
 
   it("check injected reducer", function() {

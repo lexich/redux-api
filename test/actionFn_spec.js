@@ -219,12 +219,12 @@ describe("actionFn", function() {
 
     const expectedEvent = [
       {
-        type: "actionFetch",
+        type: ACTIONS.actionFetch,
         syncing: true,
         request: { pathvars: undefined, params: {} }
       },
       {
-        type: "actionSuccess",
+        type: ACTIONS.actionSuccess,
         syncing: false,
         data: { msg: "hello" },
         origData: { msg: "hello" },
@@ -549,42 +549,42 @@ describe("actionFn", function() {
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     const expectedEvent = [{
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: {
         pathvars: { id: 1 },
         params: { method: "GET" }
       }
     }, {
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: {
         pathvars: { id: 2 },
         params: { body: "Hello", method: "POST" }
       }
     }, {
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: {
         pathvars: { id: 3 },
         params: { body: "World", method: "PUT" }
       }
     }, {
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: {
         pathvars: { id: 4 },
         params: { method: "DELETE" }
       }
     }, {
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: {
         pathvars: { id: 5 },
         params: { body: "World", method: "PATCH" }
       }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: { url: "/test/1", opts: { method: "GET" } },
       origData: { url: "/test/1", opts: { method: "GET" } },
@@ -593,7 +593,7 @@ describe("actionFn", function() {
         params: { method: "GET" }
       }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: {
         url: "/test/2",
@@ -608,7 +608,7 @@ describe("actionFn", function() {
         params: { body: "Hello", method: "POST" }
       }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: {
         url: "/test/3",
@@ -623,7 +623,7 @@ describe("actionFn", function() {
         params: { body: "World", method: "PUT" }
       }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: {
         url: "/test/4",
@@ -638,7 +638,7 @@ describe("actionFn", function() {
         params: { method: "DELETE" }
       }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: {
         url: "/test/5",
@@ -710,11 +710,11 @@ describe("actionFn", function() {
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
     const expectedEvent = [{
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: { pathvars: { id: "overwrite" }, params: undefined }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: { url: "/test/overwrite", opts: null },
       origData: { url: "/test/overwrite", opts: null },
@@ -745,14 +745,14 @@ describe("actionFn", function() {
     };
     const api = actionFn("/test/", "test", null, ACTIONS, meta);
     const expectedEvent = [{
-      type: "actionFetch",
+      type: ACTIONS.actionFetch,
       syncing: false,
       request: {
         pathvars: { id: 1 },
         params: null
       }
     }, {
-      type: "actionSuccess",
+      type: ACTIONS.actionSuccess,
       syncing: false,
       data: { url: "/test/?id=1", opts: null },
       origData: { url: "/test/?id=1", opts: null },
