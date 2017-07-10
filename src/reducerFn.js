@@ -44,16 +44,16 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionReset:
         const { mutation } = action;
         return (mutation === "sync") ?
-          { ...state,
-            pathvars:{},
-            body:{},
-            sync: false } :
-          { ...initialState };
+        { ...state,
+          pathvars: {},
+          body: {},
+          sync: false } :
+        { ...initialState };
       case actionAbort:
         return {
           ...state,
-          pathvars:{},
-          body:{},
+          pathvars: {},
+          body: {},
           loading: false,
           syncing: false,
           error: action.error

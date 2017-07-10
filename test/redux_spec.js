@@ -153,8 +153,8 @@ describe("redux", ()=> {
           sync: false,
           syncing: false,
           loading: false,
-          pathvars:{},
-          body:{},
+          pathvars: {},
+          body: {},
           data: {},
           error: new Error("Error: Application abort request")
         });
@@ -167,23 +167,23 @@ describe("redux", ()=> {
     store = createStoreWithMiddleware(reducer);
 
     expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: false, pathvars:{}, body:{}, data: {} }
+      { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
     );
 
     store.dispatch(rest.actions.test((err)=> {
       expect(err).to.eql(new Error("Error: Application abort request"));
       expect(store.getState().test).to.eql(
-        { sync: false, syncing: false, loading: true, pathvars:{}, body:{}, data: {} }
+        { sync: false, syncing: false, loading: true, pathvars: {}, body: {}, data: {} }
       );
     }));
 
     expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: true, pathvars:{}, body:{}, data: {}, error: null }
+      { sync: false, syncing: false, loading: true, pathvars: {}, body: {}, data: {}, error: null }
     );
     store.dispatch(rest.actions.test.reset());
 
     expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: false, pathvars:{}, body:{}, data: {} }
+      { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
     );
   });
 
@@ -210,8 +210,8 @@ describe("redux", ()=> {
 
     const store = storeHelper(rest);
     expect(store.getState()).to.eql({
-      external: { sync: false, syncing: false, loading: false, pathvars:{}, body:{}, data: {} },
-      test: { sync: false, syncing: false, loading: false, pathvars:{}, body:{}, data: {} }
+      external: { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} },
+      test: { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
     });
 
     return new Promise((done)=> {
@@ -228,8 +228,8 @@ describe("redux", ()=> {
           sync: true,
           syncing: false,
           loading: false,
-          pathvars:{},
-          body:{},
+          pathvars: {},
+          body: {},
           data: { url: "/external" },
           error: null
         },
@@ -237,8 +237,8 @@ describe("redux", ()=> {
           sync: false,
           syncing: false,
           loading: false,
-          pathvars:{},
-          body:{},
+          pathvars: {},
+          body: {},
           data: { url: "/external" }
         }
       });
@@ -258,8 +258,8 @@ describe("redux", ()=> {
         sync: true,
         syncing: false,
         loading: false,
-        pathvars:{},
-        body:{},
+        pathvars: {},
+        body: {},
         data: { data: "/api/url" },
         error: null
       });
@@ -268,8 +268,8 @@ describe("redux", ()=> {
         sync: false,
         syncing: false,
         loading: false,
-        pathvars:{},
-        body:{},
+        pathvars: {},
+        body: {},
         data: { data: "/api/url" },
         error: null
       });
@@ -360,8 +360,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: true,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: {},
             error: null
           }
@@ -371,8 +371,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: false,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: {}
           }
         }
@@ -383,8 +383,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: { data: "/test1" },
             error: null
           }
@@ -394,8 +394,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: false,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: {}
           }
         }
@@ -406,8 +406,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: { data: "/test1" },
             error: null
           }
@@ -417,8 +417,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: true,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: {},
             error: null
           }
@@ -430,8 +430,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: { data: "/test1" },
             error: null
           }
@@ -441,8 +441,8 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars:{},
-            body:{},
+            pathvars: {},
+            body: {},
             data: { data: "/test2" },
             error: null
           }
@@ -615,14 +615,13 @@ describe("redux", ()=> {
                 sync: false,
                 syncing: false,
                 loading: false,
-                pathvars:{},
-                body:{},
+                pathvars: {},
+                body: {},
                 data: {},
                 error: err
               });
               resolve();
-            }
-            catch (e) {
+            } catch (e) {
               reject(e);
             }
           }));
@@ -655,8 +654,8 @@ describe("redux", ()=> {
               sync: false,
               syncing: false,
               loading: false,
-              pathvars:{},
-              body:{},
+              pathvars: {},
+              body: {},
               data: {},
               error: err
             });
