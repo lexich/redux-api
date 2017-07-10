@@ -7,7 +7,6 @@ import { setExpire } from "./utils/cache";
  * Reducer contructor
  * @param  {Object}   initialState default initial state
  * @param  {Object}   actions      actions map
- * @param  {Function} transformer  transformer function
  * @param  {Function} reducer      custom reducer function
  * @return {Function}              reducer function
  */
@@ -19,6 +18,8 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionFetch:
         return {
           ...state,
+          pathvars:{},
+          body:{},
           loading: true,
           error: null,
           syncing: !!action.syncing
@@ -26,6 +27,8 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionSuccess:
         return {
           ...state,
+          pathvars:{},
+          body:{},
           loading: false,
           sync: true,
           syncing: false,
@@ -35,6 +38,8 @@ export default function reducerFn(initialState, actions={}, reducer) {
       case actionFail:
         return {
           ...state,
+          pathvars:{},
+          body:{},
           loading: false,
           error: action.error,
           syncing: false
@@ -45,13 +50,22 @@ export default function reducerFn(initialState, actions={}, reducer) {
           { ...state, sync: false } :
           { ...initialState };
       case actionAbort:
-        return { ...state, loading: false, syncing: false, error: action.error };
+        return {
+          ...state,
+          pathvars:{},
+          body:{},
+          loading: false,
+          syncing: false,
+          error: action.error
+        };
       case actionCache:
         const { id, data } = action;
         const cacheExpire = state.cache[id] ? state.cache[id].expire : null;
         const expire = setExpire(action.expire, cacheExpire);
         return {
           ...state,
+          pathvars:{},
+          body:{},
           cache: { ...state.cache, [id]: { expire, data } }
         };
       default:
