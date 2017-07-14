@@ -9,7 +9,6 @@ function processData(data) {
 }
 
 function toJSON(resp) {
-  console.log("111", resp);
   if (resp.text) {
     return resp.text().then(processData);
   } else if (resp instanceof Promise) {
@@ -20,15 +19,12 @@ function toJSON(resp) {
 }
 
 export default function (fetch) {
-  return (url, opts)=> fetch(url, opts).then(
-    (resp)=> {
-        console.log("XXX", resp);
-        return toJSON(resp).then((data)=> {
-          if (resp.status >= 200 && resp.status < 300) {
-            return data;
-          } else {
-            return Promise.reject(data);
-          }
-        });
-    });
+  return (url, opts)=> fetch(url, opts).then(resp=>
+    toJSON(resp).then((data)=> {
+      if (resp.status >= 200 && resp.status < 300) {
+        return data;
+      } else {
+        return Promise.reject(data);
+      }
+    }));
 }

@@ -147,10 +147,23 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
       const fetchResolverOpts = {
         dispatch,
         getState,
-        requestOptions,
+        request: requestOptions,
         actions: meta.actions,
         prefetch: meta.prefetch
       };
+      if (Object.defineProperty) {
+        Object.defineProperty(fetchResolverOpts, "requestOptions", {
+          get() {
+            /* eslint no-console: 0 */
+            console.warn("Deprecated option, use `request` option");
+            return requestOptions;
+          },
+        });
+      } else {
+        fetchResolverOpts.requestOptions = requestOptions;
+      }
+
+
       const result = new Promise((done, fail)=> {
         fetchResolver(0, fetchResolverOpts, (err)=> {
           if (err) {

@@ -456,7 +456,11 @@ describe("actionFn", function() {
       expect(msg).to.eql(exp);
     }
     const expOpts = {
-      dispatch, getState, requestOptions, actions: undefined, prefetch: meta.prefetch
+      dispatch,
+      getState,
+      request: requestOptions,
+      actions: undefined,
+      prefetch: meta.prefetch
     };
     return new Promise((resolve)=> {
       api(resolve)(dispatch, getState);
