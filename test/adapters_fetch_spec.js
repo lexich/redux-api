@@ -12,13 +12,16 @@ describe("fetch adapters", function() {
       expect(url).to.eql("url");
       expect(opts).to.eql("opts");
       resolve({
-        json() {
+        status: 200,
+        text() {
           jsonCall += 1;
+          return Promise.resolve("{}");
         }
       });
     });
-    fetch(fetchApi)("url", "opts").then(()=> {
-      expect(jsonCall).to.eql(1);
-    });
+    return fetch(fetchApi)("url", "opts")
+      .then(()=> {
+        expect(jsonCall).to.eql(1);
+      });
   });
 });
