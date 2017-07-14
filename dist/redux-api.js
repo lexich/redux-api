@@ -1350,10 +1350,22 @@ function actionFn(url, name, options) {
       var fetchResolverOpts = {
         dispatch: dispatch,
         getState: getState,
-        requestOptions: requestOptions,
+        request: requestOptions,
         actions: meta.actions,
         prefetch: meta.prefetch
       };
+      if (Object.defineProperty) {
+        Object.defineProperty(fetchResolverOpts, "requestOptions", {
+          get: function get() {
+            /* eslint no-console: 0 */
+            console.warn("Deprecated option, use `request` option");
+            return requestOptions;
+          }
+        });
+      } else {
+        fetchResolverOpts.requestOptions = requestOptions;
+      }
+
       var result = new Promise(function (done, fail) {
         (0, _fetchResolver2.default)(0, fetchResolverOpts, function (err) {
           if (err) {
