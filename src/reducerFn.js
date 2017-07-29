@@ -14,12 +14,14 @@ export default function reducerFn(initialState, actions={}, reducer) {
   const { actionFetch, actionSuccess, actionFail,
     actionReset, actionCache, actionAbort } = actions;
   return (state=initialState, action)=> {
-    const params = action.params || {};
+    const request = action.request || {};
+    const params = request.params || {};
+
     switch (action.type) {
       case actionFetch:
         return {
           ...state,
-          pathvars: action.pathvars || {},
+          pathvars: request.pathvars || {},
           body: params.body || {},
           loading: true,
           error: null,

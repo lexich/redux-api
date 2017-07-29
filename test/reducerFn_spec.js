@@ -53,7 +53,7 @@ describe("reducerFn", function() {
     };
     const fn = reducerFn(initialState, actions);
 
-    const res1 = fn(initialState, { type: actions.actionFetch, pathvars: { id: 42 } });
+    const res1 = fn(initialState, { type: actions.actionFetch, request: { pathvars: { id: 42 } } });
     expect(res1).to.eql({
       loading: true, error: null, data: { msg: "Hello" }, syncing: false, pathvars: { id: 42 }, body: {}
     });
@@ -91,7 +91,7 @@ describe("reducerFn", function() {
     };
     const fn = reducerFn(initialState, actions);
 
-    const res1 = fn(initialState, { type: actions.actionFetch, pathvars: { other: "var" }, params: { method: "post", body: { hello: "world", it: { should: { store: " the body" } } } } });
+    const res1 = fn(initialState, { type: actions.actionFetch, request: { pathvars: { other: "var" }, params: { method: "post", body: { hello: "world", it: { should: { store: " the body" } } } } } });
     expect(res1).to.eql({
       loading: true, error: null, data: { msg: "Hello" }, syncing: false, pathvars: { other: "var" }, body: { hello: "world", it: { should: { store: " the body" } } }
     });
