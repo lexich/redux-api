@@ -1640,12 +1640,11 @@ function reducerFn(initialState) {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
     var action = arguments[1];
 
-    var params = action.params || {};
+    var request = action.request || {};
     switch (action.type) {
       case actionFetch:
         return _extends({}, state, {
-          pathvars: action.pathvars || {},
-          body: params.body || {},
+          request: request,
           loading: true,
           error: null,
           syncing: !!action.syncing
@@ -1668,13 +1667,11 @@ function reducerFn(initialState) {
         var mutation = action.mutation;
 
         return mutation === "sync" ? _extends({}, state, {
-          pathvars: {},
-          body: {},
+          request: null,
           sync: false }) : _extends({}, initialState);
       case actionAbort:
         return _extends({}, state, {
-          pathvars: {},
-          body: {},
+          request: null,
           loading: false,
           syncing: false,
           error: action.error
@@ -3438,7 +3435,7 @@ function reduxApi(config, baseConfig) {
       var sync = false;
       var syncing = false;
       var loading = false;
-      var initialState = opts.cache ? { sync: sync, syncing: syncing, loading: loading, data: data, pathvars: {}, body: {}, cache: {} } : { sync: sync, syncing: syncing, loading: loading, data: data, pathvars: {}, body: {} };
+      var initialState = opts.cache ? { sync: sync, syncing: syncing, loading: loading, data: data, cache: {}, request: null } : { sync: sync, syncing: syncing, loading: loading, data: data, request: null };
 
       var reducer = opts.reducer ? opts.reducer.bind(memo) : null;
       memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, reducer);
