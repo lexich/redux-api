@@ -141,50 +141,60 @@ describe("redux", ()=> {
     })).catch(none);
   });
 
-  it("check abort request", (done)=> {
-    /* eslint prefer-const: 0 */
-    let store;
+  it("check abort request", ()=> {
+    const timeoutPromise = (url, timeout)=> new Promise(
+      resolve=> setTimeout(()=> resolve(url), timeout));
+
     const rest = reduxApi({
       test: "/test"
-    }).use("fetch", url=> new Promise((resolve)=> {
-      setTimeout(()=> {
-        resolve({ url });
-        expect(store.getState().test).to.eql({
-          sync: false,
-          syncing: false,
-          loading: false,
-          pathvars: {},
-          body: {},
-          data: {},
-          error: new Error("Error: Application abort request")
-        });
-        done();
-      }, 100);
-    }));
+    }).use("fetch", url=> timeoutPromise(url, 100));
 
     const reducer = combineReducers(rest.reducers);
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
-    store = createStoreWithMiddleware(reducer);
+    const store = createStoreWithMiddleware(reducer);
 
-    expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
+    expect({
+      sync: false,
+      syncing: false,
+      loading: false,
+      data: {},
+      request: null
+    }).to.eql(store.getState().test, "Initial state");
+    const retAborting = store.dispatch(rest.actions.test()).then(
+      ()=> expect(false).to.eql(true, "Should be error"),
+      (err)=> {
+        expect(err).to.eql(new Error("Error: Application abort request"));
+        expect({
+          sync: false,
+          syncing: false,
+          loading: false,
+          data: {},
+          request: null,
+          error: {}
+        }).to.eql(store.getState().test, "OK");
+        return true;
+      }
     );
-
-    store.dispatch(rest.actions.test((err)=> {
-      expect(err).to.eql(new Error("Error: Application abort request"));
-      expect(store.getState().test).to.eql(
-        { sync: false, syncing: false, loading: true, pathvars: {}, body: {}, data: {} }
-      );
-    }));
-
-    expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: true, pathvars: {}, body: {}, data: {}, error: null }
-    );
+    expect({
+      sync: false,
+      syncing: false,
+      loading: true,
+      data: {},
+      error: null,
+      request: {
+        params: undefined,
+        pathvars: undefined
+      }
+    }).to.eql(store.getState().test, "State doesn't change, request in process");
     store.dispatch(rest.actions.test.reset());
-
-    expect(store.getState().test).to.eql(
-      { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
-    );
+    expect({
+      sync: false,
+      syncing: false,
+      loading: false,
+      data: {},
+      request: null
+    }).to.eql(store.getState().test, "State after reset");
+    return retAborting;
   });
 
   it("check reducer option", ()=> {
@@ -210,8 +220,8 @@ describe("redux", ()=> {
 
     const store = storeHelper(rest);
     expect(store.getState()).to.eql({
-      external: { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} },
-      test: { sync: false, syncing: false, loading: false, pathvars: {}, body: {}, data: {} }
+      external: { sync: false, syncing: false, loading: false, data: {}, request: null },
+      test: { sync: false, syncing: false, loading: false, data: {}, request: null }
     });
 
     return new Promise((done)=> {
@@ -228,8 +238,10 @@ describe("redux", ()=> {
           sync: true,
           syncing: false,
           loading: false,
-          pathvars: {},
-          body: {},
+          request: {
+            params: {},
+            pathvars: undefined
+          },
           data: { url: "/external" },
           error: null
         },
@@ -237,8 +249,7 @@ describe("redux", ()=> {
           sync: false,
           syncing: false,
           loading: false,
-          pathvars: {},
-          body: {},
+          request: null,
           data: { url: "/external" }
         }
       });
@@ -258,18 +269,19 @@ describe("redux", ()=> {
         sync: true,
         syncing: false,
         loading: false,
-        pathvars: {},
-        body: {},
         data: { data: "/api/url" },
+        request: {
+          params: {},
+          pathvars: undefined
+        },
         error: null
       });
       store.dispatch(rest.actions.test.reset("sync"));
       expect(store.getState().test).to.eql({
+        request: null,
         sync: false,
         syncing: false,
         loading: false,
-        pathvars: {},
-        body: {},
         data: { data: "/api/url" },
         error: null
       });
@@ -360,10 +372,12 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: true,
-            pathvars: {},
-            body: {},
             data: {},
-            error: null
+            error: null,
+            request: {
+              params: undefined,
+              pathvars: undefined
+            },
           }
         },
         r2: {
@@ -371,9 +385,8 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: false,
-            pathvars: {},
-            body: {},
-            data: {}
+            data: {},
+            request: null
           }
         }
       }],
@@ -383,10 +396,12 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars: {},
-            body: {},
             data: { data: "/test1" },
-            error: null
+            error: null,
+            request: {
+              params: undefined,
+              pathvars: undefined
+            }
           }
         },
         r2: {
@@ -394,8 +409,7 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: false,
-            pathvars: {},
-            body: {},
+            request: null,
             data: {}
           }
         }
@@ -406,10 +420,12 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars: {},
-            body: {},
             data: { data: "/test1" },
-            error: null
+            error: null,
+            request: {
+              params: undefined,
+              pathvars: undefined
+            }
           }
         },
         r2: {
@@ -417,10 +433,12 @@ describe("redux", ()=> {
             sync: false,
             syncing: false,
             loading: true,
-            pathvars: {},
-            body: {},
             data: {},
-            error: null
+            error: null,
+            request: {
+              params: undefined,
+              pathvars: undefined
+            }
           }
         }
       }],
@@ -430,10 +448,12 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars: {},
-            body: {},
             data: { data: "/test1" },
-            error: null
+            error: null,
+            request: {
+              params: undefined,
+              pathvars: undefined
+            }
           }
         },
         r2: {
@@ -441,10 +461,12 @@ describe("redux", ()=> {
             sync: true,
             syncing: false,
             loading: false,
-            pathvars: {},
-            body: {},
             data: { data: "/test2" },
-            error: null
+            error: null,
+            request: {
+              params: undefined,
+              pathvars: undefined
+            }
           }
         }
       }],
@@ -468,10 +490,10 @@ describe("redux", ()=> {
       .then(()=> store.dispatch(rest2.actions.test()))
       .then(()=> {
         expect(receiveArgs).to.have.length(4);
-        expect(receiveArgs[0]).to.eql(expectedArgs[0]);
-        expect(receiveArgs[1]).to.eql(expectedArgs[1]);
-        expect(receiveArgs[2]).to.eql(expectedArgs[2]);
-        expect(receiveArgs[3]).to.eql(expectedArgs[3]);
+        expect(expectedArgs[0]).to.eql(receiveArgs[0]);
+        expect(expectedArgs[1]).to.eql(receiveArgs[1]);
+        expect(expectedArgs[2]).to.eql(receiveArgs[2]);
+        expect(expectedArgs[3]).to.eql(receiveArgs[3]);
 
         expect(actualData).to.have.length(2);
         expect(actualData[0]).to.eql(expectedData[0]);
@@ -610,16 +632,18 @@ describe("redux", ()=> {
           ()=> reject("Abort should generate error"),
           (err)=> {
             try {
-              expect(err.message).to.eql("Application abort request");
-              expect(store.getState().test).to.eql({
+              expect("Application abort request").to.eql(err.message);
+              expect({
                 sync: false,
                 syncing: false,
                 loading: false,
-                pathvars: {},
-                body: {},
                 data: {},
+                request: {
+                  params: undefined,
+                  pathvars: undefined
+                },
                 error: err
-              });
+              }).to.eql(store.getState().test);
               resolve();
             } catch (e) {
               reject(e);
@@ -644,27 +668,90 @@ describe("redux", ()=> {
       );
     });
     const store = storeHelper(rest);
-    const ret1 = new Promise((resolve, reject)=>
-      store.dispatch(rest.actions.test())
-        .then(
-          ()=> reject("Abort shout generate error"),
-          (err)=> {
-            expect(err.message).to.eql("Application abort request");
-            expect(store.getState().test).to.eql({
-              sync: false,
-              syncing: false,
-              loading: false,
-              pathvars: {},
-              body: {},
-              data: {},
-              error: err
-            });
-            resolve();
-          }));
+    const ret1 = store.dispatch(rest.actions.test()).then(
+      ()=> Promise.reject("Abort shout generate error"),
+      (err)=> {
+        try {
+          expect("Application abort request").to.eql(err.message);
+          expect({
+            sync: false,
+            syncing: false,
+            loading: false,
+            data: {},
+            request: {
+              params: undefined,
+              pathvars: undefined
+            },
+            error: err
+          }).to.eql(store.getState().test);
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      });
     const ret2 = store.dispatch(rest.actions.test.force());
     return Promise.all([ret1, ret2])
       .then(()=> {
         expect(store.getState().test.data).to.eql({ data: "/api/url" });
       });
+  });
+
+  it("check pathvars", ()=> {
+    const rest = reduxApi({
+      test: "/api/url/:id",
+    }).use("fetch", (url)=> {
+      return new Promise(resolve=> resolve(url));
+    });
+    const store = storeHelper(rest);
+    const INIT_STATE = {
+      test: {
+        request: null,
+        sync: false,
+        syncing: false,
+        loading: false,
+        data: {}
+      }
+    };
+    expect(INIT_STATE).to.eql(store.getState());
+
+    const STATE_1 = {
+      test: {
+        sync: true,
+        syncing: false,
+        loading: false,
+        data: {
+          data: "/api/url/1"
+        },
+        request: {
+          pathvars: { id: 1 },
+          params: { body: "Test", headers: ["JSON"] }
+        },
+        error: null
+      }
+    };
+    const STATE_2 = {
+      test: {
+        sync: true,
+        syncing: false,
+        loading: false,
+        data: {
+          data: "/api/url/2"
+        },
+        request: {
+          pathvars: { id: 2 },
+          params: { body: "Test2", headers: ["XML"] }
+        },
+        error: null
+      }
+    };
+
+
+    return store.dispatch(rest.actions.test(
+      { id: 1 }, { body: "Test", headers: ["JSON"] })
+    ).then(()=> {
+      expect(STATE_1).to.eql(store.getState());
+      return store.dispatch(rest.actions.test({ id: 2 }, { body: "Test2", headers: ["XML"] }));
+    }).then(()=> {
+      expect(STATE_2).to.eql(store.getState());
+    });
   });
 });
