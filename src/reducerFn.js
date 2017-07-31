@@ -15,14 +15,11 @@ export default function reducerFn(initialState, actions={}, reducer) {
     actionReset, actionCache, actionAbort } = actions;
   return (state=initialState, action)=> {
     const request = action.request || {};
-    const params = request.params || {};
-
     switch (action.type) {
       case actionFetch:
         return {
           ...state,
-          pathvars: request.pathvars || {},
-          body: params.body || {},
+          request,
           loading: true,
           error: null,
           syncing: !!action.syncing
@@ -47,15 +44,13 @@ export default function reducerFn(initialState, actions={}, reducer) {
         const { mutation } = action;
         return (mutation === "sync") ?
         { ...state,
-          pathvars: {},
-          body: {},
+          request: null,
           sync: false } :
         { ...initialState };
       case actionAbort:
         return {
           ...state,
-          pathvars: {},
-          body: {},
+          request: null,
           loading: false,
           syncing: false,
           error: action.error
