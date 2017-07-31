@@ -278,7 +278,7 @@ In this case you global state is look like this:
     prefetch: [
       function({actions, dispatch, getState, requestOptions}, cb) {
         const {profile: {data: {uuid}}} = getState();
-        const {pathVars: {name}} = requestOptions;
+        const {pathvars: {name}} = requestOptions;
         uuid ? cb() : dispatch(actions.profile({name}, cb));
       }     
     ],
