@@ -10,14 +10,13 @@ Flux REST API for redux infrastructure
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is intended to be used with [Redux](https://github.com/gaearon/redux).
 
-=======
+
 ## Documentation
 See [DOCS.md](docs/DOCS.md) for API documentation.
 ## Use cases
 * [AuthorizationJWT.md](docs/AuthorizationJWT.md) - example of JWT Authorization  
 * [Scoping.md](docs/Scoping.md) - use scoping or using multiple redux-api instance without naming intersections.
 
-=======
 ## Install
 with npm
 ```sh
