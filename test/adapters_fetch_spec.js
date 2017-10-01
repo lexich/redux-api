@@ -24,4 +24,18 @@ describe("fetch adapters", function() {
         expect(jsonCall).to.eql(1);
       });
   });
+  it("should return the error response as content", function() {
+    const fetchApi = (url, opts)=> new Promise((resolve)=> {
+      expect(url).to.eql("url");
+      expect(opts).to.eql("opts");
+      resolve({
+        status: 404,
+        statusText: "Not Found",
+      });
+    });
+    return fetch(fetchApi)("url", "opts")
+      .catch((error)=> {
+        expect(error).to.eql({ status: 404, statusText: "Not Found" });
+      });
+  });
 });

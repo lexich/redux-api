@@ -23,8 +23,11 @@ export default function (fetch) {
     toJSON(resp).then((data)=> {
       if (resp.status >= 200 && resp.status < 300) {
         return data;
+      } else if (resp.status >= 400) {
+        return Promise.reject({ status: resp.status, statusText: resp.statusText });
       } else {
         return Promise.reject(data);
       }
-    }));
+    })
+  );
 }
