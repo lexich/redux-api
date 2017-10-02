@@ -19,12 +19,19 @@ function toJSON(resp) {
 }
 
 export default function (fetch) {
-  return (url, opts)=> fetch(url, opts).then(resp=>
-    toJSON(resp).then((data)=> {
-      if (resp.status >= 200 && resp.status < 300) {
-        return data;
-      } else {
-        return Promise.reject(data);
-      }
-    }));
+  return (url, opts)=> fetch(url, opts).then((resp)=> {
+    if (resp.status >= 400) {
+      return Promise.reject({ status: resp.status, statusText: resp.statusText });
+    } else {
+      return toJSON(resp).then((data)=> {
+        if (resp.status >= 200 && resp.status < 300) {
+          return data;
+        } else {
+          return Promise.reject(data);
+        }
+      });
+    }
+  }
+
+  );
 }
