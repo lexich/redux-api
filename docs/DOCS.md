@@ -6,11 +6,11 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 #### reduxApi(options, baseConfig)
-- @description create endpoint
-- @param **options** - configuration of rest-api endpoints
-  - @type: Object
-  - @default: {}
-  - @example:
+- **Description**: create endpoint
+- **Param** **options** - configuration of rest-api endpoints
+  - **Type**: Object
+  - **Default**: {}
+  - **Example**:
   Simple endpoint definition `GET /api/v1/entry` where response is Object
 ```js
     {
@@ -41,17 +41,17 @@ import reduxApi, {transformers} from "redux-api";
       }
     }
 ```
-@param **baseConfig** - additional base configuration  
-@param baseConfig.prefix - custom prefix for ACTIONS if you use more then 1 restApi instance  
-@type: String  
-@default: ""  
+**Param** **baseConfig** - additional base configuration
+**Param** baseConfig.prefix - custom prefix for ACTIONS if you use more then 1 restApi instance
+**Type**: String
+**Default**: ""
 
 
 ### Configuration options
 #### url
-- @description: url endpoint
-- @type: String
-- @example:
+- **Description**: url endpoint
+- **Type**: String
+- **Example**:
 ```js
 {
   entry: {
@@ -61,9 +61,9 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 #### urlOptions
-- @description: options for transforming urls
-- @type: Object
-- @example: Keys `delimiter` and `arrayFormat` are passed on to
+- **Description**: options for transforming urls
+- **Type**: Object
+- **Example**: Keys `delimiter` and `arrayFormat` are passed on to
   [qs#parse](https://github.com/ljharb/qs#parsing-objects) and
   [qs#stringify](https://github.com/ljharb/qs#stringifying):
 ```js
@@ -97,10 +97,10 @@ import reduxApi, {transformers} from "redux-api";
   This would re-encode the url to `/api/v1/entry?a[]=5;a[]=6`.
 
 #### transformer
-- @description: function for rest response transformation
-- @type: Function
-- @default: transformers.object
-- @example: It's a good idea to write custom transformer
+- **Description**: function for rest response transformation
+- **Type**: Function
+- **Default**: transformers.object
+- **Example**: It's a good idea to write custom transformer
     for example you have response
 ```json
   { "title": "Hello", "message": "World" }
@@ -114,10 +114,10 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 #### options
-- @description: options for rest-api backend. `function(url, options)`
-- @type: Object | Functions
-- @default: null
-- @example: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend
+- **Description**: options for rest-api backend. `function(url, options)`
+- **Type**: Object | Functions
+- **Default**: null
+- **Example**: if you use [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) backend
 ```js
       options: {
         method: "post",
@@ -139,10 +139,10 @@ import reduxApi, {transformers} from "redux-api";
 ```
 
 #### cache
-- @description: cache response. By default cache is turn off. If cache = true - this means that cache is permanent. Also cache can be object. see example
-- @type Boolean, Object, null
-- @default: null
-- @example
+- **Description**: cache response. By default cache is turn off. If cache = true - this means that cache is permanent. Also cache can be object. see example
+- **Type** Boolean, Object, null
+- **Default**: null
+- **Example**:
 ```js
 {
   permanent: {
@@ -168,10 +168,10 @@ import reduxApi, {transformers} from "redux-api";
 
 #### broadcast
 - @deprecated
-- @description: list of actions which would emit after data fetching.
-- @type: Array
-- @default: null
-- @example:
+- **Description**: list of actions which would emit after data fetching.
+- **Type**: Array
+- **Default**: null
+- **Example**:
 ```js
 import {ACTION_ENTRY_UPDATE} from "./constants";
 ....
@@ -194,11 +194,11 @@ function (state, action) {
 ```
 
 #### reducer
-- @description: Define your custom reducer to catch other events and modify state of current entry
+- **Description**: Define your custom reducer to catch other events and modify state of current entry
 ATTENTION: custom reducer can't catch default events for current entry.
-- @type: Function
-- @default: null
-- @example:
+- **Type**: Function
+- **Default**: null
+- **Example**:
 ```js
 const rest = reduxApi({
   hello: "/api/hello",
@@ -222,10 +222,10 @@ const rest = reduxApi({
 ```
 
 #### virtual
-- @description: if virtual is `true` this endpoint doesn't create reducer and doesn't emit redux-api actions. All data broadcasting by actions from `broadcast` list.
-- @type: Array
-- @default: false
-- @example
+- **Description**: if virtual is `true` this endpoint doesn't create reducer and doesn't emit redux-api actions. All data broadcasting by actions from `broadcast` list.
+- **Type**: Array
+- **Default**: false
+- **Example**:
 It usefull, for example, when you need to manipulate list of items. But you don't want to persist information about each manipulation, you want to save it in list.
 ```js
 const rest = reduxApi({
@@ -247,10 +247,10 @@ In this case you global state is look like this:
 ```
 
 #### prefetch
-- @description: you can organize chain of calling events before the current endpoint will be executed
-- @type: Array<Function>
-- @default: null
-- @example:
+- **Description**: you can organize chain of calling events before the current endpoint will be executed
+- **Type**: Array<Function>
+- **Default**: null
+- **Example**:
 
 ```js
 {
@@ -280,21 +280,21 @@ In this case you global state is look like this:
         const {profile: {data: {uuid}}} = getState();
         const {pathvars: {name}} = requestOptions;
         uuid ? cb() : dispatch(actions.profile({name}, cb));
-      }     
+      }
     ],
     options: function(url, params, getState) {
       const {profile: {data: {uuid}}} = getState();
       return { ...params, body: { ...params.body, uuid }};
     }
-  }  
+  }
 }
 ```
 
 #### postfetch
-- @description: you can organize chain of calling events after the current endpoint will be successful executed
-- @type: Array<Function>
-- @default: null
-- @example:
+- **Description**: you can organize chain of calling events after the current endpoint will be successful executed
+- **Type**: Array<Function>
+- **Default**: null
+- **Example**:
 ```js
 {
   user: "/user/info",
@@ -310,13 +310,13 @@ In this case you global state is look like this:
 ```
 
 #### validation (data, callback)
-- @param **data** - response data
+- **Param** **data** - response data
   > type: Object
 
-- @param **callback** - you need to execute this callback function to finish data validation
+- **Param** **callback** - you need to execute this callback function to finish data validation
   > type: Function
 
-- @example
+- **Example**:
 ```js
 {
   test: {
@@ -334,9 +334,9 @@ In this case you global state is look like this:
 ```
 
 #### reducerName
-- @description:  Sometimes though, you might want named actions that go back to the same reducer. For example:
-- @type: String
-- @example:
+- **Description**:  Sometimes though, you might want named actions that go back to the same reducer. For example:
+- **Type**: String
+- **Example**:
 ```js
 import reduxApi, {transformers} from "redux-api";
 const rest = reduxApi({
@@ -366,9 +366,9 @@ In the above example, both getUser, and updateUser update the same user reducer 
 For example used es7 javascript
 
 #### helpers
-- @description: you can create custom helper function which work with this rest endpoint but with different parameters.
-- @type: Object
-- @example:
+- **Description**: you can create custom helper function which work with this rest endpoint but with different parameters.
+- **Type**: Object
+- **Example**:
 ```js
 {
   logger: "/api/logger",
@@ -407,10 +407,10 @@ rest.actions.test.async();
 ```
 
 #### crud
-- @description: autogenerate `helpers` ("get", "post", "put", "delete", "patch") for selected endpoint. Also you can overwrite autogenerate action with `helpers` definitions.
-- @type: Boolean
-- @default: false
-- @example:
+- **Description**: autogenerate `helpers` ("get", "post", "put", "delete", "patch") for selected endpoint. Also you can overwrite autogenerate action with `helpers` definitions.
+- **Type**: Boolean
+- **Default**: false
+- **Example**:
 ```js
 {
   test: {
@@ -431,14 +431,14 @@ rest.actions.test.delete({ id: 1 });
 ### reduxApi object
 
 #### use(key, value)
-- @description initialize `reduxApi` with custom properties
-- @param **key** - name of property
-- @param **value** - value of property
+- **Description**: initialize `reduxApi` with custom properties
+- **Param** **key** - name of property
+- **Param** **value** - value of property
 
 #### list of properties
 #### fetch
-- @description backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
-- @example
+- **Description**: backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- **Example**:
 ```js
 import adapterFetch from "redux-api/lib/adapters/fetch";
 const rest = reduxApi({...});
@@ -446,17 +446,17 @@ rest.use("fetch", adapterFetch(fetch));
 ```
 
 #### server
-- @description - redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for client-size mode. If `server===true` redux-api works in server-size mode.
-- @default false
+- **Description**: redux api is isomorphic compatible see [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `server===false` for client-size mode. If `server===true` redux-api works in server-size mode.
+- **Default** false
 ```js
 const rest = reduxApi({...});
 rest.use("server", true);
 ```
 
 #### rootUrl
-- @description - root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`
-- @type: String | Functions
-- @example
+- **Description**: root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`
+- **Type**: String | Functions
+- **Example**:
 ```js
 const rest = reduxApi({...});
 rest.use("rootUrl", "http://localhost:3000");
@@ -471,9 +471,9 @@ rest.use("rootUrl", function(url, params, getState) {
 ```
 
 #### options
-- @description - Apply add options for each rest call.
-- @type: String | Functions
-- @example
+- **Description**: Apply add options for each rest call.
+- **Type**: String | Functions
+- **Example**:
 ```js
 const rest = reduxApi({...});
 rest.use("options", function() {
@@ -498,8 +498,8 @@ rest.use("options", function(url, params getState) {
 ```
 
 #### middlewareParser
-- @description - if you use middleware different from [redux-thunk](https://github.com/gaearon/redux-thunk) you can realize custom behaviour for argument parser.
-- @example
+- **Description**: if you use middleware different from [redux-thunk](https://github.com/gaearon/redux-thunk) you can realize custom behaviour for argument parser.
+- **Example**:
 ```js
 // Custom middleware
 const cutsomThunkMiddleware = ({ dispatch, getState }) => next => action => {
@@ -517,8 +517,8 @@ reduxApi({ ... }).use("middlewareParser",
 ```
 
 #### responseHandler
-- @description - catch all http response from each redux-api endpoint. First argument is Error is response fail, second argument data from success response. It can be used for logging, error handling or data transformation.
-- @example
+- **Description**: catch all http response from each redux-api endpoint. First argument is `Error` is response fail, second argument data from success response. It can be used for logging, error handling or data transformation.
+- **Example**:
 ```js
 reduxApi({ ... }).use("responseHandler",
   (err, data)=>
@@ -537,12 +537,12 @@ reduxApi({ ... }).use("responseHandler",
 
 #### init(adapter, isServer, rootUrl)
 - @deprecated
-- @description: `reduxApi` initializer returns non initialized object. You need to call `init` for initialize it.
-- @type: Function
-- @param **adapter** - backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
-- @param **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for client-size mode. If `isServer===true` redux-api works in server-size mode.
-- @param **rootUrl** - root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`.
-- @example:
+- **Description**: `reduxApi` initializer returns not initialized object. You need to call `init` for initialize it.
+- **Type**: Function
+- **Param** **adapter** - backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- **Param** **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for client-size mode. If `isServer===true` redux-api works in server-size mode.
+- **Param** **rootUrl** - root url for every endpoint. very usefull for isomorphic(universal) app. For client-side use default rootUrl, and for backend use http://localhost:80 for example. For client-side for request `/api/get` will be `/api/get` and for backend will be `http://localhost:80/api/get`.
+- **Example**:
 
 ```js
 import "isomorphic-fetch";
@@ -555,9 +555,9 @@ rest.init(adapterFetch(fetch), false, "http://localhost:3000");
 ```
 
 #### actions
-- @description: list of redux actions for rest manipulations
-- @type: Object
-- @example:
+- **Description**: list of redux actions for rest manipulations
+- **Type**: Object
+- **Example**:
 ```js
 const rest = reduxApi({
   entries: "/api/v1/entry",
@@ -595,12 +595,12 @@ dispatch(rest.actions.entries.sync());
 ### Actions sub methods
 
 #### sync(urlparams, params, callback)
-- @description: this method save you from twice requests flag `sync`. if `sync === true` request wouldn't execute. In server-side mode calls twice
-- @param **urlparams**  - update url according Url schema
-- @param **params**     - add additional params to rest request
-- @param **callback**   - callback function when action ends
-- @type: Function
-- @example:
+- **Description**: this method save you from twice requests flag `sync`. if `sync === true` request wouldn't execute. In server-side mode calls twice
+- **Param** **urlparams**  - update url according Url schema
+- **Param** **params**     - add additional params to rest request
+- **Param** **callback**   - callback function when action ends
+- **Type**: Function
+- **Example**:
 
 ```js
 import {actions} from "./rest";
@@ -611,9 +611,9 @@ function onEnter(state, replaceState, callback) {
 ```
 
 ### abort()
-- @description: abort loading request
-- @type: null
-- @example:
+- **Description**: abort loading request
+- **Type**: null
+- **Example**:
 ```js
 import {actions} from "./rest";
 dispatch(actions.entries({ id: 1 }))
@@ -622,9 +622,9 @@ dispatch(actions.entries({ id: 2 }))
 ```
 
 ### force(urlparams, params, callback)
-- @description: abort previous request if it performs and after that perform new request. This method combines `abort` and direct call action methods.
-- @type: Function
-- @example:
+- **Description**: abort previous request if it performs and after that perform new request. This method combines `abort` and direct call action methods.
+- **Type**: Function
+- **Example**:
 ```
 import {actions} from "./rest";
 dispatch(actions.entries({ id: 1 }))
@@ -632,10 +632,10 @@ dispatch(actions.entries.force({ id: 2 }))
 ```
 
 #### reset(mutation)
-- @description: Reset state of current reducer and application's abort request if it processed.
-- @type: Function
-- @param mutation: if `mutation` equal `sync`, it reset only `sync` flag in store.
-- @example:
+- **Description**: Reset state of current reducer and application abort request if it processed.
+- **Type**: Function
+- **Param** mutation: if `mutation` equal `sync`, it reset only `sync` flag in store.
+- **Example**:
 ```js
 import {actions} from "./rest";
 function onLeave(state, replaceState, cb) {
@@ -645,9 +645,9 @@ function onLeave(state, replaceState, cb) {
 ```
 
 #### request()
-- @description: Pure xhr request without sending events or catching reducers.
-- @type: Function
-- @example:
+- **Description**: Pure xhr request is without sending events or catching reducers.
+- **Type**: Function
+- **Example**:
 ```js
 import {actions} from "./rest";
 actions.entries.request().then((data)=> {
@@ -701,8 +701,8 @@ function accessReducer(state=initialState, action) {
 
 ### Tools
 #### async
-- @description - helps to organize chain call of actions
-- @example
+- **Description**: helps to organize chain call of actions
+- **Example**:
 ```js
 import reduxApi, { async } from "redux-api";
 const rest = reduxApi({
@@ -724,7 +724,7 @@ const rest = reduxApi({
   user: "/user/1"
 });
 ```
-In the above example, an endpoint for a user object is created. The corresponding initial store state for this object is the following: 
+In the above example, an endpoint for a user object is created. The corresponding initial store state for this object is the following:
 
 ```js
 // initialState
