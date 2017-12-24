@@ -41,10 +41,10 @@ import reduxApi, {transformers} from "redux-api";
       }
     }
 ```
-**Param** **baseConfig** - additional base configuration  
-**Param** baseConfig.prefix - custom prefix for ACTIONS if you use more then 1 restApi instance  
-**Type**: String  
-**Default**: ""  
+**Param** **baseConfig** - additional base configuration
+**Param** baseConfig.prefix - custom prefix for ACTIONS if you use more then 1 restApi instance
+**Type**: String
+**Default**: ""
 
 
 ### Configuration options
@@ -280,13 +280,13 @@ In this case you global state is look like this:
         const {profile: {data: {uuid}}} = getState();
         const {pathvars: {name}} = requestOptions;
         uuid ? cb() : dispatch(actions.profile({name}, cb));
-      }     
+      }
     ],
     options: function(url, params, getState) {
       const {profile: {data: {uuid}}} = getState();
       return { ...params, body: { ...params.body, uuid }};
     }
-  }  
+  }
 }
 ```
 
@@ -517,7 +517,7 @@ reduxApi({ ... }).use("middlewareParser",
 ```
 
 #### responseHandler
-- **Description**: catch all http response from each redux-api endpoint. First argument is Error is response fail, second argument data from success response. It can be used for logging, error handling or data transformation.
+- **Description**: catch all http response from each redux-api endpoint. First argument is `Error` is response fail, second argument data from success response. It can be used for logging, error handling or data transformation.
 - **Example**:
 ```js
 reduxApi({ ... }).use("responseHandler",
@@ -537,7 +537,7 @@ reduxApi({ ... }).use("responseHandler",
 
 #### init(adapter, isServer, rootUrl)
 - @deprecated
-- **Description**: `reduxApi` initializer returns non initialized object. You need to call `init` for initialize it.
+- **Description**: `reduxApi` initializer returns not initialized object. You need to call `init` for initialize it.
 - **Type**: Function
 - **Param** **adapter** - backend adapter. In current example we use `adaptersFetch` adapter for rest backend using `fetch` API for rest [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch)
 - **Param** **isServer** - redux api is isomorphic compatible see   [examples/isomorphic](https://github.com/lexich/redux-api/tree/master/examples/isomorphic) By default `isServer===false` for client-size mode. If `isServer===true` redux-api works in server-size mode.
@@ -632,7 +632,7 @@ dispatch(actions.entries.force({ id: 2 }))
 ```
 
 #### reset(mutation)
-- **Description**: Reset state of current reducer and application's abort request if it processed.
+- **Description**: Reset state of current reducer and application abort request if it processed.
 - **Type**: Function
 - **Param** mutation: if `mutation` equal `sync`, it reset only `sync` flag in store.
 - **Example**:
@@ -645,7 +645,7 @@ function onLeave(state, replaceState, cb) {
 ```
 
 #### request()
-- **Description**: Pure xhr request without sending events or catching reducers.
+- **Description**: Pure xhr request is without sending events or catching reducers.
 - **Type**: Function
 - **Example**:
 ```js
@@ -724,7 +724,7 @@ const rest = reduxApi({
   user: "/user/1"
 });
 ```
-In the above example, an endpoint for a user object is created. The corresponding initial store state for this object is the following: 
+In the above example, an endpoint for a user object is created. The corresponding initial store state for this object is the following:
 
 ```js
 // initialState
