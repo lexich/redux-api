@@ -20,18 +20,20 @@ function toJSON(resp) {
 
 export default function (fetch) {
   return (url, opts)=> fetch(url, opts).then((resp)=> {
-    if (resp.status >= 400) {
-      return Promise.reject({ status: resp.status, statusText: resp.statusText });
+    // Normalize IE9's response to HTTP 204 when Win error 1223.
+    const status = (resp.status === 1223) ? 204 : resp.status;
+    const statusText = (resp.status === 1223) ? "No Content" : resp.statusText;
+
+    if (status >= 400) {
+      return Promise.reject({ status, statusText });
     } else {
       return toJSON(resp).then((data)=> {
-        if (resp.status >= 200 && resp.status < 300) {
+        if (status >= 200 && status < 300) {
           return data;
         } else {
           return Promise.reject(data);
         }
       });
     }
-  }
-
-  );
+  });
 }
