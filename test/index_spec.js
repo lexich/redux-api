@@ -35,7 +35,7 @@ describe("index", function() {
     const urls = [];
     function fetchUrl(url) {
       urls.push(url);
-      return new Promise(resolve=> resolve({ msg: "hello" }));
+      return new Promise(resolve => resolve({ msg: "hello" }));
     }
     const res = reduxApi({
       test1: "/url1/",
@@ -43,9 +43,9 @@ describe("index", function() {
       test3: "",
       test4: "/(:id)"
     })
-    .use("fetch", fetchUrl)
-    .use("server", false)
-    .use("rootUrl", "http://api.com/root");
+      .use("fetch", fetchUrl)
+      .use("server", false)
+      .use("rootUrl", "http://api.com/root");
 
     const res2 = reduxApi({
       test1: "/url1/",
@@ -53,20 +53,20 @@ describe("index", function() {
       test3: "",
       test4: "/(:id)"
     })
-    .use("fetch", fetchUrl)
-    .use("server", false)
-    .use("rootUrl", "http://api.ru/");
+      .use("fetch", fetchUrl)
+      .use("server", false)
+      .use("rootUrl", "http://api.ru/");
 
     const res3 = reduxApi({
       test1: "/url1/"
     })
-    .use("fetch", fetchUrl)
-    .use("server", false)
-    .use("rootUrl", (url, params /* , getState */)=> {
-      expect(url).to.eql("/url1/");
-      expect(params).to.eql({ a: "b" });
-      return "http://api.net/";
-    });
+      .use("fetch", fetchUrl)
+      .use("server", false)
+      .use("rootUrl", (url, params /* , getState */) => {
+        expect(url).to.eql("/url1/");
+        expect(params).to.eql({ a: "b" });
+        return "http://api.net/";
+      });
 
     const act = res.actions;
     const act2 = res2.actions;
@@ -81,7 +81,7 @@ describe("index", function() {
       act2.test3.request(),
       act2.test4.request({ id: 2 }),
       act3.test1.request({}, { a: "b" })
-    ]).then(()=> {
+    ]).then(() => {
       expect([
         "http://api.com/root/url1/",
         "http://api.com/root/url2",
@@ -105,8 +105,7 @@ describe("index", function() {
     }
     const res = reduxApi({
       test: "/plain/url"
-    })
-    .use("fetch", fetchSuccess);
+    }).use("fetch", fetchSuccess);
     expect(size(res.actions)).to.eql(1);
     expect(size(res.events)).to.eql(1);
 
@@ -126,7 +125,8 @@ describe("index", function() {
         type: "@@redux-api@test",
         syncing: false,
         request: { pathvars: undefined, params: {} }
-      }, {
+      },
+      {
         type: "@@redux-api@test_success",
         data: { msg: "hello" },
         origData: { msg: "hello" },
@@ -134,7 +134,7 @@ describe("index", function() {
         request: { pathvars: undefined, params: {} }
       }
     ];
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       const action = res.actions.test(resolve);
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
@@ -142,7 +142,7 @@ describe("index", function() {
         expect(msg).to.eql(exp);
       }
       action(dispatch, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedEvent).to.have.length(0);
     });
   });
@@ -171,18 +171,21 @@ describe("index", function() {
     expect(res.actions.test).to.exist;
     expect(res.reducers.test).to.exist;
 
-    const expectedEvent = [{
-      type: "@@redux-api@test",
-      syncing: false,
-      request: { pathvars: { id: 1 }, params: {} }
-    }, {
-      type: "@@redux-api@test_success",
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: { id: 1 }, params: {} }
-    }];
-    return new Promise((resolve)=> {
+    const expectedEvent = [
+      {
+        type: "@@redux-api@test",
+        syncing: false,
+        request: { pathvars: { id: 1 }, params: {} }
+      },
+      {
+        type: "@@redux-api@test_success",
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: { pathvars: { id: 1 }, params: {} }
+      }
+    ];
+    return new Promise(resolve => {
       const action = res.actions.test({ id: 1 }, resolve);
       function dispatch(msg) {
         expect(expectedEvent).to.have.length.above(0);
@@ -190,7 +193,7 @@ describe("index", function() {
         expect(msg).to.eql(exp);
       }
       action(dispatch, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedEvent).to.have.length(0);
     });
   });
@@ -228,7 +231,7 @@ describe("index", function() {
     const expectUrls = [];
     function fetchSuccess(url) {
       expectUrls.push(url);
-      return new Promise(resolve=> resolve({ url }));
+      return new Promise(resolve => resolve({ url }));
     }
     const res = reduxApi({
       test: "/test",
@@ -236,20 +239,16 @@ describe("index", function() {
         url: "/test1",
         prefetch: [
           function(opts, cb) {
-            opts.actions.test(cb)(
-              opts.dispatch, opts.getState
-            );
+            opts.actions.test(cb)(opts.dispatch, opts.getState);
           }
         ]
       }
     }).use("fetch", fetchSuccess);
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       const action = res.actions.test1(resolve);
       action(function() {}, getState);
-    }).then(()=> {
-      expect(expectUrls).to.eql([
-        "/test", "/test1"
-      ]);
+    }).then(() => {
+      expect(expectUrls).to.eql(["/test", "/test1"]);
     });
   });
 
@@ -283,16 +282,15 @@ describe("index", function() {
       }
     }).use("fetch", function(url, opts) {
       result.push({ url, opts });
-      return new Promise(
-        resolve=> resolve({ hello: "world" }));
+      return new Promise(resolve => resolve({ hello: "world" }));
     });
-    const a1 = new Promise((resolve)=> {
+    const a1 = new Promise(resolve => {
       res.actions.hello.test1(2, "lexich", resolve)(dispatch, getState);
     });
-    const a2 = new Promise((resolve)=> {
+    const a2 = new Promise(resolve => {
       res.actions.hello.test2(resolve)(dispatch, getState);
     });
-    const a3 = new Promise((resolve)=> {
+    const a3 = new Promise(resolve => {
       const mockSync = res.actions.hello.sync;
       let counter = 0;
       res.actions.hello.sync = function(...args) {
@@ -302,7 +300,7 @@ describe("index", function() {
       res.actions.hello.testSync(1, resolve)(dispatch, getState);
       expect(counter).to.eql(1);
     });
-    return Promise.all([a1, a2, a3]).then(()=> {
+    return Promise.all([a1, a2, a3]).then(() => {
       expect(result).to.eql([
         { url: "/test/lexich/2", opts: {} },
         { url: "/test/kitty/9", opts: {} },
@@ -310,7 +308,7 @@ describe("index", function() {
       ]);
     });
   });
-  it("check global options", ()=> {
+  it("check global options", () => {
     let expOpts;
     const rest = reduxApi({
       test: {
@@ -322,14 +320,14 @@ describe("index", function() {
         url: "/api/test"
       }
     })
-    .use("options", {
-      headers: {
-        Accept: "application/json"
-      }
-    })
-    .use("fetch", (url, options)=> {
-      expOpts=options;
-    });
+      .use("options", {
+        headers: {
+          Accept: "application/json"
+        }
+      })
+      .use("fetch", (url, options) => {
+        expOpts = options;
+      });
     rest.actions.test.request();
     expect(expOpts).to.eql({
       headers: {
@@ -338,7 +336,7 @@ describe("index", function() {
       }
     });
   });
-  it("check global options as function", ()=> {
+  it("check global options as function", () => {
     let expOpts;
     const rest = reduxApi({
       test: {
@@ -350,18 +348,18 @@ describe("index", function() {
         url: "/api/test/(:id)"
       }
     })
-    .use("options", (url, params /* , getState */)=> {
-      expect(url).to.eql("/api/test/1");
-      expect(params).to.eql({ a: "b" });
-      return {
-        headers: {
-          Accept: "application/json"
-        }
-      };
-    })
-    .use("fetch", (url, options)=> {
-      expOpts=options;
-    });
+      .use("options", (url, params /* , getState */) => {
+        expect(url).to.eql("/api/test/1");
+        expect(params).to.eql({ a: "b" });
+        return {
+          headers: {
+            Accept: "application/json"
+          }
+        };
+      })
+      .use("fetch", (url, options) => {
+        expOpts = options;
+      });
     rest.actions.test.request({ id: 1 }, { a: "b" });
     expect(expOpts).to.eql({
       a: "b",
@@ -372,85 +370,88 @@ describe("index", function() {
     });
   });
 
-  it("check crud option", ()=> {
+  it("check crud option", () => {
     const rest = reduxApi({
       test: { url: "/test", crud: true }
     });
     expect(rest.actions.test).to.include.keys(
-      "get", "post", "delete", "put", "patch"
+      "get",
+      "post",
+      "delete",
+      "put",
+      "patch"
     );
-    expect(rest.actions.test).to.include.keys(
-      "request", "reset", "sync"
-    );
+    expect(rest.actions.test).to.include.keys("request", "reset", "sync");
   });
 
-  it("check responseHandler option", ()=> {
+  it("check responseHandler option", () => {
     const error1 = new Error("bar");
     const error2 = new Error("baz");
     function fetchSuccess() {
-      return new Promise(resolve=> resolve({ msg: "hello" }));
+      return new Promise(resolve => resolve({ msg: "hello" }));
     }
     function fetchError() {
-      return new Promise((resolve, reject)=> reject(error2));
+      return new Promise((resolve, reject) => reject(error2));
     }
 
     let calledSucess = false;
     const resSuccess = reduxApi({
-      hello: "/test/",
+      hello: "/test/"
     })
-    .use("fetch", fetchSuccess)
-    .use("responseHandler", (err, data)=> {
-      expect(err).to.equal(null);
-      expect(data).to.deep.equal({ msg: "hello" });
+      .use("fetch", fetchSuccess)
+      .use("responseHandler", (err, data) => {
+        expect(err).to.equal(null);
+        expect(data).to.deep.equal({ msg: "hello" });
 
-      calledSucess = true;
+        calledSucess = true;
 
-      return { modified: true };
-    });
+        return { modified: true };
+      });
 
     let calledError = false;
     const resError = reduxApi({
-      hello: "/test/",
+      hello: "/test/"
     })
-    .use("fetch", fetchError)
-    .use("responseHandler", (err, data)=> {
-      expect(err).to.equal(error2);
-      expect(data).to.equal(undefined);
+      .use("fetch", fetchError)
+      .use("responseHandler", (err, data) => {
+        expect(err).to.equal(error2);
+        expect(data).to.equal(undefined);
 
-      calledError = true;
+        calledError = true;
 
-      throw error1;
-    });
+        throw error1;
+      });
 
     let calledWithoutReturn = false;
     const resWithoutReturn = reduxApi({
-      hello: "/test/",
+      hello: "/test/"
     })
-    .use("fetch", fetchSuccess)
-    .use("responseHandler", (/* err, data */)=> {
-      calledWithoutReturn = true;
-    });
+      .use("fetch", fetchSuccess)
+      .use("responseHandler", (/* err, data */) => {
+        calledWithoutReturn = true;
+      });
 
     return Promise.all([
-      resSuccess.actions.hello.request().then((res)=> {
+      resSuccess.actions.hello.request().then(res => {
         expect(calledSucess).to.true;
         expect(res).to.deep.equal({ modified: true });
       }),
 
-      resError.actions.hello.request()
-      .catch((err)=> {
-        return { inCatch: true, err };
-      })
-      .then((res)=> {
-        expect(calledError).to.true;
-        expect(res.inCatch).to.true;
-        expect(res.err).to.equal(error1);
-      }),
+      resError.actions.hello
+        .request()
+        .catch(err => {
+          return { inCatch: true, err };
+        })
+        .then(res => {
+          expect(calledError).to.true;
+          expect(res.inCatch).to.true;
+          expect(res.err).to.equal(error1);
+        }),
 
-      resWithoutReturn.actions.hello.request().then((res)=> {
+      resWithoutReturn.actions.hello.request().then(res => {
         expect(calledWithoutReturn).to.true;
         expect(res).to.deep.equal({ msg: "hello" });
-      }),
+      })
     ]);
   });
 });

@@ -8,7 +8,12 @@ import get from "./utils/get";
 import fetchResolver from "./fetchResolver";
 import PubSub from "./PubSub";
 import createHolder from "./createHolder";
-import { none, extractArgs, defaultMiddlewareArgsParser, CRUD } from "./helpers";
+import {
+  none,
+  extractArgs,
+  defaultMiddlewareArgsParser,
+  CRUD
+} from "./helpers";
 import { getCacheManager } from "./utils/cache";
 
 /**
@@ -20,18 +25,27 @@ import { getCacheManager } from "./utils/cache";
  * @param  {[type]} fetchAdapter adapter for fetching data
  * @return {Function+Object}     action function object
  */
-export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
-  const { actionFetch, actionSuccess, actionFail,
-    actionReset, actionCache, actionAbort } = ACTIONS;
+export default function actionFn(url, name, options, ACTIONS = {}, meta = {}) {
+  const {
+    actionFetch,
+    actionSuccess,
+    actionFail,
+    actionReset,
+    actionCache,
+    actionAbort
+  } = ACTIONS;
   const pubsub = new PubSub();
   const requestHolder = createHolder();
 
   function getOptions(urlT, params, getState) {
-    const globalOptions = !meta.holder ? {} :
-      (meta.holder.options instanceof Function) ?
-        meta.holder.options(urlT, params, getState) : (meta.holder.options);
-    const baseOptions = !(options instanceof Function) ? options :
-      options(urlT, params, getState);
+    const globalOptions = !meta.holder
+      ? {}
+      : meta.holder.options instanceof Function
+        ? meta.holder.options(urlT, params, getState)
+        : meta.holder.options;
+    const baseOptions = !(options instanceof Function)
+      ? options
+      : options(urlT, params, getState);
     return merge({}, globalOptions, baseOptions, params);
   }
 
@@ -39,21 +53,30 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const resultUrlT = urlTransform(url, pathvars, meta.urlOptions);
     let urlT = resultUrlT;
     let rootUrl = get(meta, "holder", "rootUrl");
-    rootUrl = !(rootUrl instanceof Function) ? rootUrl :
-      rootUrl(urlT, params, getState);
+    rootUrl = !(rootUrl instanceof Function)
+      ? rootUrl
+      : rootUrl(urlT, params, getState);
     if (rootUrl) {
       const rootUrlObject = libUrl.parse(rootUrl);
       const urlObject = libUrl.parse(urlT);
       if (!urlObject.host) {
-        const urlPath = (rootUrlObject.path ? rootUrlObject.path.replace(/\/$/, "") : "") +
-          "/" + (urlObject.path ? urlObject.path.replace(/^\//, "") : "");
+        const urlPath =
+          (rootUrlObject.path ? rootUrlObject.path.replace(/\/$/, "") : "") +
+          "/" +
+          (urlObject.path ? urlObject.path.replace(/^\//, "") : "");
         urlT = `${rootUrlObject.protocol}//${rootUrlObject.host}${urlPath}`;
       }
     }
     return urlT;
   }
 
-  function fetch(pathvars, params, options = {}, getState=none, dispatch=none) {
+  function fetch(
+    pathvars,
+    params,
+    options = {},
+    getState = none,
+    dispatch = none
+  ) {
     const urlT = getUrl(pathvars, params, getState);
     const opts = getOptions(urlT, params, getState);
     let id = meta.reducerName || "";
@@ -72,7 +95,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     }
     const response = meta.fetch(urlT, opts);
     if (cacheManager && dispatch !== none && id) {
-      response.then((data)=> {
+      response.then(data => {
         dispatch({ type: actionCache, id, data, expire: cacheManager.expire });
       });
     }
@@ -91,19 +114,29 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object}   pathvars    path vars for url
    * @param  {Object}   params      fetch params
    * @param  {Function} getState    helper meta function
-  */
-  function request(pathvars, params, options, getState=none, dispatch=none) {
+   */
+  function request(
+    pathvars,
+    params,
+    options,
+    getState = none,
+    dispatch = none
+  ) {
     const response = fetch(pathvars, params, options, getState, dispatch);
-    const result = !meta.validation ? response : response.then(
-      data=> new Promise(
-        (resolve, reject)=> meta.validation(data,
-          err=> err ? reject(err) : resolve(data))));
+    const result = !meta.validation
+      ? response
+      : response.then(
+          data =>
+            new Promise((resolve, reject) =>
+              meta.validation(data, err => (err ? reject(err) : resolve(data)))
+            )
+        );
     let ret = result;
     const responseHandler = get(meta, "holder", "responseHandler");
     if (responseHandler) {
       if (result && result.then) {
         ret = result.then(
-          (data)=> {
+          data => {
             const res = responseHandler(null, data);
             if (res === undefined) {
               return data;
@@ -111,7 +144,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
               return res;
             }
           },
-          err=> responseHandler(err)
+          err => responseHandler(err)
         );
       } else {
         ret = responseHandler(result);
@@ -132,9 +165,9 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
     const syncing = params ? !!params.syncing : false;
     params && delete params.syncing;
     pubsub.push(callback);
-    return (...middlewareArgs)=> {
-      const middlewareParser = get(meta, "holder", "middlewareParser") ||
-        defaultMiddlewareArgsParser;
+    return (...middlewareArgs) => {
+      const middlewareParser =
+        get(meta, "holder", "middlewareParser") || defaultMiddlewareArgsParser;
       const { dispatch, getState } = middlewareParser(...middlewareArgs);
       const state = getState();
       const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
@@ -142,7 +175,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
         return Promise.reject("isLoading");
       }
       const requestOptions = { pathvars, params };
-      const prevData =  get(state, meta.prefix, meta.reducerName, "data");
+      const prevData = get(state, meta.prefix, meta.reducerName, "data");
       dispatch({ type: actionFetch, syncing, request: requestOptions });
       const fetchResolverOpts = {
         dispatch,
@@ -157,62 +190,78 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
             /* eslint no-console: 0 */
             console.warn("Deprecated option, use `request` option");
             return requestOptions;
-          },
+          }
         });
       } else {
         fetchResolverOpts.requestOptions = requestOptions;
       }
 
-
-      const result = new Promise((done, fail)=> {
-        fetchResolver(0, fetchResolverOpts, (err)=> {
+      const result = new Promise((done, fail) => {
+        fetchResolver(0, fetchResolverOpts, err => {
           if (err) {
             pubsub.reject(err);
             return fail(err);
           }
-          new Promise((resolve, reject)=> {
+          new Promise((resolve, reject) => {
             requestHolder.set({
               resolve,
               reject,
-              promise: request(pathvars, params, {}, getState, dispatch).then(resolve, reject)
+              promise: request(pathvars, params, {}, getState, dispatch).then(
+                resolve,
+                reject
+              )
             });
-          }).then((d)=> {
-            requestHolder.pop();
-            const data = meta.transformer(d, prevData, {
-              type: actionSuccess, request: requestOptions
-            });
-            dispatch({
-              data,
-              origData: d,
-              type: actionSuccess,
-              syncing: false,
-              request: requestOptions
-            });
-            if (meta.broadcast) {
-              meta.broadcast.forEach((type)=> {
-                dispatch({ type, data, origData: d, request: requestOptions });
+          }).then(
+            d => {
+              requestHolder.pop();
+              const data = meta.transformer(d, prevData, {
+                type: actionSuccess,
+                request: requestOptions
               });
-            }
-            if (meta.postfetch) {
-              meta.postfetch.forEach((postfetch)=> {
-                (postfetch instanceof Function) && postfetch({
-                  data, getState, dispatch, actions: meta.actions, request: requestOptions
+              dispatch({
+                data,
+                origData: d,
+                type: actionSuccess,
+                syncing: false,
+                request: requestOptions
+              });
+              if (meta.broadcast) {
+                meta.broadcast.forEach(type => {
+                  dispatch({
+                    type,
+                    data,
+                    origData: d,
+                    request: requestOptions
+                  });
                 });
+              }
+              if (meta.postfetch) {
+                meta.postfetch.forEach(postfetch => {
+                  postfetch instanceof Function &&
+                    postfetch({
+                      data,
+                      getState,
+                      dispatch,
+                      actions: meta.actions,
+                      request: requestOptions
+                    });
+                });
+              }
+              pubsub.resolve(data);
+              done(data);
+            },
+            error => {
+              dispatch({
+                error,
+                type: actionFail,
+                loading: false,
+                syncing: false,
+                request: requestOptions
               });
+              pubsub.reject(error);
+              fail(error);
             }
-            pubsub.resolve(data);
-            done(data);
-          }, (error)=> {
-            dispatch({
-              error,
-              type: actionFail,
-              loading: false,
-              syncing: false,
-              request: requestOptions
-            });
-            pubsub.reject(error);
-            fail(error);
-          });
+          );
         });
       });
       result.catch(none);
@@ -230,9 +279,11 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   /**
    * Reset store to initial state
    */
-  fn.reset = (mutation)=> {
+  fn.reset = mutation => {
     abort();
-    return mutation === "sync" ? { type: actionReset, mutation } : { type: actionReset };
+    return mutation === "sync"
+      ? { type: actionReset, mutation }
+      : { type: actionReset };
   };
 
   /*
@@ -244,7 +295,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   };
 
   fn.force = function(...args) {
-    return (dispatch, getState)=> {
+    return (dispatch, getState) => {
       const state = getState();
       const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
@@ -261,10 +312,10 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
    * @param  {Object} params      fetch params
    * @param  {Function} callback) callback execute after end request
    */
-  fn.sync = (...args)=> {
+  fn.sync = (...args) => {
     const [pathvars, params, callback] = extractArgs(args);
     const isServer = meta.holder ? meta.holder.server : false;
-    return (dispatch, getState)=> {
+    return (dispatch, getState) => {
       const state = getState();
       const store = state[name];
       if (!isServer && store && store.sync) {
@@ -280,39 +331,45 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   if (meta.crud) {
     helpers = { ...CRUD, ...helpers };
   }
-  const fnHelperCallback = (memo, func, helpername)=> {
+  const fnHelperCallback = (memo, func, helpername) => {
     if (memo[helpername]) {
       throw new Error(
         `Helper name: "${helpername}" for endpoint "${name}" has been already reserved`
       );
     }
-    const { sync, call } = (func instanceof Function) ? { call: func } : func;
-    memo[helpername] = (...args)=> (dispatch, getState)=> {
+    const { sync, call } = func instanceof Function ? { call: func } : func;
+    memo[helpername] = (...args) => (dispatch, getState) => {
       const index = args.length - 1;
-      const callbackFn = (args[index] instanceof Function) ? args[index] : none;
-      const helpersResult = fastApply(call, { getState, dispatch, actions: meta.actions }, args);
-      const result = new Promise((resolve, reject)=> {
-        const callback = (err, data)=> {
+      const callbackFn = args[index] instanceof Function ? args[index] : none;
+      const helpersResult = fastApply(
+        call,
+        { getState, dispatch, actions: meta.actions },
+        args
+      );
+      const result = new Promise((resolve, reject) => {
+        const callback = (err, data) => {
           err ? reject(err) : resolve(data);
           callbackFn(err, data);
         };
         // If helper alias using async functionality
         if (helpersResult instanceof Function) {
-          helpersResult((error, newArgs=[])=> {
+          helpersResult((error, newArgs = []) => {
             if (error) {
               callback(error);
             } else {
-              fastApply(
-                sync ? fn.sync : fn, null, newArgs.concat(callback)
-              )(dispatch, getState);
+              fastApply(sync ? fn.sync : fn, null, newArgs.concat(callback))(
+                dispatch,
+                getState
+              );
             }
           });
         } else {
           // if helper alias is synchronous
           const [pathvars, params] = helpersResult;
-          fastApply(
-            sync ? fn.sync : fn, null, [pathvars, params, callback]
-          )(dispatch, getState);
+          fastApply(sync ? fn.sync : fn, null, [pathvars, params, callback])(
+            dispatch,
+            getState
+          );
         }
       });
       result.catch(none);
@@ -322,5 +379,7 @@ export default function actionFn(url, name, options, ACTIONS={}, meta={}) {
   };
 
   return Object.keys(helpers).reduce(
-    (memo, key)=> fnHelperCallback(memo, helpers[key], key, helpers), fn);
+    (memo, key) => fnHelperCallback(memo, helpers[key], key, helpers),
+    fn
+  );
 }

@@ -14,7 +14,7 @@ export default reduxApi({
     options: { headers },
     cache: { expire: 5000 },
     transformer(data) {
-      return map(data, (item)=> {
+      return map(data, item => {
         return {
           name: item.name,
           fullName: item.full_name,

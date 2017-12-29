@@ -17,22 +17,27 @@ const rxClean = /(\(:[^\)]+\)|:[^\/]+\/?)/g;
  * @return {String}         result url
  */
 export default function urlTransform(url, params, options) {
-  if (!url) { return ""; }
+  if (!url) {
+    return "";
+  }
   params || (params = {});
   const usedKeys = {};
-  const urlWithParams = Object.keys(params).reduce((url, key)=> {
+  const urlWithParams = Object.keys(params).reduce((url, key) => {
     const value = params[key];
     const rx = new RegExp(`(\\(:${key}\\)|:${key})(\/?)`, "g");
-    return url.replace(rx, (_, _1, slash)=> {
+    return url.replace(rx, (_, _1, slash) => {
       usedKeys[key] = value;
-      return value ? (value + slash) : value;
+      return value ? value + slash : value;
     });
   }, url);
 
-  if (!urlWithParams) { return urlWithParams; }
+  if (!urlWithParams) {
+    return urlWithParams;
+  }
   const { protocol, host, path } = parse(urlWithParams);
-  const cleanURL = (host) ?
-    `${protocol}//${host}${path.replace(rxClean, "")}` : path.replace(rxClean, "");
+  const cleanURL = host
+    ? `${protocol}//${host}${path.replace(rxClean, "")}`
+    : path.replace(rxClean, "");
   const usedKeysArray = Object.keys(usedKeys);
   if (usedKeysArray.length !== Object.keys(params).length) {
     const urlObject = cleanURL.split("?");
@@ -44,7 +49,7 @@ export default function urlTransform(url, params, options) {
       ...options.qsParseOptions
     };
     const mergeParams = merge(
-      (urlObject[1] && qs.parse(urlObject[1], qsParseOptions)),
+      urlObject[1] && qs.parse(urlObject[1], qsParseOptions),
       omit(params, usedKeysArray)
     );
     const qsStringifyOptions = {

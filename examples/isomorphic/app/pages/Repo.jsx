@@ -11,15 +11,18 @@ class Repo extends React.Component {
       <div className="Repo media">
         <div className="media-left">
           <Link to={`/${owner.login}`}>
-            <img className="Repo__media media-object" src={owner.avatar_url } />
+            <img className="Repo__media media-object" src={owner.avatar_url} />
           </Link>
         </div>
         <div className="media-body">
-          <h4>{ data.name }</h4>
-          <Link to={`/${owner.login}`}>@{ owner.login }</Link>&nbsp;
-          Stars { data.stargazers_count } Forks {data.forks }
+          <h4>{data.name}</h4>
+          <Link to={`/${owner.login}`}>@{owner.login}</Link>&nbsp; Stars{" "}
+          {data.stargazers_count} Forks {data.forks}
         </div>
-      </div>) : ( <div className="Repo">Loading</div> );
+      </div>
+    ) : (
+      <div className="Repo">Loading</div>
+    );
   }
 }
 
@@ -29,7 +32,7 @@ Repo.propTypes = {
 };
 
 function select(state) {
-  return {repo: state.repo };
+  return { repo: state.repo };
 }
 
 export default connect(select)(Repo);

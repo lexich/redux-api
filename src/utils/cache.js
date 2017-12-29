@@ -17,7 +17,9 @@ export const MockNowDate = {
 export const Manager = {
   expire: false,
   getData(cache) {
-    if (!cache) { return; }
+    if (!cache) {
+      return;
+    }
     const { expire, data } = cache;
     if (expire === false || expire === undefined || expire === null) {
       return data;
@@ -29,9 +31,13 @@ export const Manager = {
     }
   },
   id(params) {
-    if (!params) { return ""; }
+    if (!params) {
+      return "";
+    }
     return Object.keys(params).reduce(
-      (memo, key)=> memo + `${key}=${params[key]};`, "");
+      (memo, key) => memo + `${key}=${params[key]};`,
+      ""
+    );
   }
 };
 

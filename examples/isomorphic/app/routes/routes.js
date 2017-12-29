@@ -15,20 +15,23 @@ export default function routes({ dispatch }) {
         replaceState(state, "/lexich");
       }
     },
-    childRoutes: [{
-      path: "/:user",
-      component: User,
-      onEnter(state, replaceState, callback) {
-        const { user } = state.params;
-        dispatch(actions.userRepos({ user }, null, callback));
+    childRoutes: [
+      {
+        path: "/:user",
+        component: User,
+        onEnter(state, replaceState, callback) {
+          const { user } = state.params;
+          dispatch(actions.userRepos({ user }, null, callback));
+        }
+      },
+      {
+        path: "/:user/:repo",
+        component: Repo,
+        onEnter(state, replaceState, callback) {
+          const { user, repo } = state.params;
+          dispatch(actions.repo({ user, repo }, null, callback));
+        }
       }
-    }, {
-      path: "/:user/:repo",
-      component: Repo,
-      onEnter(state, replaceState, callback) {
-        const { user, repo } = state.params;
-        dispatch(actions.repo({ user, repo }, null, callback));
-      }
-    }]
+    ]
   };
 }

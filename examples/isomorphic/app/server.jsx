@@ -10,8 +10,8 @@ import { Provider } from "react-redux";
 import thunk from "redux-thunk";
 
 // React-router
-import {RoutingContext, match} from "react-router";
-import {createMemoryHistory as createHistory} from "history";
+import { RoutingContext, match } from "react-router";
+import { createMemoryHistory as createHistory } from "history";
 
 import routes from "./routes/routes";
 
@@ -20,9 +20,7 @@ import "isomorphic-fetch";
 import reduxApi from "./utils/rest";
 import adapterFetch from "redux-api/lib/adapters/fetch";
 
-reduxApi
-  .use("fetch", adapterFetch(fetch))
-  .use("server", true);
+reduxApi.use("fetch", adapterFetch(fetch)).use("server", true);
 
 const history = createHistory();
 
@@ -44,25 +42,33 @@ app.use(function(req, res, next) {
   const reducer = combineReducers(reduxApi.reducers);
   const store = createStoreWithMiddleware(reducer);
   const childRoutes = routes(store);
-  match({ routes: childRoutes, location }, (error, redirectLocation, renderProps)=> {
-    if (redirectLocation) {
-      res.status(301).redirect(redirectLocation.pathname + redirectLocation.search);
-    } else if (error) {
-      res.status(500).send(error.message);
-    } else if (renderProps === null) {
-      res.status(404).render("404.ejs");
-    } else {
-      const html = ReactDom.renderToString(
-        <Provider store={store}>
-          <RoutingContext {...renderProps} />
-        </Provider>
-      );
-      res.render("index.ejs", { html, json: JSON.stringify(store.getState()) });
+  match(
+    { routes: childRoutes, location },
+    (error, redirectLocation, renderProps) => {
+      if (redirectLocation) {
+        res
+          .status(301)
+          .redirect(redirectLocation.pathname + redirectLocation.search);
+      } else if (error) {
+        res.status(500).send(error.message);
+      } else if (renderProps === null) {
+        res.status(404).render("404.ejs");
+      } else {
+        const html = ReactDom.renderToString(
+          <Provider store={store}>
+            <RoutingContext {...renderProps} />
+          </Provider>
+        );
+        res.render("index.ejs", {
+          html,
+          json: JSON.stringify(store.getState())
+        });
+      }
     }
-  });
+  );
 });
 
 const server = app.listen(4444, function() {
-  const {port} = server.address();
+  const { port } = server.address();
   console.log("Server started at http://localhost:%s", port);
 });

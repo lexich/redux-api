@@ -8,7 +8,7 @@ const OBJECT = "[object Object]";
  */
 export default {
   array(data) {
-    return !data ? [] : (Array.isArray(data) ? data : [data]);
+    return !data ? [] : Array.isArray(data) ? data : [data];
   },
   object(data) {
     if (!data) {

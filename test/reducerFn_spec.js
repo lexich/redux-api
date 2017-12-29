@@ -64,7 +64,10 @@ describe("reducerFn", function() {
     };
     const fn = reducerFn(initialState, actions);
 
-    const res1 = fn(initialState, { type: actions.actionFetch, request: { pathvars: { id: 42 } } });
+    const res1 = fn(initialState, {
+      type: actions.actionFetch,
+      request: { pathvars: { id: 42 } }
+    });
     expect({
       loading: true,
       error: null,
@@ -106,7 +109,11 @@ describe("reducerFn", function() {
   });
 
   it("check with body", function() {
-    const initialState = { loading: false, request: null, data: { msg: "Hello" } };
+    const initialState = {
+      loading: false,
+      request: null,
+      data: { msg: "Hello" }
+    };
     const actions = {
       actionFetch: "actionFetch",
       actionSuccess: "actionSuccess",
@@ -188,7 +195,7 @@ describe("reducerFn", function() {
       actionFail: "actionFail",
       actionReset: "actionReset"
     };
-    const fn = reducerFn(initialState, actions, (state, action)=> {
+    const fn = reducerFn(initialState, actions, (state, action) => {
       if (action.type === "CUSTOM") {
         return { ...state, data: "custom" };
       } else {

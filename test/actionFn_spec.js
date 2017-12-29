@@ -48,38 +48,41 @@ describe("actionFn", function() {
     let executeCounter = 0;
     const api = actionFn("/test", "test", null, ACTIONS, {
       transformer,
-      fetch: ()=> {
+      fetch: () => {
         executeCounter += 1;
         return fetchSuccess();
       }
     });
 
-    const async1 = new Promise((resolve)=> {
+    const async1 = new Promise(resolve => {
       const initialState = getState();
       initialState.test.sync = true;
 
-      api.sync(resolve)(function() {}, ()=> initialState);
+      api.sync(resolve)(function() {}, () => initialState);
       expect(executeCounter).to.be.eql(0);
     });
 
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: true,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }];
-    const async2 = new Promise((resolve)=> {
-      api.sync(resolve)((msg)=> {
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: true,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
+    const async2 = new Promise(resolve => {
+      api.sync(resolve)(msg => {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(executeCounter).to.be.eql(1);
       expect(expectedEvent).to.have.length(0);
     });
@@ -92,7 +95,7 @@ describe("actionFn", function() {
     let paramsFetch;
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
       transformer,
-      fetch: (url, params)=> {
+      fetch: (url, params) => {
         urlFetch = url;
         paramsFetch = params;
         return fetchSuccess();
@@ -100,7 +103,7 @@ describe("actionFn", function() {
     });
     const async = api.request({ id: 2 }, { hello: "world" });
     expect(async).to.be.an.instanceof(Promise);
-    return async.then((data)=> {
+    return async.then(data => {
       expect(data).to.eql({ msg: "hello" });
       expect(urlFetch).to.eql("/test/2");
       expect(paramsFetch).to.eql({ hello: "world" });
@@ -113,18 +116,21 @@ describe("actionFn", function() {
       fetch: fetchSuccess
     });
     expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }];
-    return new Promise((resolve)=> {
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
+    return new Promise(resolve => {
       const action = api(resolve);
       expect(isFunction(action)).to.be.true;
       function dispatch(msg) {
@@ -133,7 +139,7 @@ describe("actionFn", function() {
         expect(msg).to.eql(exp);
       }
       action(dispatch, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedEvent).to.have.length(0);
     });
   });
@@ -145,7 +151,8 @@ describe("actionFn", function() {
     });
     expect(api.reset()).to.eql({ type: ACTIONS.actionReset });
     expect(api.reset("sync")).to.eql({
-      type: ACTIONS.actionReset, mutation: "sync"
+      type: ACTIONS.actionReset,
+      mutation: "sync"
     });
     expect(api.reset("other")).to.eql({ type: ACTIONS.actionReset });
   });
@@ -155,16 +162,19 @@ describe("actionFn", function() {
       transformer,
       fetch: fetchFail
     });
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionFail,
-      error: ERROR,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionFail,
+        error: ERROR,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
@@ -173,30 +183,39 @@ describe("actionFn", function() {
       expect(msg.request).to.eql(exp.request);
       expect(msg.error).to.eql(exp.error);
     }
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api(resolve)(dispatch, getState);
-    }).then(()=> {
-      expect(expectedEvent).to.have.length(0);
-    }, err=> expect(null).to.eql(err));
+    }).then(
+      () => {
+        expect(expectedEvent).to.have.length(0);
+      },
+      err => expect(null).to.eql(err)
+    );
   });
 
   it("check options param", function() {
     let callOptions = 0;
     let checkOptions = null;
-    const api = actionFn("/test/:id", "test", function(url, params, _getState) {
-      expect(_getState).to.exist;
-      expect(getState === _getState).to.be.true;
-      callOptions += 1;
-      return { ...params,  test: 1 };
-    }, ACTIONS, {
-      transformer,
-      fetch(url, opts) {
-        checkOptions = opts;
-        return fetchSuccess();
+    const api = actionFn(
+      "/test/:id",
+      "test",
+      function(url, params, _getState) {
+        expect(_getState).to.exist;
+        expect(getState === _getState).to.be.true;
+        callOptions += 1;
+        return { ...params, test: 1 };
+      },
+      ACTIONS,
+      {
+        transformer,
+        fetch(url, opts) {
+          checkOptions = opts;
+          return fetchSuccess();
+        }
       }
-    });
+    );
     function dispatch() {}
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api("", { params: 1 }, resolve)(dispatch, getState);
       expect(callOptions).to.eql(1);
       expect(checkOptions).to.eql({ params: 1, test: 1 });
@@ -231,35 +250,39 @@ describe("actionFn", function() {
         request: { pathvars: undefined, params: {} }
       }
     ];
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api.sync(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getServerState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedEvent).to.have.length(0);
     });
   });
 
   it("check broadcast option", function() {
     const BROADCAST_ACTION = "BROADCAST_ACTION";
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: BROADCAST_ACTION,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      request: { pathvars: undefined, params: {} }
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: BROADCAST_ACTION,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
     const meta = {
       transformer,
       fetch: fetchSuccess,
@@ -267,13 +290,13 @@ describe("actionFn", function() {
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
 
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedEvent).to.have.length(0);
     });
   });
@@ -290,7 +313,7 @@ describe("actionFn", function() {
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    return api.request({ id: 1 }).then((data)=> {
+    return api.request({ id: 1 }).then(data => {
       expect(data).to.eql({ msg: "hello" });
       expect(counter).to.eql(1);
       expect(expData).to.eql({ msg: "hello" });
@@ -308,26 +331,29 @@ describe("actionFn", function() {
         cb();
       }
     };
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
 
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedEvent).to.have.length(0);
       expect(counter).to.eql(1);
       expect(expData).to.eql({ msg: "hello" });
@@ -345,18 +371,21 @@ describe("actionFn", function() {
         cb("invalid");
       }
     };
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionFail,
-      error: "invalid",
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionFail,
+        error: "invalid",
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      }
+    ];
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api(resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -365,11 +394,14 @@ describe("actionFn", function() {
         expect(msg.request).to.eql(exp.request);
         expect(msg.error).to.eql(exp.error);
       }, getState);
-    }).then(()=> {
-      expect(expectedEvent).to.have.length(0);
-      expect(counter).to.eql(1);
-      expect(expData).to.eql({ msg: "hello" });
-    }, err=> expect(null).to.eql(err));
+    }).then(
+      () => {
+        expect(expectedEvent).to.have.length(0);
+        expect(counter).to.eql(1);
+        expect(expData).to.eql({ msg: "hello" });
+      },
+      err => expect(null).to.eql(err)
+    );
   });
   it("check postfetch option", function() {
     let expectedOpts;
@@ -388,37 +420,48 @@ describe("actionFn", function() {
       actions: { hello: "a" }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: { pathvars: undefined, params: {} }
-    }, {
-      type: "One",
-      data: { msg: "hello" }
-    }, {
-      type: "Two",
-      data: { msg: "hello" }
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: { pathvars: undefined, params: {} }
+      },
+      {
+        type: "One",
+        data: { msg: "hello" }
+      },
+      {
+        type: "Two",
+        data: { msg: "hello" }
+      }
+    ];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
       expect(msg).to.eql(exp);
     }
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api(resolve)(dispatch, getState);
-    }).then(()=> {
+    }).then(() => {
       expect(expectedOpts).to.exist;
-      expect(expectedOpts).to.include.keys("data", "getState", "dispatch", "actions", "request");
+      expect(expectedOpts).to.include.keys(
+        "data",
+        "getState",
+        "dispatch",
+        "actions",
+        "request"
+      );
       expect(expectedOpts.getState).to.eql(getState);
       expect(expectedOpts.dispatch).to.eql(dispatch);
       expect(expectedOpts.actions).to.eql({ hello: "a" });
-      expect(expectedOpts.request).to.eql({ params: {}, pathvars: (void 0) });
+      expect(expectedOpts.request).to.eql({ params: {}, pathvars: void 0 });
     });
   });
   it("check prefetch option", function() {
@@ -439,17 +482,20 @@ describe("actionFn", function() {
     };
     const requestOptions = { pathvars: undefined, params: {} };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: requestOptions
-    }, {
-      type: ACTIONS.actionSuccess,
-      data: { msg: "hello" },
-      origData: { msg: "hello" },
-      syncing: false,
-      request: requestOptions
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: requestOptions
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        data: { msg: "hello" },
+        origData: { msg: "hello" },
+        syncing: false,
+        request: requestOptions
+      }
+    ];
     function dispatch(msg) {
       expect(expectedEvent).to.have.length.above(0);
       const exp = expectedEvent.shift();
@@ -462,67 +508,76 @@ describe("actionFn", function() {
       actions: undefined,
       prefetch: meta.prefetch
     };
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api(resolve)(dispatch, getState);
-    }).then(()=> {
-      expect(expectedEvent).to.have.length(0);
-      expect(checkPrefetch).to.eql([
-        ["one", expOpts],
-        ["two", expOpts],
-      ]);
-    }, err=> expect(null).to.eql(err));
+    }).then(
+      () => {
+        expect(expectedEvent).to.have.length(0);
+        expect(checkPrefetch).to.eql([["one", expOpts], ["two", expOpts]]);
+      },
+      err => expect(null).to.eql(err)
+    );
   });
   it("check incorrect helpers name", function() {
-    expect(
-      ()=> actionFn("/test/:id", "test", null, ACTIONS, {
+    expect(() =>
+      actionFn("/test/:id", "test", null, ACTIONS, {
         helpers: {
           reset() {}
         }
       })
-    ).to.throw(Error, "Helper name: \"reset\" for endpoint \"test\" has been already reserved");
-    expect(
-      ()=> actionFn("/test/:id", "test", null, ACTIONS, {
+    ).to.throw(
+      Error,
+      'Helper name: "reset" for endpoint "test" has been already reserved'
+    );
+    expect(() =>
+      actionFn("/test/:id", "test", null, ACTIONS, {
         helpers: {
           sync() {}
         }
       })
-    ).to.throw(Error, "Helper name: \"sync\" for endpoint \"test\" has been already reserved");
+    ).to.throw(
+      Error,
+      'Helper name: "sync" for endpoint "test" has been already reserved'
+    );
   });
   it("check that helpers returns Promise", function() {
     const api = actionFn("/test/:id", "test", null, ACTIONS, {
       transformer,
       fetch: fetchSuccess,
       helpers: {
-        test: ()=> cb=> cb(null, [{ id: 1 }, { async: true }])
+        test: () => cb => cb(null, [{ id: 1 }, { async: true }])
       }
     });
-    const result = api.test()(()=> {}, getState);
+    const result = api.test()(() => {}, getState);
     expect(result).to.be.an.instanceof(Promise);
   });
   it("check helpers with async functionality", function() {
     const meta = {
       transformer,
       fetch(url, opts) {
-        return new Promise(resolve=> resolve({ url, opts }));
+        return new Promise(resolve => resolve({ url, opts }));
       },
       helpers: {
-        asyncSuccess: ()=> cb=> cb(null, [{ id: 1 }, { async: true }]),
-        asyncFail: ()=> cb=> cb("Error")
+        asyncSuccess: () => cb => cb(null, [{ id: 1 }, { async: true }]),
+        asyncFail: () => cb => cb("Error")
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent1 = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: { id: 1 }, params: { async: true } }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: { url: "/test/1", opts: { async: true } },
-      origData: { url: "/test/1", opts: { async: true } },
-      request: { pathvars: { id: 1 }, params: { async: true } }
-    }];
-    const wait1 = new Promise((resolve)=> {
+    const expectedEvent1 = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: { id: 1 }, params: { async: true } }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: { url: "/test/1", opts: { async: true } },
+        origData: { url: "/test/1", opts: { async: true } },
+        request: { pathvars: { id: 1 }, params: { async: true } }
+      }
+    ];
+    const wait1 = new Promise(resolve => {
       api.asyncSuccess(resolve)(function(msg) {
         expect(expectedEvent1).to.have.length.above(0);
         const exp = expectedEvent1.shift();
@@ -530,135 +585,145 @@ describe("actionFn", function() {
       }, getState);
     });
     let errorMsg;
-    const wait2 = new Promise((resolve)=> {
+    const wait2 = new Promise(resolve => {
       api.asyncFail(function(err) {
         errorMsg = err;
         resolve();
       })(function() {}, getState);
     });
-    return Promise.all([wait1, wait2])
-      .then(()=> {
-        expect(expectedEvent1).to.have.length(0);
-        expect(errorMsg).to.eql("Error");
-      });
+    return Promise.all([wait1, wait2]).then(() => {
+      expect(expectedEvent1).to.have.length(0);
+      expect(errorMsg).to.eql("Error");
+    });
   });
 
-  it("check crud option",  function() {
+  it("check crud option", function() {
     const meta = {
       transformer,
       crud: true,
       fetch(url, opts) {
-        return new Promise(resolve=> resolve({ url, opts }));
+        return new Promise(resolve => resolve({ url, opts }));
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: {
-        pathvars: { id: 1 },
-        params: { method: "GET" }
-      }
-    }, {
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: {
-        pathvars: { id: 2 },
-        params: { body: "Hello", method: "POST" }
-      }
-    }, {
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: {
-        pathvars: { id: 3 },
-        params: { body: "World", method: "PUT" }
-      }
-    }, {
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: {
-        pathvars: { id: 4 },
-        params: { method: "DELETE" }
-      }
-    }, {
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: {
-        pathvars: { id: 5 },
-        params: { body: "World", method: "PATCH" }
-      }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: { url: "/test/1", opts: { method: "GET" } },
-      origData: { url: "/test/1", opts: { method: "GET" } },
-      request: {
-        pathvars: { id: 1 },
-        params: { method: "GET" }
-      }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: {
-        url: "/test/2",
-        opts: { body: "Hello", method: "POST" }
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: {
+          pathvars: { id: 1 },
+          params: { method: "GET" }
+        }
       },
-      origData: {
-        url: "/test/2",
-        opts: { body: "Hello", method: "POST" }
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: {
+          pathvars: { id: 2 },
+          params: { body: "Hello", method: "POST" }
+        }
       },
-      request: {
-        pathvars: { id: 2 },
-        params: { body: "Hello", method: "POST" }
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: {
+          pathvars: { id: 3 },
+          params: { body: "World", method: "PUT" }
+        }
+      },
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: {
+          pathvars: { id: 4 },
+          params: { method: "DELETE" }
+        }
+      },
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: {
+          pathvars: { id: 5 },
+          params: { body: "World", method: "PATCH" }
+        }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: { url: "/test/1", opts: { method: "GET" } },
+        origData: { url: "/test/1", opts: { method: "GET" } },
+        request: {
+          pathvars: { id: 1 },
+          params: { method: "GET" }
+        }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: {
+          url: "/test/2",
+          opts: { body: "Hello", method: "POST" }
+        },
+        origData: {
+          url: "/test/2",
+          opts: { body: "Hello", method: "POST" }
+        },
+        request: {
+          pathvars: { id: 2 },
+          params: { body: "Hello", method: "POST" }
+        }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: {
+          url: "/test/3",
+          opts: { body: "World", method: "PUT" }
+        },
+        origData: {
+          url: "/test/3",
+          opts: { body: "World", method: "PUT" }
+        },
+        request: {
+          pathvars: { id: 3 },
+          params: { body: "World", method: "PUT" }
+        }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: {
+          url: "/test/4",
+          opts: { method: "DELETE" }
+        },
+        origData: {
+          url: "/test/4",
+          opts: { method: "DELETE" }
+        },
+        request: {
+          pathvars: { id: 4 },
+          params: { method: "DELETE" }
+        }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: {
+          url: "/test/5",
+          opts: { body: "World", method: "PATCH" }
+        },
+        origData: {
+          url: "/test/5",
+          opts: { body: "World", method: "PATCH" }
+        },
+        request: {
+          pathvars: { id: 5 },
+          params: { body: "World", method: "PATCH" }
+        }
       }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: {
-        url: "/test/3",
-        opts: { body: "World", method: "PUT" }
-      },
-      origData: {
-        url: "/test/3",
-        opts: { body: "World", method: "PUT" }
-      },
-      request: {
-        pathvars: { id: 3 },
-        params: { body: "World", method: "PUT" }
-      }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: {
-        url: "/test/4",
-        opts: { method: "DELETE" }
-      },
-      origData: {
-        url: "/test/4",
-        opts: { method: "DELETE" }
-      },
-      request: {
-        pathvars: { id: 4 },
-        params: { method: "DELETE" }
-      }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: {
-        url: "/test/5",
-        opts: { body: "World", method: "PATCH" }
-      },
-      origData: {
-        url: "/test/5",
-        opts: { body: "World", method: "PATCH" }
-      },
-      request: {
-        pathvars: { id: 5 },
-        params: { body: "World", method: "PATCH" }
-      }
-    }];
+    ];
 
-    const getQuery = new Promise((resolve)=> {
+    const getQuery = new Promise(resolve => {
       api.get({ id: 1 }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -666,28 +731,28 @@ describe("actionFn", function() {
       }, getState);
     });
 
-    const postQuery = new Promise((resolve)=> {
+    const postQuery = new Promise(resolve => {
       api.post({ id: 2 }, { body: "Hello" }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
     });
-    const putQuery = new Promise((resolve)=> {
+    const putQuery = new Promise(resolve => {
       api.put({ id: 3 }, { body: "World" }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
     });
-    const deleteQuery = new Promise((resolve)=> {
+    const deleteQuery = new Promise(resolve => {
       api.delete({ id: 4 }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
     });
-    const patchQuery = new Promise((resolve)=> {
+    const patchQuery = new Promise(resolve => {
       api.patch({ id: 5 }, { body: "World" }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
@@ -695,16 +760,21 @@ describe("actionFn", function() {
       }, getState);
     });
 
-    return Promise.all([getQuery, postQuery, putQuery, deleteQuery, patchQuery])
-      .then(()=> expect(expectedEvent).to.have.length(0));
+    return Promise.all([
+      getQuery,
+      postQuery,
+      putQuery,
+      deleteQuery,
+      patchQuery
+    ]).then(() => expect(expectedEvent).to.have.length(0));
   });
 
-  it("check crud option with overwrite",  function() {
+  it("check crud option with overwrite", function() {
     const meta = {
       transformer,
       crud: true,
       fetch(url, opts) {
-        return new Promise(resolve=> resolve({ url, opts }));
+        return new Promise(resolve => resolve({ url, opts }));
       },
       helpers: {
         get() {
@@ -713,33 +783,36 @@ describe("actionFn", function() {
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: { pathvars: { id: "overwrite" }, params: undefined }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: { url: "/test/overwrite", opts: null },
-      origData: { url: "/test/overwrite", opts: null },
-      request: { pathvars: { id: "overwrite" }, params: undefined }
-    }];
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: { pathvars: { id: "overwrite" }, params: undefined }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: { url: "/test/overwrite", opts: null },
+        origData: { url: "/test/overwrite", opts: null },
+        request: { pathvars: { id: "overwrite" }, params: undefined }
+      }
+    ];
 
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api.get({ id: 1 }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
-    }).then(()=> expect(expectedEvent).to.have.length(0));
+    }).then(() => expect(expectedEvent).to.have.length(0));
   });
 
-  it("check crud option with overwrite 2",  function() {
+  it("check crud option with overwrite 2", function() {
     const meta = {
       transformer,
       crud: true,
       fetch(url, opts) {
-        return new Promise(resolve=> resolve({ url, opts }));
+        return new Promise(resolve => resolve({ url, opts }));
       },
       helpers: {
         get(param) {
@@ -748,42 +821,45 @@ describe("actionFn", function() {
       }
     };
     const api = actionFn("/test/", "test", null, ACTIONS, meta);
-    const expectedEvent = [{
-      type: ACTIONS.actionFetch,
-      syncing: false,
-      request: {
-        pathvars: { id: 1 },
-        params: null
+    const expectedEvent = [
+      {
+        type: ACTIONS.actionFetch,
+        syncing: false,
+        request: {
+          pathvars: { id: 1 },
+          params: null
+        }
+      },
+      {
+        type: ACTIONS.actionSuccess,
+        syncing: false,
+        data: { url: "/test/?id=1", opts: null },
+        origData: { url: "/test/?id=1", opts: null },
+        request: { pathvars: { id: 1 }, params: null }
       }
-    }, {
-      type: ACTIONS.actionSuccess,
-      syncing: false,
-      data: { url: "/test/?id=1", opts: null },
-      origData: { url: "/test/?id=1", opts: null },
-      request: { pathvars: { id: 1 }, params: null }
-    }];
+    ];
 
-    return new Promise((resolve)=> {
+    return new Promise(resolve => {
       api.get({ id: 1 }, resolve)(function(msg) {
         expect(expectedEvent).to.have.length.above(0);
         const exp = expectedEvent.shift();
         expect(msg).to.eql(exp);
       }, getState);
-    }).then(()=> expect(expectedEvent).to.have.length(0));
+    }).then(() => expect(expectedEvent).to.have.length(0));
   });
 
   it("check merge params", function() {
     let params;
     const meta = {
       transformer,
-      fetch: (urlparams, _params)=> {
+      fetch: (urlparams, _params) => {
         params = _params;
         return fetchSuccess();
       }
     };
     const opts = { headers: { One: 1 } };
     const api = actionFn("/test", "test", opts, ACTIONS, meta);
-    return api.request(null, { headers: { Two: 2 } }).then(()=> {
+    return api.request(null, { headers: { Two: 2 } }).then(() => {
       expect(params).to.eql({
         headers: {
           One: 1,
@@ -797,7 +873,7 @@ describe("actionFn", function() {
     let urlFetch;
     const api = actionFn("/test", "test", null, ACTIONS, {
       transformer,
-      fetch: (url)=> {
+      fetch: url => {
         urlFetch = url;
         return fetchSuccess();
       },
@@ -808,7 +884,7 @@ describe("actionFn", function() {
     });
     const async = api.request({ id: [1, 2] });
     expect(async).to.be.an.instanceof(Promise);
-    return async.then(()=> {
+    return async.then(() => {
       expect(urlFetch).to.eql("/test?id=1,id=2");
     });
   });
@@ -826,10 +902,8 @@ describe("actionFn", function() {
         }
       }
     });
-    return api.request().then(()=> {
-      expect(resp).to.eql([
-        { err: null, data: { msg: "hello" } }
-      ]);
+    return api.request().then(() => {
+      expect(resp).to.eql([{ err: null, data: { msg: "hello" } }]);
     });
   });
 
@@ -846,19 +920,19 @@ describe("actionFn", function() {
         }
       }
     });
-    return api.request().then(null, ()=> {
+    return api.request().then(null, () => {
       expect(resp).to.have.length(1);
       expect(resp[0].data).to.not.exist;
       expect(resp[0].err).to.be.an.instanceof(Error);
     });
   });
 
-  it("chained callbacks all resolve",  function() {
+  it("chained callbacks all resolve", function() {
     const meta = {
       transformer,
       crud: true,
       fetch(url, opts) {
-        return new Promise(resolve=> resolve({ url, opts }));
+        return new Promise(resolve => resolve({ url, opts }));
       }
     };
     const api = actionFn("/test/:id", "test", null, ACTIONS, meta);
@@ -872,14 +946,11 @@ describe("actionFn", function() {
     function none() {}
 
     function chainedAction(resolve) {
-      api.get({ id: 1 }, ()=> spy(resolve))(none, getState);
+      api.get({ id: 1 }, () => spy(resolve))(none, getState);
     }
 
-    return new Promise(resolve=>
-      api.get(
-        { id: 1 },
-        ()=> chainedAction(resolve)
-      )(none, getState)
-    ).then(()=> expect(callCount).to.have.length.equal(1));
+    return new Promise(resolve =>
+      api.get({ id: 1 }, () => chainedAction(resolve))(none, getState)
+    ).then(() => expect(callCount).to.have.length.equal(1));
   });
 });

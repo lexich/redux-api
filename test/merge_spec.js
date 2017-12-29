@@ -5,7 +5,6 @@
 import { expect } from "chai";
 import merge from "../src/utils/merge";
 
-
 describe("merge", function() {
   it("check null args", function() {
     expect(merge()).to.not.exit;
@@ -35,42 +34,26 @@ describe("merge", function() {
   });
 
   it("merge plain object", function() {
-    expect(
-      merge({ a: 1 }, { b: 2 })
-    ).to.eql({ a: 1, b: 2 });
-    expect(
-      merge({ a: 1 }, { b: 2 }, { c: 3 })
-    ).to.eql({ a: 1, b: 2, c: 3 });
-    expect(
-      merge({ a: { c: 2 } }, { b: 2 })
-    ).to.eql({ a: { c: 2 }, b: 2 });
+    expect(merge({ a: 1 }, { b: 2 })).to.eql({ a: 1, b: 2 });
+    expect(merge({ a: 1 }, { b: 2 }, { c: 3 })).to.eql({ a: 1, b: 2, c: 3 });
+    expect(merge({ a: { c: 2 } }, { b: 2 })).to.eql({ a: { c: 2 }, b: 2 });
   });
 
   it("deep merge object", function() {
-    expect(
-      merge({ a: { b: 1 } }, { a: { c: 2 } })
-    ).to.eql(
-      { a: { b: 1, c: 2 } }
-    );
+    expect(merge({ a: { b: 1 } }, { a: { c: 2 } })).to.eql({
+      a: { b: 1, c: 2 }
+    });
   });
 
   it("merge null with object", function() {
-    expect(
-      merge((void 0), { a: 1 })
-    ).to.eql({ a: 1 });
+    expect(merge(void 0, { a: 1 })).to.eql({ a: 1 });
 
-    expect(
-      merge({ a: 1 }, (void 0))
-    ).to.eql({ a: 1 });
+    expect(merge({ a: 1 }, void 0)).to.eql({ a: 1 });
   });
 
   it("merge array with item", function() {
-    expect(
-      merge({ id: [1, 2] }, { id: 3 })
-    ).to.eql({ id: [1, 2, 3] });
+    expect(merge({ id: [1, 2] }, { id: 3 })).to.eql({ id: [1, 2, 3] });
 
-    expect(
-      merge({ id: 3 }, { id: [1, 2] })
-    ).to.eql({ id: [3, 1, 2] });
+    expect(merge({ id: 3 }, { id: [1, 2] })).to.eql({ id: [3, 1, 2] });
   });
 });

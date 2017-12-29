@@ -5,16 +5,16 @@ import { Link } from "react-router";
 class User extends React.Component {
   render() {
     const { userRepos } = this.props;
-    const Repos = userRepos.data.map(
-      (item)=> (<Link className="list-group-item"
-        key={item.name} to={`/${item.user}/${item.name}`}>
-          { item.name }
-      </Link>));
-    return (
-      <div className="User list-group">
-        { Repos }
-      </div>
-    );
+    const Repos = userRepos.data.map(item => (
+      <Link
+        className="list-group-item"
+        key={item.name}
+        to={`/${item.user}/${item.name}`}
+      >
+        {item.name}
+      </Link>
+    ));
+    return <div className="User list-group">{Repos}</div>;
   }
 }
 
@@ -24,7 +24,7 @@ User.propTypes = {
 };
 
 function select(state) {
-  return {userRepos: state.userRepos };
+  return { userRepos: state.userRepos };
 }
 
 export default connect(select)(User);

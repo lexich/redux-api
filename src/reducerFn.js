@@ -10,10 +10,16 @@ import { setExpire } from "./utils/cache";
  * @param  {Function} reducer      custom reducer function
  * @return {Function}              reducer function
  */
-export default function reducerFn(initialState, actions={}, reducer) {
-  const { actionFetch, actionSuccess, actionFail,
-    actionReset, actionCache, actionAbort } = actions;
-  return (state=initialState, action)=> {
+export default function reducerFn(initialState, actions = {}, reducer) {
+  const {
+    actionFetch,
+    actionSuccess,
+    actionFail,
+    actionReset,
+    actionCache,
+    actionAbort
+  } = actions;
+  return (state = initialState, action) => {
     const request = action.request || {};
     switch (action.type) {
       case actionFetch:
@@ -42,11 +48,13 @@ export default function reducerFn(initialState, actions={}, reducer) {
         };
       case actionReset:
         const { mutation } = action;
-        return (mutation === "sync") ?
-        { ...state,
-          request: null,
-          sync: false } :
-        { ...initialState };
+        return mutation === "sync"
+          ? {
+              ...state,
+              request: null,
+              sync: false
+            }
+          : { ...initialState };
       case actionAbort:
         return {
           ...state,

@@ -17,9 +17,11 @@ describe("fetchResolver", function() {
     expect(fetchResolver(999)).to.be.undefined;
   });
   it("call without callback", function() {
-    expect(fetchResolver(0, {
-      prefetch: [(opts, cb)=> cb()]
-    })).to.be.undefined;
+    expect(
+      fetchResolver(0, {
+        prefetch: [(opts, cb) => cb()]
+      })
+    ).to.be.undefined;
   });
   it("check normal usage", function() {
     const result = [];
@@ -35,17 +37,14 @@ describe("fetchResolver", function() {
         }
       ]
     };
-    fetchResolver(0, opts,
-      ()=> result.push("ok"));
-    expect(result).to.eql([
-      ["one", opts],
-      ["two", opts],
-      "ok"
-    ]);
+    fetchResolver(0, opts, () => result.push("ok"));
+    expect(result).to.eql([["one", opts], ["two", opts], "ok"]);
   });
   it("check usage without prefetch options", function() {
     let counter = 0;
-    fetchResolver(0, {}, ()=> { counter += 1; });
+    fetchResolver(0, {}, () => {
+      counter += 1;
+    });
     expect(counter).to.eql(1);
   });
 });

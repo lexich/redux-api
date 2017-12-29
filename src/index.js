@@ -73,7 +73,7 @@ export default function reduxApi(config, baseConfig) {
 
       return this;
     },
-    init(fetch, isServer=false, rootUrl) {
+    init(fetch, isServer = false, rootUrl) {
       /* eslint no-console: 0 */
       console.warn("Deprecated method, use `use` method");
       this.use("fetch", fetch);
@@ -86,19 +86,31 @@ export default function reduxApi(config, baseConfig) {
     events: {}
   };
   function fnConfigCallback(memo, value, key) {
-    const opts = typeof value === "object" ?
-      { ...defaultEndpointConfig, reducerName: key, ...value } :
-      { ...defaultEndpointConfig, reducerName: key, url: value };
+    const opts =
+      typeof value === "object"
+        ? { ...defaultEndpointConfig, reducerName: key, ...value }
+        : { ...defaultEndpointConfig, reducerName: key, url: value };
 
-    if (opts.broadcast !== (void 0)) {
+    if (opts.broadcast !== void 0) {
       /* eslint no-console: 0 */
-      console.warn("Deprecated `broadcast` option. you shoud use `events`" +
-      "to catch redux-api events (see https://github.com/lexich/redux-api/blob/master/DOCS.md#Events)");
+      console.warn(
+        "Deprecated `broadcast` option. you shoud use `events`" +
+          "to catch redux-api events (see https://github.com/lexich/redux-api/blob/master/DOCS.md#Events)"
+      );
     }
 
     const {
-      url, urlOptions, options, transformer, broadcast, crud,
-      reducerName, prefetch, postfetch, validation, helpers
+      url,
+      urlOptions,
+      options,
+      transformer,
+      broadcast,
+      crud,
+      reducerName,
+      prefetch,
+      postfetch,
+      validation,
+      helpers
     } = opts;
 
     const prefix = (baseConfig && baseConfig.prefix) || "";
@@ -112,9 +124,11 @@ export default function reduxApi(config, baseConfig) {
       actionAbort: `${PREFIX}@${prefix}${reducerName}_abort`
     };
 
-    const fetch = opts.fetch ? opts.fetch : function(...args) {
-      return fetchHolder.fetch.apply(this, args);
-    };
+    const fetch = opts.fetch
+      ? opts.fetch
+      : function(...args) {
+          return fetchHolder.fetch.apply(this, args);
+        };
 
     const meta = {
       holder: fetchHolder,
@@ -141,9 +155,9 @@ export default function reduxApi(config, baseConfig) {
       const sync = false;
       const syncing = false;
       const loading = false;
-      const initialState = opts.cache ?
-        { sync, syncing, loading, data, cache: {}, request: null } :
-        { sync, syncing, loading, data, request: null };
+      const initialState = opts.cache
+        ? { sync, syncing, loading, data, cache: {}, request: null }
+        : { sync, syncing, loading, data, request: null };
 
       const reducer = opts.reducer ? opts.reducer.bind(memo) : null;
       memo.reducers[reducerName] = reducerFn(initialState, ACTIONS, reducer);
@@ -153,7 +167,9 @@ export default function reduxApi(config, baseConfig) {
   }
 
   return Object.keys(config).reduce(
-    (memo, key)=> fnConfigCallback(memo, config[key], key, config), cfg);
+    (memo, key) => fnConfigCallback(memo, config[key], key, config),
+    cfg
+  );
 }
 
 reduxApi.transformers = transformers;

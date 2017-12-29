@@ -18,22 +18,23 @@ function toJSON(resp) {
   }
 }
 
-export default function (fetch) {
-  return (url, opts)=> fetch(url, opts).then((resp)=> {
-    // Normalize IE9's response to HTTP 204 when Win error 1223.
-    const status = (resp.status === 1223) ? 204 : resp.status;
-    const statusText = (resp.status === 1223) ? "No Content" : resp.statusText;
+export default function(fetch) {
+  return (url, opts) =>
+    fetch(url, opts).then(resp => {
+      // Normalize IE9's response to HTTP 204 when Win error 1223.
+      const status = resp.status === 1223 ? 204 : resp.status;
+      const statusText = resp.status === 1223 ? "No Content" : resp.statusText;
 
-    if (status >= 400) {
-      return Promise.reject({ status, statusText });
-    } else {
-      return toJSON(resp).then((data)=> {
-        if (status >= 200 && status < 300) {
-          return data;
-        } else {
-          return Promise.reject(data);
-        }
-      });
-    }
-  });
+      if (status >= 400) {
+        return Promise.reject({ status, statusText });
+      } else {
+        return toJSON(resp).then(data => {
+          if (status >= 200 && status < 300) {
+            return data;
+          } else {
+            return Promise.reject(data);
+          }
+        });
+      }
+    });
 }

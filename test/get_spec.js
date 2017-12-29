@@ -5,7 +5,6 @@
 import { expect } from "chai";
 import get from "../src/utils/get";
 
-
 describe("get", function() {
   it("check `get` full path", function() {
     const obj = {
@@ -19,7 +18,7 @@ describe("get", function() {
     const obj = {
       a: { b: { c: { 0: 2 } } }
     };
-    const c = get(obj, "", "a", null, "b", (void 0), "c", 0);
+    const c = get(obj, "", "a", null, "b", void 0, "c", 0);
     expect(c).to.eql(2);
   });
 

@@ -4,7 +4,7 @@ import { render } from "react-dom";
 
 // React-Router
 import Router from "react-router";
-import {createHistory} from "history";
+import { createHistory } from "history";
 import routes from "./routes/routes";
 
 // Redux
@@ -24,7 +24,9 @@ reduxApi.use("fetch", adapterFetch(fetch));
 const reducer = combineReducers(reduxApi.reducers);
 const finalCreateStore = applyMiddleware(thunk)(createStore);
 const initialState = window.$REDUX_STATE;
-const store = initialState ? finalCreateStore(reducer, initialState) : finalCreateStore(reducer);
+const store = initialState
+  ? finalCreateStore(reducer, initialState)
+  : finalCreateStore(reducer);
 delete window.$REDUX_STATE;
 
 const childRoutes = routes(store);
@@ -33,8 +35,7 @@ const el = document.getElementById("react-main-mount");
 
 render(
   <Provider store={store}>
-    <Router key="ta-app" history={history} children={childRoutes}/>
+    <Router key="ta-app" history={history} children={childRoutes} />
   </Provider>,
   el
 );
-
