@@ -1277,7 +1277,7 @@ function actionFn(url, name, options) {
    * @param  {Object}   pathvars    path vars for url
    * @param  {Object}   params      fetch params
    * @param  {Function} getState    helper meta function
-  */
+   */
   function request(pathvars, params, options) {
     var getState = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _helpers.none;
     var dispatch = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : _helpers.none;
@@ -1381,7 +1381,8 @@ function actionFn(url, name, options) {
           }).then(function (d) {
             requestHolder.pop();
             var data = meta.transformer(d, prevData, {
-              type: actionSuccess, request: requestOptions
+              type: actionSuccess,
+              request: requestOptions
             });
             dispatch({
               data: data,
@@ -1392,13 +1393,22 @@ function actionFn(url, name, options) {
             });
             if (meta.broadcast) {
               meta.broadcast.forEach(function (type) {
-                dispatch({ type: type, data: data, origData: d, request: requestOptions });
+                dispatch({
+                  type: type,
+                  data: data,
+                  origData: d,
+                  request: requestOptions
+                });
               });
             }
             if (meta.postfetch) {
               meta.postfetch.forEach(function (postfetch) {
                 postfetch instanceof Function && postfetch({
-                  data: data, getState: getState, dispatch: dispatch, actions: meta.actions, request: requestOptions
+                  data: data,
+                  getState: getState,
+                  dispatch: dispatch,
+                  actions: meta.actions,
+                  request: requestOptions
                 });
               });
             }
@@ -1668,7 +1678,8 @@ function reducerFn(initialState) {
 
         return mutation === "sync" ? _extends({}, state, {
           request: null,
-          sync: false }) : _extends({}, initialState);
+          sync: false
+        }) : _extends({}, initialState);
       case actionAbort:
         return _extends({}, state, {
           request: null,
