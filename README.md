@@ -6,7 +6,7 @@ Flux REST API for redux infrastructure
 [![Coverage Status](https://coveralls.io/repos/lexich/redux-api/badge.png?branch=master)](https://coveralls.io/r/lexich/redux-api?branch=master)
 
 ## Introduction
-`redux-api` solves the problem of writing clients to communicate with backends. It generates [actions](http://redux.js.org/docs/basics/Actions.html) and [reducers](http://redux.js.org/docs/basics/Reducers.html) for making AJAX calls to API endpoints. You don't need to write a lot of [boilerplate code](http://redux.js.org/docs/advanced/ExampleRedditAPI.html) if you use `redux` and wanted to exchange data with server.
+`redux-api` solves the problem of writing clients to communicate with backends. It generates [actions](http://redux.js.org/docs/basics/Actions.html) and [reducers](http://redux.js.org/docs/basics/Reducers.html) for making AJAX calls to API endpoints. You don't need to write a lot of [boilerplate code](http://redux.js.org/docs/advanced/ExampleRedditAPI.html) if you use `redux` and want to exchange data with server.
 
 Inspired by [Redux-rest](https://github.com/Kvoti/redux-rest) and is intended to be used with [Redux](https://github.com/gaearon/redux).
 
@@ -18,16 +18,16 @@ See [DOCS.md](docs/DOCS.md) for API documentation.
 * [Scoping.md](docs/Scoping.md) - use scoping or using multiple redux-api instance without naming intersections.
 
 ## Install
-with npm
+With npm:
 ```sh
 npm install redux-api --save
 ```
-with bower
+With bower:
 ```sh
 bower install redux-api --save
 ```
 
-If you don't use tools like webpack, browserify, etc and loading redux-api manually - the best way add redux-api to you project is:
+If you don't use tools like webpack, browserify, etc and you want to load redux-api manually, the best way to add redux-api to your project is:
 ```js
 <script src="(...)/redux-api.min.js"></script>
 <script>
@@ -41,20 +41,22 @@ If you don't use tools like webpack, browserify, etc and loading redux-api manua
 =======
 ## Remote calls
 
-`redux-api` doesn't bind you to a technology to make AJAX calls. It uses configurable `adapters` - a pretty simple function which receives 2 arguments: URL of endpoint and options - and returns a Promise as result. The default adapter has an implementation like this:
+`redux-api` doesn't bind you to a technology to make AJAX calls. It uses configurable `adapters` - a pretty simple function which receives 2 arguments: `endpoint` and `options`, and returns a Promise as result. The default adapter uses [isomorphic-fetch](https://github.com/matthew-andrews/isomorphic-fetch), and has an implementation like this:
 ```js
 function adapterFetch(url, options) {
   return fetch(url, options);
 }
+```
 
-// if you like jquery
+However, you are not tied to using isomorphic-fetch. For instance, if you prefer to use jQuery, you can use the following adapter:
+```js
 function adapterJquery(url, options) {
   return new Promise((success, error)=> {
     $.ajax({ ...options, url, success, error });
   });
 }
 ```
-This implementation allows one to make any request and process any response.
+This implementation allows you to make any request and process any response.
 
 And of course you have to set up adapter to your `redux-api` instance before using.
 ```
@@ -86,7 +88,7 @@ export default reduxApi({
       }
     }
   }
-}).use("fetch", adapterFetch(fetch)); // it's necessary to point using REST backend
+}).use("fetch", adapterFetch(fetch));
 ```
 
 index.jsx
