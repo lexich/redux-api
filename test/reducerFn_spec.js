@@ -13,7 +13,7 @@ describe("reducerFn", function() {
     expect(isFunction(fn)).to.be.true;
   });
   it("check", function() {
-    const initialState = { loading: false, data: { msg: "Hello" } };
+    const initialState = { msg: "Hello" };
     const actions = {
       actionFetch: "actionFetch",
       actionSuccess: "actionSuccess",
@@ -23,28 +23,37 @@ describe("reducerFn", function() {
     const fn = reducerFn(initialState, actions);
     const res1 = fn(initialState, { type: actions.actionFetch });
     expect({
-      loading: true,
-      error: null,
-      data: { msg: "Hello" },
-      syncing: false,
-      request: {}
+      api: {
+        empty: false,
+        loading: true,
+        error: null,
+        syncing: false,
+        request: {}
+      },
+      msg: "Hello"
     }).to.eql(res1);
 
-    const res2 = fn(initialState, { type: actions.actionSuccess, data: true });
+    const res2 = fn(initialState, { type: actions.actionSuccess, data: { items: [] } });
     expect({
-      loading: false,
-      error: null,
-      data: true,
-      sync: true,
-      syncing: false
+      api: {
+        empty: true,
+        loading: false,
+        error: null,
+        sync: true,
+        syncing: false
+      },
+      items: []
     }).to.eql(res2);
 
     const res3 = fn(initialState, { type: actions.actionFail, error: "Error" });
     expect({
-      loading: false,
-      error: "Error",
-      data: { msg: "Hello" },
-      syncing: false
+      api: {
+        empty: false,
+        loading: false,
+        error: "Error",        
+        syncing: false
+      },
+      msg: "Hello"
     }).to.eql(res3);
 
     const res4 = fn(initialState, { type: actions.actionReset });
@@ -55,7 +64,7 @@ describe("reducerFn", function() {
   });
 
   it("check with path variables", function() {
-    const initialState = { loading: false, data: { msg: "Hello" } };
+    const initialState = { msg: "Hello" };
     const actions = {
       actionFetch: "actionFetch",
       actionSuccess: "actionSuccess",
@@ -69,36 +78,45 @@ describe("reducerFn", function() {
       request: { pathvars: { id: 42 } }
     });
     expect({
-      loading: true,
-      error: null,
-      data: { msg: "Hello" },
-      syncing: false,
-      request: {
-        pathvars: { id: 42 }
-      }
+      api: {
+        empty: false,
+        loading: true,
+        error: null,      
+        syncing: false,
+        request: {
+          pathvars: { id: 42 }
+        }
+      },
+      msg: "Hello"
     }).to.eql(res1);
 
-    const res2 = fn(res1, { type: actions.actionSuccess, data: true });
+    const res2 = fn(res1, { type: actions.actionSuccess, data: { items: [55] }});
     expect({
-      loading: false,
-      error: null,
-      data: true,
-      sync: true,
-      syncing: false,
-      request: {
-        pathvars: { id: 42 }
-      }
+      api: {
+        empty: false,
+        loading: false,
+        error: null,      
+        sync: true,
+        syncing: false,
+        request: {
+          pathvars: { id: 42 }
+        }
+      },
+      items: [55]
     }).to.eql(res2);
 
     const res3 = fn(res1, { type: actions.actionFail, error: "Error" });
     expect({
-      loading: false,
-      error: "Error",
-      data: { msg: "Hello" },
-      syncing: false,
-      request: {
-        pathvars: { id: 42 }
-      }
+      api: {
+        empty: false,
+        loading: false,
+        error: "Error",      
+        syncing: false,
+        request: {
+          pathvars: { id: 42 }
+        }
+      },
+      msg: "Hello"
     }).to.eql(res3);
 
     const res4 = fn(res2, { type: actions.actionReset });
@@ -110,9 +128,11 @@ describe("reducerFn", function() {
 
   it("check with body", function() {
     const initialState = {
-      loading: false,
-      request: null,
-      data: { msg: "Hello" }
+      api: {
+        loading: false,
+        request: null,
+      },
+      msg: "Hello"      
     };
     const actions = {
       actionFetch: "actionFetch",
@@ -133,51 +153,60 @@ describe("reducerFn", function() {
       }
     });
     expect({
-      loading: true,
-      error: null,
-      data: { msg: "Hello" },
-      syncing: false,
-      request: {
-        pathvars: { other: "var" },
-        params: {
-          method: "post",
-          body: { hello: "world", it: { should: { store: " the body" } } }
+      api: {
+        empty: false,
+        loading: true,
+        error: null,        
+        syncing: false,
+        request: {
+          pathvars: { other: "var" },
+          params: {
+            method: "post",
+            body: { hello: "world", it: { should: { store: " the body" } } }
+          }
         }
-      }
+      },
+      msg: "Hello"
     }).to.eql(res1);
 
-    const res2 = fn(res1, { type: actions.actionSuccess, data: true });
+    const res2 = fn(res1, { type: actions.actionSuccess, data: { items: [] }});
     expect({
-      loading: false,
-      error: null,
-      data: true,
-      sync: true,
-      syncing: false,
-      request: {
-        pathvars: { other: "var" },
-        params: {
-          method: "post",
-          body: { hello: "world", it: { should: { store: " the body" } } }
+      api: {
+        empty: true,
+        loading: false,
+        error: null,        
+        sync: true,
+        syncing: false,
+        request: {
+          pathvars: { other: "var" },
+          params: {
+            method: "post",
+            body: { hello: "world", it: { should: { store: " the body" } } }
+          }
         }
-      }
+      },
+      items: []
     }).to.eql(res2);
 
     const res3 = fn(res1, { type: actions.actionFail, error: "Error" });
     expect({
-      loading: false,
-      error: "Error",
-      data: { msg: "Hello" },
-      syncing: false,
-      request: {
-        pathvars: { other: "var" },
-        params: {
-          method: "post",
-          body: {
-            hello: "world",
-            it: { should: { store: " the body" } }
+      api: {
+        empty: false,
+        loading: false,
+        error: "Error",
+        syncing: false,
+        request: {
+          pathvars: { other: "var" },
+          params: {
+            method: "post",
+            body: {
+              hello: "world",
+              it: { should: { store: " the body" } }
+            }
           }
-        }
-      }
+        },
+      },
+      msg: "Hello"
     }).to.eql(res3);
 
     const res4 = fn(res2, { type: actions.actionReset });

@@ -2,6 +2,7 @@
 
 /* eslint no-case-declarations: 0 */
 import { setExpire } from "./utils/cache";
+import { responseTransform } from "./transformers"
 
 /**
  * Reducer contructor
@@ -19,52 +20,68 @@ export default function reducerFn(initialState, actions = {}, reducer) {
     actionCache,
     actionAbort
   } = actions;
-  return (state = initialState, action) => {
+  return (state = initialState, action) => {    
     const request = action.request || {};
+    const data = action.data || {};
     switch (action.type) {
       case actionFetch:
-        return {
+        return responseTransform({
           ...state,
-          request,
-          loading: true,
-          error: null,
-          syncing: !!action.syncing
-        };
+          api: {
+            ...state.api,
+            request,
+            loading: true,
+            error: null,
+            syncing: !!action.syncing
+          }          
+        });
       case actionSuccess:
-        return {
-          ...state,
-          loading: false,
-          sync: true,
-          syncing: false,
-          error: null,
-          data: action.data
-        };
+        return responseTransform({
+          ...data,
+          api: {
+            ...state.api,
+            ...data.api,
+            loading: false,
+            sync: true,
+            syncing: false,
+            error: null
+          }
+        });
       case actionFail:
-        return {
+        return responseTransform({
           ...state,
-          loading: false,
-          error: action.error,
-          syncing: false
-        };
+          api: {
+            ...state.api,
+            loading: false,
+            error: action.error,
+            syncing: false
+          }
+        });
       case actionReset:
         const { mutation } = action;
         return mutation === "sync"
-          ? {
+          ? responseTransform({
               ...state,
-              request: null,
-              sync: false
-            }
+              api: {
+                ...state.api,
+                request: null,
+                sync: false
+              }
+            })
           : { ...initialState };
       case actionAbort:
-        return {
+        return responseTransform({
           ...state,
-          request: null,
-          loading: false,
-          syncing: false,
-          error: action.error
-        };
+          api: {
+            ...state.api,
+            request: null,
+            loading: false,
+            syncing: false,
+            error: action.error
+          }
+        });
       case actionCache:
-        const { id, data } = action;
+        const { id } = action;
         const cacheExpire = state.cache[id] ? state.cache[id].expire : null;
         const expire = setExpire(action.expire, cacheExpire);
         return {

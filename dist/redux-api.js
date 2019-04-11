@@ -183,6 +183,42 @@ function getCacheManager(expire, cache) {
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var toString = Object.prototype.toString;
+var OBJECT = "[object Object]";
+
+var responseTransform = exports.responseTransform = function responseTransform(response) {
+  if (response.api) {
+    var keys = Object.keys(response);
+    response.api.empty = keys.length < 2 || !!(response.items && response.items.length === 0);
+  }
+  return response;
+};
+
+/**
+ * Default responce transformens
+ */
+exports.default = {
+  array: function array(data) {
+    return !data ? [] : Array.isArray(data) ? data : [data];
+  },
+  object: function object(data) {
+    if (!data) {
+      return {};
+    }
+    return toString.call(data) === OBJECT ? data : { data: data };
+  }
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 // Load modules
@@ -365,7 +401,7 @@ exports.isBuffer = function (obj) {
 };
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1080,7 +1116,7 @@ Url.prototype.parseHost = function () {
 };
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1130,7 +1166,7 @@ function mergePair(a, b) {
 }
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -1139,7 +1175,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1159,7 +1195,7 @@ var _fastApply = __webpack_require__(9);
 
 var _fastApply2 = _interopRequireDefault(_fastApply);
 
-var _url = __webpack_require__(2);
+var _url = __webpack_require__(3);
 
 var _url2 = _interopRequireDefault(_url);
 
@@ -1167,7 +1203,7 @@ var _urlTransform = __webpack_require__(24);
 
 var _urlTransform2 = _interopRequireDefault(_urlTransform);
 
-var _merge = __webpack_require__(3);
+var _merge = __webpack_require__(4);
 
 var _merge2 = _interopRequireDefault(_merge);
 
@@ -1562,7 +1598,7 @@ function actionFn(url, name, options) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1609,7 +1645,7 @@ function async(dispatch) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1626,6 +1662,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.default = reducerFn;
 
 var _cache = __webpack_require__(0);
+
+var _transformers = __webpack_require__(1);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -1651,45 +1689,54 @@ function reducerFn(initialState) {
     var action = arguments[1];
 
     var request = action.request || {};
+    var data = action.data || {};
     switch (action.type) {
       case actionFetch:
-        return _extends({}, state, {
-          request: request,
-          loading: true,
-          error: null,
-          syncing: !!action.syncing
-        });
+        return (0, _transformers.responseTransform)(_extends({}, state, {
+          api: _extends({}, state.api, {
+            request: request,
+            loading: true,
+            error: null,
+            syncing: !!action.syncing
+          })
+        }));
       case actionSuccess:
-        return _extends({}, state, {
-          loading: false,
-          sync: true,
-          syncing: false,
-          error: null,
-          data: action.data
-        });
+        return (0, _transformers.responseTransform)(_extends({}, data, {
+          api: _extends({}, state.api, data.api, {
+            loading: false,
+            sync: true,
+            syncing: false,
+            error: null
+          })
+        }));
       case actionFail:
-        return _extends({}, state, {
-          loading: false,
-          error: action.error,
-          syncing: false
-        });
+        return (0, _transformers.responseTransform)(_extends({}, state, {
+          api: _extends({}, state.api, {
+            loading: false,
+            error: action.error,
+            syncing: false
+          })
+        }));
       case actionReset:
         var mutation = action.mutation;
 
-        return mutation === "sync" ? _extends({}, state, {
-          request: null,
-          sync: false
-        }) : _extends({}, initialState);
+        return mutation === "sync" ? (0, _transformers.responseTransform)(_extends({}, state, {
+          api: _extends({}, state.api, {
+            request: null,
+            sync: false
+          })
+        })) : _extends({}, initialState);
       case actionAbort:
-        return _extends({}, state, {
-          request: null,
-          loading: false,
-          syncing: false,
-          error: action.error
-        });
+        return (0, _transformers.responseTransform)(_extends({}, state, {
+          api: _extends({}, state.api, {
+            request: null,
+            loading: false,
+            syncing: false,
+            error: action.error
+          })
+        }));
       case actionCache:
-        var id = action.id,
-            data = action.data;
+        var id = action.id;
 
         var cacheExpire = state.cache[id] ? state.cache[id].expire : null;
         var expire = (0, _cache.setExpire)(action.expire, cacheExpire);
@@ -1701,35 +1748,6 @@ function reducerFn(initialState) {
     }
   };
 }
-module.exports = exports["default"];
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var toString = Object.prototype.toString;
-var OBJECT = "[object Object]";
-
-/**
- * Default responce transformens
- */
-exports.default = {
-  array: function array(data) {
-    return !data ? [] : Array.isArray(data) ? data : [data];
-  },
-  object: function object(data) {
-    if (!data) {
-      return {};
-    }
-    return toString.call(data) === OBJECT ? data : { data: data };
-  }
-};
 module.exports = exports["default"];
 
 /***/ }),
@@ -2276,7 +2294,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	/** Expose `punycode` */
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
 	// like the following:
-	if ("function" == 'function' && _typeof(__webpack_require__(4)) == 'object' && __webpack_require__(4)) {
+	if ("function" == 'function' && _typeof(__webpack_require__(5)) == 'object' && __webpack_require__(5)) {
 		!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 			return punycode;
 		}.call(exports, __webpack_require__, exports, module),
@@ -2328,7 +2346,7 @@ module.exports = {
 
 // Load modules
 
-var Utils = __webpack_require__(1);
+var Utils = __webpack_require__(2);
 
 // Declare internals
 
@@ -2507,7 +2525,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 // Load modules
 
-var Utils = __webpack_require__(1);
+var Utils = __webpack_require__(2);
 
 // Declare internals
 
@@ -3126,13 +3144,13 @@ var _qs = __webpack_require__(11);
 
 var _qs2 = _interopRequireDefault(_qs);
 
-var _url = __webpack_require__(2);
+var _url = __webpack_require__(3);
 
 var _omit = __webpack_require__(26);
 
 var _omit2 = _interopRequireDefault(_omit);
 
-var _merge = __webpack_require__(3);
+var _merge = __webpack_require__(4);
 
 var _merge2 = _interopRequireDefault(_merge);
 
@@ -3277,19 +3295,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 exports.default = reduxApi;
 
-var _reducerFn = __webpack_require__(7);
+var _reducerFn = __webpack_require__(8);
 
 var _reducerFn2 = _interopRequireDefault(_reducerFn);
 
-var _actionFn = __webpack_require__(5);
+var _actionFn = __webpack_require__(6);
 
 var _actionFn2 = _interopRequireDefault(_actionFn);
 
-var _transformers = __webpack_require__(8);
+var _transformers = __webpack_require__(1);
 
 var _transformers2 = _interopRequireDefault(_transformers);
 
-var _async = __webpack_require__(6);
+var _async = __webpack_require__(7);
 
 var _async2 = _interopRequireDefault(_async);
 
@@ -3442,14 +3460,14 @@ function reduxApi(config, baseConfig) {
     memo.actions[key] = (0, _actionFn2.default)(url, key, options, ACTIONS, meta);
 
     if (!meta.virtual && !memo.reducers[reducerName]) {
-      var data = transformer();
+      var data = transformer() || {};
       var sync = false;
       var syncing = false;
       var loading = false;
-      var initialState = opts.cache ? { sync: sync, syncing: syncing, loading: loading, data: data, cache: {}, request: null } : { sync: sync, syncing: syncing, loading: loading, data: data, request: null };
+      var initialState = opts.cache ? _extends({}, data, { api: _extends({}, data.api, { sync: sync, syncing: syncing, loading: loading, cache: {}, request: null }) }) : _extends({}, data, { api: _extends({}, data.api, { sync: sync, syncing: syncing, loading: loading, request: null }) });
 
       var reducer = opts.reducer ? opts.reducer.bind(memo) : null;
-      memo.reducers[reducerName] = (0, _reducerFn2.default)(initialState, ACTIONS, reducer);
+      memo.reducers[reducerName] = (0, _reducerFn2.default)((0, _transformers.responseTransform)(initialState), ACTIONS, reducer);
     }
     memo.events[reducerName] = ACTIONS;
     return memo;
