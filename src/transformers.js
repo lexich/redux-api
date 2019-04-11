@@ -3,13 +3,14 @@
 const toString = Object.prototype.toString;
 const OBJECT = "[object Object]";
 
-export const responseTransform = response => {    
-  if(response.api){
-    const keys = Object.keys(response)    
-    response.api.empty = keys.length < 2 || !!(response.items && response.items.length === 0)
+export const responseTransform = response => {
+  if (response.api) {
+    const keys = Object.keys(response);
+    response.api.empty =
+      keys.length < 2 || !!(response.items && response.items.length === 0);
   }
-  return response
-}
+  return response;
+};
 
 /**
  * Default responce transformens

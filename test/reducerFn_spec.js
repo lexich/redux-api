@@ -33,7 +33,10 @@ describe("reducerFn", function() {
       msg: "Hello"
     }).to.eql(res1);
 
-    const res2 = fn(initialState, { type: actions.actionSuccess, data: { items: [] } });
+    const res2 = fn(initialState, {
+      type: actions.actionSuccess,
+      data: { items: [] }
+    });
     expect({
       api: {
         empty: true,
@@ -50,7 +53,7 @@ describe("reducerFn", function() {
       api: {
         empty: false,
         loading: false,
-        error: "Error",        
+        error: "Error",
         syncing: false
       },
       msg: "Hello"
@@ -81,7 +84,7 @@ describe("reducerFn", function() {
       api: {
         empty: false,
         loading: true,
-        error: null,      
+        error: null,
         syncing: false,
         request: {
           pathvars: { id: 42 }
@@ -90,12 +93,15 @@ describe("reducerFn", function() {
       msg: "Hello"
     }).to.eql(res1);
 
-    const res2 = fn(res1, { type: actions.actionSuccess, data: { items: [55] }});
+    const res2 = fn(res1, {
+      type: actions.actionSuccess,
+      data: { items: [55] }
+    });
     expect({
       api: {
         empty: false,
         loading: false,
-        error: null,      
+        error: null,
         sync: true,
         syncing: false,
         request: {
@@ -110,7 +116,7 @@ describe("reducerFn", function() {
       api: {
         empty: false,
         loading: false,
-        error: "Error",      
+        error: "Error",
         syncing: false,
         request: {
           pathvars: { id: 42 }
@@ -130,9 +136,9 @@ describe("reducerFn", function() {
     const initialState = {
       api: {
         loading: false,
-        request: null,
+        request: null
       },
-      msg: "Hello"      
+      msg: "Hello"
     };
     const actions = {
       actionFetch: "actionFetch",
@@ -156,7 +162,7 @@ describe("reducerFn", function() {
       api: {
         empty: false,
         loading: true,
-        error: null,        
+        error: null,
         syncing: false,
         request: {
           pathvars: { other: "var" },
@@ -169,12 +175,12 @@ describe("reducerFn", function() {
       msg: "Hello"
     }).to.eql(res1);
 
-    const res2 = fn(res1, { type: actions.actionSuccess, data: { items: [] }});
+    const res2 = fn(res1, { type: actions.actionSuccess, data: { items: [] } });
     expect({
       api: {
         empty: true,
         loading: false,
-        error: null,        
+        error: null,
         sync: true,
         syncing: false,
         request: {
@@ -204,7 +210,7 @@ describe("reducerFn", function() {
               it: { should: { store: " the body" } }
             }
           }
-        },
+        }
       },
       msg: "Hello"
     }).to.eql(res3);

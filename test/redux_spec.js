@@ -191,14 +191,14 @@ describe("redux", () => {
         empty: true,
         sync: false,
         syncing: false,
-        loading: false,        
+        loading: false,
         request: null
       }
     }).to.eql(store.getState().test, "Initial state");
     const retAborting = store.dispatch(rest.actions.test()).then(
       () => expect(false).to.eql(true, "Should be error"),
       err => {
-        expect(err).to.eql(new Error("Error: Application abort request"));  
+        expect(err).to.eql(new Error("Error: Application abort request"));
         return true;
       }
     );
@@ -207,7 +207,7 @@ describe("redux", () => {
         empty: true,
         sync: false,
         syncing: false,
-        loading: true,        
+        loading: true,
         error: null,
         request: {
           params: undefined,
@@ -224,9 +224,9 @@ describe("redux", () => {
         empty: true,
         sync: false,
         syncing: false,
-        loading: false,      
+        loading: false,
         request: null
-      }      
+      }
     }).to.eql(store.getState().test, "State after reset");
     return retAborting;
   });
@@ -259,7 +259,7 @@ describe("redux", () => {
           empty: true,
           sync: false,
           syncing: false,
-          loading: false,        
+          loading: false,
           request: null
         }
       },
@@ -268,7 +268,7 @@ describe("redux", () => {
           empty: true,
           sync: false,
           syncing: false,
-          loading: false,          
+          loading: false,
           request: null
         }
       }
@@ -296,7 +296,7 @@ describe("redux", () => {
           empty: false,
           sync: true,
           syncing: false,
-          loading: false,          
+          loading: false,
           request: {
             params: {},
             pathvars: undefined
@@ -312,7 +312,7 @@ describe("redux", () => {
           request: null,
           sync: false,
           syncing: false,
-          loading: false,          
+          loading: false,
           error: null
         },
         data: "/api/url"
@@ -375,8 +375,8 @@ describe("redux", () => {
     const store = storeHelper(rest);
     return store
       .dispatch(rest.actions.test1())
-      .then(() => store.dispatch(rest.actions.test2()))
-      // TODO: .then(() => expect(expectedArgs).to.eql(["none"]));
+      .then(() => store.dispatch(rest.actions.test2()));
+    // TODO: .then(() => expect(expectedArgs).to.eql(["none"]));
   });
 
   /*
@@ -634,7 +634,7 @@ describe("redux", () => {
                   pathvars: undefined
                 },
                 error: err
-              }              
+              }
             }).to.eql(store.getState().test);
             resolve();
           } catch (e) {
@@ -705,7 +705,7 @@ describe("redux", () => {
           request: null,
           sync: false,
           syncing: false,
-          loading: false,
+          loading: false
         }
       }
     };
@@ -717,14 +717,14 @@ describe("redux", () => {
           empty: false,
           sync: true,
           syncing: false,
-          loading: false,          
+          loading: false,
           request: {
             pathvars: { id: 1 },
             params: { body: "Test", headers: ["JSON"] }
           },
           error: null
         },
-        data: "/api/url/1",
+        data: "/api/url/1"
       }
     };
     const STATE_2 = {
@@ -733,14 +733,14 @@ describe("redux", () => {
           empty: false,
           sync: true,
           syncing: false,
-          loading: false,        
+          loading: false,
           request: {
             pathvars: { id: 2 },
             params: { body: "Test2", headers: ["XML"] }
           },
           error: null
         },
-        data: "/api/url/2",
+        data: "/api/url/2"
       }
     };
 

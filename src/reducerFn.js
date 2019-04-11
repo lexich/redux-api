@@ -2,7 +2,7 @@
 
 /* eslint no-case-declarations: 0 */
 import { setExpire } from "./utils/cache";
-import { responseTransform } from "./transformers"
+import { responseTransform } from "./transformers";
 
 /**
  * Reducer contructor
@@ -20,7 +20,7 @@ export default function reducerFn(initialState, actions = {}, reducer) {
     actionCache,
     actionAbort
   } = actions;
-  return (state = initialState, action) => {    
+  return (state = initialState, action) => {
     const request = action.request || {};
     const data = action.data || {};
     switch (action.type) {
@@ -33,7 +33,7 @@ export default function reducerFn(initialState, actions = {}, reducer) {
             loading: true,
             error: null,
             syncing: !!action.syncing
-          }          
+          }
         });
       case actionSuccess:
         return responseTransform({

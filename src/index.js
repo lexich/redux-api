@@ -151,16 +151,33 @@ export default function reduxApi(config, baseConfig) {
     memo.actions[key] = actionFn(url, key, options, ACTIONS, meta);
 
     if (!meta.virtual && !memo.reducers[reducerName]) {
-      const data = transformer() || {}
+      const data = transformer() || {};
       const sync = false;
       const syncing = false;
       const loading = false;
       const initialState = opts.cache
-        ? { ...data, api: { ...data.api, sync, syncing, loading, cache: {}, request: null } }
-        : { ...data, api: { ...data.api, sync, syncing, loading, request: null } };
+        ? {
+            ...data,
+            api: {
+              ...data.api,
+              sync,
+              syncing,
+              loading,
+              cache: {},
+              request: null
+            }
+          }
+        : {
+            ...data,
+            api: { ...data.api, sync, syncing, loading, request: null }
+          };
 
       const reducer = opts.reducer ? opts.reducer.bind(memo) : null;
-      memo.reducers[reducerName] = reducerFn(responseTransform(initialState), ACTIONS, reducer);
+      memo.reducers[reducerName] = reducerFn(
+        responseTransform(initialState),
+        ACTIONS,
+        reducer
+      );
     }
     memo.events[reducerName] = ACTIONS;
     return memo;
