@@ -1491,7 +1491,7 @@ function actionFn(url, name, options) {
     var isServer = meta.holder ? meta.holder.server : false;
     return function (dispatch, getState) {
       var state = getState();
-      var store = state[name];
+      var store = (0, _get2.default)(state, meta.prefix, name);
       if (!isServer && store && store.sync) {
         callback(null, store.data);
         return;

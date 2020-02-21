@@ -317,7 +317,7 @@ export default function actionFn(url, name, options, ACTIONS = {}, meta = {}) {
     const isServer = meta.holder ? meta.holder.server : false;
     return (dispatch, getState) => {
       const state = getState();
-      const store = state[name];
+      const store = get(state, meta.prefix, name);
       if (!isServer && store && store.sync) {
         callback(null, store.data);
         return;
