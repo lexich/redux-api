@@ -1,6 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.12.0](https://github.com/lexich/redux-api/compare/v0.11.2...v0.12.0) (2020-02-25)
+
+
+### Bug Fixes
+
+* potential security vulnerabilities in dependencies ([5a37929](https://github.com/lexich/redux-api/commit/5a379290d78798ca39b4eb7792f9a0cd0d6ab0b8))
 
 <a name="0.11.2"></a>
 ## [0.11.2](https://github.com/lexich/redux-api/compare/v0.11.1...v0.11.2) (2017-12-29)
