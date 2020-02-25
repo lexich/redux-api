@@ -10,7 +10,9 @@ function get(obj, ...path) {
     (memo, name) =>
       Array.isArray(name)
         ? get(memo, ...name)
-        : isEmpty(name) ? memo : memo && memo[name],
+        : isEmpty(name)
+        ? memo
+        : memo && memo[name],
     obj
   );
 }

@@ -15,19 +15,10 @@ if (process.env.NODE_ENV === "production") {
       minimize: true
     })
   );
-  plugins.push(
-    new webpack.optimize.UglifyJsPlugin({
-      debug: true,
-      sourceMap: true,
-      compressor: {
-        screw_ie8: true,
-        warnings: false
-      }
-    })
-  );
 }
 
 module.exports = {
+  mode: process.env.NODE_ENV,
   entry: "./src/index",
   output: {
     library: "redux-api",
@@ -36,13 +27,18 @@ module.exports = {
     filename: process.env.NODE_ENV === "production" ? "redux-api.min.js" : "redux-api.js",
     path: path.resolve(__dirname, "dist")
   },
-
+  optimization: {
+    minimize: true
+  },
   devtool: "hidden-source-map",
   plugins,
   module: {
     rules: [{
       test: /\.js$/,
-      use: ["babel-loader"]
+      exclude: /node_modules/,
+      use: {
+        loader: "babel-loader",
+      }
     }]
   },
   resolve: {

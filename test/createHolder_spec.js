@@ -11,7 +11,7 @@ describe("Holder", function() {
   });
   it("default state", function() {
     expect(this.holder.empty()).to.be.true;
-    expect(this.holder.pop()).not.to.exits;
+    expect(this.holder.pop()).to.be.undefined;
   });
   it("normal usage", function() {
     const ptr = {};

@@ -13,3 +13,4 @@ bower_components
 
 #IntelliJ metadata
 *.iml
+/.nyc_output

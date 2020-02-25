@@ -7,11 +7,11 @@ import merge from "../src/utils/merge";
 
 describe("merge", function() {
   it("check null args", function() {
-    expect(merge()).to.not.exit;
-    expect(merge(void 0)).to.not.exit;
-    expect(merge(null)).to.not.exit;
-    expect(merge(null, null)).to.not.exit;
-    expect(merge(null, null, null)).to.not.exit;
+    expect(merge()).to.be.null;
+    expect(merge(void 0)).to.be.undefined;
+    expect(merge(null)).to.be.null;
+    expect(merge(null, null)).to.be.null;
+    expect(merge(null, null, null)).to.be.null;
   });
 
   it("check number", function() {

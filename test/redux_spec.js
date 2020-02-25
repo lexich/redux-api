@@ -2,12 +2,21 @@
 
 /* global describe, it */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}], no-void: 0 */
-import { expect } from "chai";
-import { createStore, combineReducers, applyMiddleware } from "redux";
+import {
+  expect
+} from "chai";
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware
+} from "redux";
 import thunk from "redux-thunk";
 import after from "lodash/after";
-import reduxApi, { async } from "../src/index";
-import { Manager } from "../src/utils/cache";
+import reduxApi from "../src";
+import async from "../src/async"
+import {
+  Manager
+} from "../src/utils/cache";
 
 function storeHelper(rest) {
   const reducer = combineReducers(rest.reducers);
@@ -28,7 +37,9 @@ describe("redux", () => {
     return new Promise(resolve => {
       store.dispatch(rest.actions.test(resolve));
     }).then(() => {
-      expect(store.getState().test.data).to.eql({ data: "/api/url" });
+      expect(store.getState().test.data).to.eql({
+        data: "/api/url"
+      });
     });
   });
   it("check async function with redux", () => {
@@ -39,14 +50,18 @@ describe("redux", () => {
       return new Promise(resolve => resolve(url));
     });
     const store = storeHelper(rest);
-    return async(
+    return async (
       store.dispatch,
       cb => rest.actions.test(cb),
       rest.actions.test2
     ).then(d => {
       expect(d.data).to.eql("/api/url2");
-      expect(store.getState().test.data).to.eql({ data: "/api/url" });
-      expect(store.getState().test2.data).to.eql({ data: "/api/url2" });
+      expect(store.getState().test.data).to.eql({
+        data: "/api/url"
+      });
+      expect(store.getState().test2.data).to.eql({
+        data: "/api/url2"
+      });
     });
   });
   it("check async 2", done => {
@@ -54,9 +69,10 @@ describe("redux", () => {
       test: "/api/url"
     }).use("fetch", url => new Promise(resolve => resolve(url)));
     const store = storeHelper(rest);
+
     function testAction() {
       return (dispatch, getState) => {
-        async(dispatch, rest.actions.test)
+        async (dispatch, rest.actions.test)
           .then(data => {
             expect(getState().test.data).to.eql(data);
             done();
@@ -69,10 +85,13 @@ describe("redux", () => {
 
   it("check custom middlewareParser", () => {
     const rest = reduxApi({
-      test: "/api/url"
-    })
+        test: "/api/url"
+      })
       .use("fetch", url => new Promise(resolve => resolve(url)))
-      .use("middlewareParser", ({ getState, dispatch }) => ({
+      .use("middlewareParser", ({
+        getState,
+        dispatch
+      }) => ({
         getState,
         dispatch
       }));
@@ -83,7 +102,10 @@ describe("redux", () => {
       getState
     }) => next => action => {
       if (typeof action === "function") {
-        return action({ dispatch, getState });
+        return action({
+          dispatch,
+          getState
+        });
       }
       return next(action);
     };
@@ -95,7 +117,9 @@ describe("redux", () => {
       store.dispatch(rest.actions.test(resolve));
     }).then(
       () => {
-        expect(store.getState().test.data).to.eql({ data: "/api/url" });
+        expect(store.getState().test.data).to.eql({
+          data: "/api/url"
+        });
       },
       err => expect(null).to.eql(err)
     );
@@ -107,23 +131,34 @@ describe("redux", () => {
     }).use(
       "fetch",
       url =>
-        new Promise(resolve => {
-          setTimeout(() => resolve({ url }), 100);
-        })
+      new Promise(resolve => {
+        setTimeout(() => resolve({
+          url
+        }), 100);
+      })
     );
 
-    const expectedAction = [
-      {
+    const expectedAction = [{
         type: "@@redux-api@test",
         syncing: true,
-        request: { pathvars: undefined, params: {} }
+        request: {
+          pathvars: undefined,
+          params: {}
+        }
       },
       {
-        data: { url: "/test" },
-        origData: { url: "/test" },
+        data: {
+          url: "/test"
+        },
+        origData: {
+          url: "/test"
+        },
         type: "@@redux-api@test_success",
         syncing: false,
-        request: { pathvars: undefined, params: {} }
+        request: {
+          pathvars: undefined,
+          params: {}
+        }
       }
     ];
     const reducer = combineReducers({
@@ -139,10 +174,12 @@ describe("redux", () => {
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
     const store = createStoreWithMiddleware(reducer);
 
-    const next = after(2, function() {
+    const next = after(2, function () {
       store.dispatch(
         rest.actions.test.sync((err, data) => {
-          expect(data).to.eql({ url: "/test" });
+          expect(data).to.eql({
+            url: "/test"
+          });
           expect(expectedAction).to.have.length(0);
           done();
         })
@@ -152,7 +189,9 @@ describe("redux", () => {
     store
       .dispatch(
         rest.actions.test.sync((err, data) => {
-          expect(data).to.eql({ url: "/test" });
+          expect(data).to.eql({
+            url: "/test"
+          });
           next();
         })
       )
@@ -160,7 +199,9 @@ describe("redux", () => {
     store
       .dispatch(
         rest.actions.test.sync((err, data) => {
-          expect(data).to.eql({ url: "/test" });
+          expect(data).to.eql({
+            url: "/test"
+          });
           next();
         })
       )
@@ -189,15 +230,15 @@ describe("redux", () => {
     const retAborting = store.dispatch(rest.actions.test()).then(
       () => expect(false).to.eql(true, "Should be error"),
       err => {
-        expect(err).to.eql(new Error("Error: Application abort request"));
+        expect(err.message).to.eql("Application abort request");
+        const { error, ...props } = store.getState().test;
         expect({
-          sync: false,
           syncing: false,
           loading: false,
           data: {},
           request: null,
-          error: {}
-        }).to.eql(store.getState().test, "OK");
+          sync: false,
+        }).to.eql(props);
         return true;
       }
     );
@@ -235,7 +276,10 @@ describe("redux", () => {
         reducer(state, action) {
           context = this;
           if (action.type === this.events.external.actionSuccess) {
-            return { ...state, data: action.data };
+            return {
+              ...state,
+              data: action.data
+            };
           } else {
             return state;
           }
@@ -243,7 +287,9 @@ describe("redux", () => {
       }
     }).use("fetch", url => {
       return new Promise(resolve => {
-        resolve({ url });
+        resolve({
+          url
+        });
       });
     });
 
@@ -279,7 +325,9 @@ describe("redux", () => {
             params: {},
             pathvars: undefined
           },
-          data: { url: "/external" },
+          data: {
+            url: "/external"
+          },
           error: null
         },
         test: {
@@ -287,7 +335,9 @@ describe("redux", () => {
           syncing: false,
           loading: false,
           request: null,
-          data: { url: "/external" }
+          data: {
+            url: "/external"
+          }
         }
       });
     });
@@ -306,7 +356,9 @@ describe("redux", () => {
         sync: true,
         syncing: false,
         loading: false,
-        data: { data: "/api/url" },
+        data: {
+          data: "/api/url"
+        },
         request: {
           params: {},
           pathvars: undefined
@@ -319,12 +371,14 @@ describe("redux", () => {
         sync: false,
         syncing: false,
         loading: false,
-        data: { data: "/api/url" },
+        data: {
+          data: "/api/url"
+        },
         error: null
       });
     });
   });
-  it("check result of dispatch", function() {
+  it("check result of dispatch", function () {
     const rest = reduxApi({
       test: "/api/url"
     }).use("fetch", url => {
@@ -334,10 +388,12 @@ describe("redux", () => {
     const result = store.dispatch(rest.actions.test());
     expect(result instanceof Promise).to.be.true;
     return result.then(data => {
-      expect(data).to.eql({ data: "/api/url" });
+      expect(data).to.eql({
+        data: "/api/url"
+      });
     });
   });
-  it("check all arguments for transformer", function() {
+  it("check all arguments for transformer", function () {
     const expectedArgs = [
       [void 0, void 0, void 0],
       [
@@ -345,7 +401,10 @@ describe("redux", () => {
         void 0,
         {
           type: "@@redux-api@test1_success",
-          request: { pathvars: void 0, params: void 0 }
+          request: {
+            pathvars: void 0,
+            params: void 0
+          }
         }
       ],
       [
@@ -353,7 +412,10 @@ describe("redux", () => {
         "/api/test1",
         {
           type: "@@redux-api@test1_success",
-          request: { pathvars: void 0, params: void 0 }
+          request: {
+            pathvars: void 0,
+            params: void 0
+          }
         }
       ],
       "none"
@@ -383,31 +445,34 @@ describe("redux", () => {
       .then(() => expect(expectedArgs).to.eql(["none"]));
   });
 
-  it("multiple endpoints", function() {
+  it("multiple endpoints", function () {
     const fetch = url => Promise.resolve(url);
 
-    const expectedData = [[void 0, void 0], ["/test1", {}]];
+    const expectedData = [
+      [void 0, void 0],
+      ["/test1", {}]
+    ];
     const actualData = [];
 
-    const rest1 = reduxApi(
-      {
-        test: {
-          url: "/test1",
-          transformer(data, prevData) {
-            actualData.push([data, prevData]);
-            return data ? { data } : {};
-          }
+    const rest1 = reduxApi({
+      test: {
+        url: "/test1",
+        transformer(data, prevData) {
+          actualData.push([data, prevData]);
+          return data ? {
+            data
+          } : {};
         }
-      },
-      { prefix: "r1" }
-    ).use("fetch", fetch);
+      }
+    }, {
+      prefix: "r1"
+    }).use("fetch", fetch);
 
-    const rest2 = reduxApi(
-      {
-        test: "/test2"
-      },
-      { prefix: "r2" }
-    ).use("fetch", fetch);
+    const rest2 = reduxApi({
+      test: "/test2"
+    }, {
+      prefix: "r2"
+    }).use("fetch", fetch);
 
     const reducer = combineReducers({
       r1: combineReducers(rest1.reducers),
@@ -450,7 +515,9 @@ describe("redux", () => {
               sync: true,
               syncing: false,
               loading: false,
-              data: { data: "/test1" },
+              data: {
+                data: "/test1"
+              },
               error: null,
               request: {
                 params: undefined,
@@ -477,7 +544,9 @@ describe("redux", () => {
               sync: true,
               syncing: false,
               loading: false,
-              data: { data: "/test1" },
+              data: {
+                data: "/test1"
+              },
               error: null,
               request: {
                 params: undefined,
@@ -508,7 +577,9 @@ describe("redux", () => {
               sync: true,
               syncing: false,
               loading: false,
-              data: { data: "/test1" },
+              data: {
+                data: "/test1"
+              },
               error: null,
               request: {
                 params: undefined,
@@ -521,7 +592,9 @@ describe("redux", () => {
               sync: true,
               syncing: false,
               loading: false,
-              data: { data: "/test2" },
+              data: {
+                data: "/test2"
+              },
               error: null,
               request: {
                 params: undefined,
@@ -533,7 +606,10 @@ describe("redux", () => {
       ]
     ];
     const receiveArgs = [];
-    function midleware({ getState }) {
+
+    function midleware({
+      getState
+    }) {
       return next => action => {
         const result = next(action);
         if (typeof action !== "function") {
@@ -543,9 +619,10 @@ describe("redux", () => {
       };
     }
 
-    const createStoreWithMiddleware = applyMiddleware(midleware, thunk)(
-      createStore
-    );
+    const createStoreWithMiddleware = applyMiddleware(
+      midleware,
+      thunk
+    )(createStore);
     const store = createStoreWithMiddleware(reducer);
 
     return store
@@ -564,7 +641,7 @@ describe("redux", () => {
       });
   });
 
-  it("check default cache options", function() {
+  it("check default cache options", function () {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -577,7 +654,10 @@ describe("redux", () => {
     });
     const store = storeHelper(rest);
     return store
-      .dispatch(rest.actions.test({ id1: 1, id2: 2 }))
+      .dispatch(rest.actions.test({
+        id1: 1,
+        id2: 2
+      }))
       .then(() => {
         const state = store.getState();
         expect(state.test.cache).to.eql({
@@ -586,14 +666,17 @@ describe("redux", () => {
             expire: false
           }
         });
-        return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
+        return store.dispatch(rest.actions.test({
+          id1: 1,
+          id2: 2
+        }));
       })
       .then(() => {
         expect(requestCount).to.eql(1);
       });
   });
 
-  it("check cache options with rewrite id", function() {
+  it("check cache options with rewrite id", function () {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -610,7 +693,10 @@ describe("redux", () => {
     });
     const store = storeHelper(rest);
     return store
-      .dispatch(rest.actions.test({ id1: 1, id2: 2 }))
+      .dispatch(rest.actions.test({
+        id1: 1,
+        id2: 2
+      }))
       .then(() => {
         const state = store.getState();
         expect(state.test.cache).to.eql({
@@ -619,14 +705,17 @@ describe("redux", () => {
             expire: false
           }
         });
-        return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
+        return store.dispatch(rest.actions.test({
+          id1: 1,
+          id2: 2
+        }));
       })
       .then(() => {
         expect(requestCount).to.eql(1);
       });
   });
 
-  it("check cache options with expire=0 request", function() {
+  it("check cache options with expire=0 request", function () {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -641,20 +730,26 @@ describe("redux", () => {
     });
     const store = storeHelper(rest);
     return store
-      .dispatch(rest.actions.test({ id1: 1, id2: 2 }))
+      .dispatch(rest.actions.test({
+        id1: 1,
+        id2: 2
+      }))
       .then(() => {
         const state = store.getState();
         const d = state.test.cache["test_id1=1;id2=2;"];
         expect(d).to.exist;
         expect(d.data).to.eql("/api/1/2");
-        return store.dispatch(rest.actions.test({ id1: 1, id2: 2 }));
+        return store.dispatch(rest.actions.test({
+          id1: 1,
+          id2: 2
+        }));
       })
       .then(() => {
         expect(requestCount).to.eql(2);
       });
   });
 
-  it("check double call crud alias", function() {
+  it("check double call crud alias", function () {
     let fetchCounter = 0;
     const rest = reduxApi({
       test: {
@@ -668,6 +763,7 @@ describe("redux", () => {
 
     const store = storeHelper(rest);
     let counter = 0;
+
     function callback() {
       counter += 1;
     }
@@ -718,7 +814,9 @@ describe("redux", () => {
     const ret2 = store.dispatch(rest.actions.test());
 
     return Promise.all([ret1, ret2]).then(() => {
-      expect(store.getState().test.data).to.eql({ data: "/api/url" });
+      expect(store.getState().test.data).to.eql({
+        data: "/api/url"
+      });
     });
   });
 
@@ -752,7 +850,9 @@ describe("redux", () => {
     );
     const ret2 = store.dispatch(rest.actions.test.force());
     return Promise.all([ret1, ret2]).then(() => {
-      expect(store.getState().test.data).to.eql({ data: "/api/url" });
+      expect(store.getState().test.data).to.eql({
+        data: "/api/url"
+      });
     });
   });
 
@@ -783,8 +883,13 @@ describe("redux", () => {
           data: "/api/url/1"
         },
         request: {
-          pathvars: { id: 1 },
-          params: { body: "Test", headers: ["JSON"] }
+          pathvars: {
+            id: 1
+          },
+          params: {
+            body: "Test",
+            headers: ["JSON"]
+          }
         },
         error: null
       }
@@ -798,8 +903,13 @@ describe("redux", () => {
           data: "/api/url/2"
         },
         request: {
-          pathvars: { id: 2 },
-          params: { body: "Test2", headers: ["XML"] }
+          pathvars: {
+            id: 2
+          },
+          params: {
+            body: "Test2",
+            headers: ["XML"]
+          }
         },
         error: null
       }
@@ -807,12 +917,22 @@ describe("redux", () => {
 
     return store
       .dispatch(
-        rest.actions.test({ id: 1 }, { body: "Test", headers: ["JSON"] })
+        rest.actions.test({
+          id: 1
+        }, {
+          body: "Test",
+          headers: ["JSON"]
+        })
       )
       .then(() => {
         expect(STATE_1).to.eql(store.getState());
         return store.dispatch(
-          rest.actions.test({ id: 2 }, { body: "Test2", headers: ["XML"] })
+          rest.actions.test({
+            id: 2
+          }, {
+            body: "Test2",
+            headers: ["XML"]
+          })
         );
       })
       .then(() => {

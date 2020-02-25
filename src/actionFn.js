@@ -41,8 +41,8 @@ export default function actionFn(url, name, options, ACTIONS = {}, meta = {}) {
     const globalOptions = !meta.holder
       ? {}
       : meta.holder.options instanceof Function
-        ? meta.holder.options(urlT, params, getState)
-        : meta.holder.options;
+      ? meta.holder.options(urlT, params, getState)
+      : meta.holder.options;
     const baseOptions = !(options instanceof Function)
       ? options
       : options(urlT, params, getState);
@@ -357,10 +357,11 @@ export default function actionFn(url, name, options, ACTIONS = {}, meta = {}) {
             if (error) {
               callback(error);
             } else {
-              fastApply(sync ? fn.sync : fn, null, newArgs.concat(callback))(
-                dispatch,
-                getState
-              );
+              fastApply(
+                sync ? fn.sync : fn,
+                null,
+                newArgs.concat(callback)
+              )(dispatch, getState);
             }
           });
         } else {
